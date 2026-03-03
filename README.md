@@ -6,7 +6,7 @@
 
 - CLI-first: run with `npx agentable [path]`
 - Deterministic scoring for unchanged repositories
-- Optional BYOK OpenRouter for AI-assisted criteria
+- Required BYOK OpenRouter for AI-assisted criteria
 - AI baseline cache keyed by repository fingerprint
 - Optional GitHub checks via `gh` CLI
 - Terminal output plus interactive localhost web dashboard
@@ -42,13 +42,12 @@ agentable . --verbose
 ## Usage
 
 ```bash
-agentable [path] [--verbose] [--no-ai] [--no-gh] [--web] [--host <ip>] [--port <n>] [--setup]
+agentable [path] [--verbose] [--no-gh] [--web] [--host <ip>] [--port <n>] [--setup]
 ```
 
 Options:
 
 - `--verbose`: print evidence lines for each criterion
-- `--no-ai`: disable AI-assisted criteria
 - `--no-gh`: disable GitHub checks
 - `--web`: starts interactive dashboard server on localhost
 - `--host`: host interface for web mode (default `127.0.0.1`)
@@ -84,11 +83,11 @@ Behavior:
 
 ## BYOK OpenRouter
 
-AI is optional. Without local OpenRouter config, AI-assisted criteria are marked as `UNVERIFIED`.
+AI is mandatory. Without local OpenRouter config, the run fails and asks you to configure credentials.
 
 Configuration model:
 
-- On first AI-enabled run, CLI asks for:
+- On first run, CLI asks for:
   - OpenRouter API key
   - OpenRouter model (default: `gpt-oss-120b`)
 - Credentials are saved in:
@@ -122,7 +121,6 @@ Examples:
 ```bash
 node dist/cli.js /Users/you/projects/my-api --verbose
 node dist/cli.js /Users/you/projects/my-api --no-gh
-node dist/cli.js /Users/you/projects/my-api --no-ai
 ```
 
 ## Scoring model
@@ -148,7 +146,7 @@ Agentable evaluates repositories across 9 comprehensive categories:
 8. **Task Discovery** - make targets, npm scripts, workflow automation
 9. **Product & Analytics** - feature flags, metrics collection
 
-Each criterion is scored as: **pass**, **fail**, **skip** (not applicable), or **unverified** (AI-only, no key configured).
+Each criterion is scored as: **pass**, **fail**, **skip** (not applicable), or **unverified** (insufficient metadata or API permissions).
 
 ## GitHub integration
 
@@ -178,14 +176,8 @@ agentable .
 # Analyze with verbose output showing evidence
 agentable . --verbose
 
-# Disable AI-assisted criteria
-agentable . --no-ai
-
 # Disable GitHub integration
 agentable . --no-gh
-
-# Run without AI or GitHub checks
-agentable . --no-ai --no-gh
 ```
 
 ### Web Dashboard
@@ -212,6 +204,12 @@ agentable --setup
 agentable .
 ```
 
+If you run non-interactively and no config is present, use:
+
+```bash
+agentable --setup
+```
+
 ## Architecture
 
 - **Collectors**: Gather data from local files, git, GitHub API, and AI
@@ -220,4 +218,3 @@ agentable .
 - **Reporter**: Terminal output with ANSI colors
 - **Web Server**: Interactive dashboard with history and drill-down
 - **Cache**: Fingerprint-based persistence for AI baselines
-

@@ -57,7 +57,7 @@ function printAgentableBanner(): void {
 
 function printHelp(): void {
   console.log(
-    `${BRAND_NAME}\n\nUsage:\n  agentable [path] [--verbose] [--no-ai] [--no-gh] [--web] [--host <ip>] [--port <n>] [--setup]\n\nOptions:\n  --verbose  Show additional evidence lines\n  --no-ai    Disable OpenRouter AI-assisted criteria\n  --no-gh    Disable GitHub checks via gh CLI\n  --web      Start interactive web dashboard in localhost\n  --host     Host interface for web mode (default: 127.0.0.1)\n  --port     Port for web mode (default: 4173)\n  --setup    Configure OpenRouter API key/model and persist locally\n  --help     Show this help\n\nConfig:\n  First run prompts for OpenRouter API key and model.\n  Saved at: ${getUserConfigPath()}\n`,
+    `${BRAND_NAME}\n\nUsage:\n  agentable [path] [--verbose] [--no-gh] [--web] [--host <ip>] [--port <n>] [--setup]\n\nOptions:\n  --verbose  Show additional evidence lines\n  --no-gh    Disable GitHub checks via gh CLI\n  --web      Start interactive web dashboard in localhost\n  --host     Host interface for web mode (default: 127.0.0.1)\n  --port     Port for web mode (default: 4173)\n  --setup    Configure OpenRouter API key/model and persist locally\n  --help     Show this help\n\nConfig:\n  OpenRouter AI is required. First run prompts for API key and model.\n  Saved at: ${getUserConfigPath()}\n`,
   );
 }
 
@@ -66,7 +66,6 @@ function parseArgs(argv: string[]): CliOptions | null {
 
   let repoPath = '.';
   let verbose = false;
-  let noAi = false;
   let noGh = false;
   let web = false;
   let host = '127.0.0.1';
@@ -90,8 +89,7 @@ function parseArgs(argv: string[]): CliOptions | null {
     }
 
     if (arg === '--no-ai') {
-      noAi = true;
-      continue;
+      throw new Error('Option --no-ai was removed. AI is now mandatory.');
     }
 
     if (arg === '--no-gh') {
@@ -163,7 +161,6 @@ function parseArgs(argv: string[]): CliOptions | null {
     runOptions: {
       repoPath,
       verbose,
-      noAi,
       noGh,
     },
     web,
@@ -195,7 +192,7 @@ async function promptAndSaveUserConfig(currentModel?: string, hasExistingKey = f
 }> {
   if (!input.isTTY || !output.isTTY) {
     throw new Error(
-      `Interactive setup requires a TTY. Run in a terminal or use --no-ai. Config path: ${getUserConfigPath()}`,
+      `Interactive setup requires a TTY. Run in a terminal and use --setup. Config path: ${getUserConfigPath()}`,
     );
   }
 
@@ -253,11 +250,12 @@ async function enrichRunOptions(parsed: CliOptions): Promise<RunOptions> {
     return runOptions;
   }
 
-  if (runOptions.noAi) {
-    return runOptions;
-  }
-
   if (!existingConfig) {
+    if (!input.isTTY || !output.isTTY) {
+      throw new Error(
+        `OpenRouter config not found and AI is required. Run \`agentable --setup\` in an interactive terminal. Config path: ${getUserConfigPath()}`,
+      );
+    }
     console.log(`${BRAND_NAME} first-time setup: configure your OpenRouter credentials.`);
     const configured = await promptAndSaveUserConfig(DEFAULT_OPENROUTER_MODEL, false);
     runOptions.aiApiKey = configured.openRouterApiKey;

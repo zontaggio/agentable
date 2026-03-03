@@ -1,9 +1,66 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fsSync = require('node:fs');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+
+const testHome = fsSync.mkdtempSync(path.join(os.tmpdir(), 'agentable-home-'));
+process.env.HOME = testHome;
+
 const { runAgentReadiness } = require('../dist/core/engine');
+
+const REAL_FETCH = global.fetch;
+
+function createAiResponse() {
+  return {
+    choices: [
+      {
+        message: {
+          content: JSON.stringify({
+            assessments: [
+              {
+                id: 'code_modularization',
+                status: 'pass',
+                reason: 'Module boundaries are clear.',
+                evidence: ['src/* folders'],
+              },
+              {
+                id: 'service_flow_documented',
+                status: 'unverified',
+                reason: 'Not applicable for non-service repository.',
+                evidence: [],
+              },
+            ],
+          }),
+        },
+      },
+    ],
+  };
+}
+
+function installAiMock() {
+  const previousFetch = global.fetch;
+  global.fetch = async (url, init) => {
+    const target = typeof url === 'string' ? url : String(url);
+    if (target.includes('openrouter.ai/api/v1/chat/completions')) {
+      return {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        async json() {
+          return createAiResponse();
+        },
+      };
+    }
+
+    return REAL_FETCH(url, init);
+  };
+
+  return () => {
+    global.fetch = previousFetch;
+  };
+}
 
 async function createRepoFixture() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-repo-'));
@@ -41,26 +98,47 @@ async function createRepoFixture() {
 }
 
 test('engine runs in local-only mode and produces summary/report', async () => {
+  const restoreFetch = installAiMock();
   const repoPath = await createRepoFixture();
 
-  const result = await runAgentReadiness({
-    repoPath,
-    verbose: false,
-    noAi: true,
-    noGh: true,
-  });
+  try {
+    const result = await runAgentReadiness({
+      repoPath,
+      verbose: false,
+      noGh: true,
+      aiApiKey: 'test-openrouter-key',
+      aiModel: 'gpt-oss-120b',
+    });
 
-  assert.equal(typeof result.report, 'string');
-  assert.ok(result.report.includes('Agentable Score'));
-  assert.ok(result.summary.counts.total > 10);
+    assert.equal(typeof result.report, 'string');
+    assert.ok(result.report.includes('Agentable Score'));
+    assert.ok(result.summary.counts.total > 10);
 
-  const result2 = await runAgentReadiness({
-    repoPath,
-    verbose: false,
-    noAi: true,
-    noGh: true,
-  });
+    const result2 = await runAgentReadiness({
+      repoPath,
+      verbose: false,
+      noGh: true,
+      aiApiKey: 'test-openrouter-key',
+      aiModel: 'gpt-oss-120b',
+    });
 
-  assert.equal(result.summary.score, result2.summary.score);
-  assert.equal(result.summary.coverage, result2.summary.coverage);
+    assert.equal(result.summary.score, result2.summary.score);
+    assert.equal(result.summary.coverage, result2.summary.coverage);
+  } finally {
+    restoreFetch();
+  }
+});
+
+test('engine propagates AI configuration errors', async () => {
+  const repoPath = await createRepoFixture();
+
+  await assert.rejects(
+    () =>
+      runAgentReadiness({
+        repoPath,
+        verbose: false,
+        noGh: true,
+      }),
+    /OpenRouter API key is missing/,
+  );
 });

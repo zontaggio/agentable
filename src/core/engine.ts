@@ -51,7 +51,6 @@ export async function runAgentReadiness(options: RunOptions): Promise<EngineOutp
     criteriaIds: aiCriteriaIds,
     local,
     profile,
-    enabled: !options.noAi,
     apiKey: options.aiApiKey,
     model,
   });
@@ -70,14 +69,11 @@ export async function runAgentReadiness(options: RunOptions): Promise<EngineOutp
   const generatedAt = new Date().toISOString();
 
   const warnings: string[] = [];
-  if (aiResult.warning) {
-    warnings.push(aiResult.warning);
-  }
   if (ghData.errors.length > 0) {
     warnings.push(...ghData.errors.slice(0, 2));
   }
   warnings.push(
-    `Fingerprint: ${fingerprint.slice(0, 12)} | AI model: ${aiResult.model} | AI cache: ${aiResult.fromCache ? 'hit' : 'miss'}`,
+    `Fingerprint: ${fingerprint.slice(0, 12)} | AI provider: ${aiResult.provider} | AI model: ${aiResult.model} | AI cache: ${aiResult.fromCache ? 'hit' : 'miss'}`,
   );
 
   const report = renderReport(summary, results, {
@@ -91,6 +87,7 @@ export async function runAgentReadiness(options: RunOptions): Promise<EngineOutp
     repoPath,
     model: aiResult.model,
     aiCache: aiResult.fromCache ? 'hit' : 'miss',
+    aiProvider: aiResult.provider,
     catalogVersion: CATALOG_VERSION,
     repoIdentifier: gitData.repoIdentifier,
   };

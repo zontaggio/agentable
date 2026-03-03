@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- AI is now mandatory for all runs.
+- First run automatically opens setup wizard when OpenRouter config is missing.
+- `--setup` remains the only explicit reconfiguration flow for model/API key.
+- AI collector internals now use a provider interface, with OpenRouter as the active provider.
+
+### Removed
+- Removed `--no-ai` CLI option.
+
+### Breaking
+- Running without valid OpenRouter config now fails instead of producing partial `UNVERIFIED` AI criteria.
+
 ## [0.1.0] - 2026-03-02
 
 ### Added

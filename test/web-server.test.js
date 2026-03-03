@@ -1,9 +1,66 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fsSync = require('node:fs');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+
+const testHome = fsSync.mkdtempSync(path.join(os.tmpdir(), 'agentable-web-home-'));
+process.env.HOME = testHome;
+
 const { startWebServer } = require('../dist/web/server');
+
+const REAL_FETCH = global.fetch;
+
+function createAiResponse() {
+  return {
+    choices: [
+      {
+        message: {
+          content: JSON.stringify({
+            assessments: [
+              {
+                id: 'code_modularization',
+                status: 'pass',
+                reason: 'Module boundaries are clear.',
+                evidence: ['src/* folders'],
+              },
+              {
+                id: 'service_flow_documented',
+                status: 'unverified',
+                reason: 'Not applicable for non-service repository.',
+                evidence: [],
+              },
+            ],
+          }),
+        },
+      },
+    ],
+  };
+}
+
+function installAiMock() {
+  const previousFetch = global.fetch;
+  global.fetch = async (url, init) => {
+    const target = typeof url === 'string' ? url : String(url);
+    if (target.includes('openrouter.ai/api/v1/chat/completions')) {
+      return {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        async json() {
+          return createAiResponse();
+        },
+      };
+    }
+
+    return REAL_FETCH(url, init);
+  };
+
+  return () => {
+    global.fetch = previousFetch;
+  };
+}
 
 async function createRepoFixture() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-webrepo-'));
@@ -40,22 +97,25 @@ async function createRepoFixture() {
 }
 
 test('web server exposes report and refresh endpoints', async () => {
+  const restoreFetch = installAiMock();
   const repoPath = await createRepoFixture();
   const historyDir = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-web-history-'));
 
-  const started = await startWebServer({
-    runOptions: {
-      repoPath,
-      verbose: false,
-      noAi: true,
-      noGh: true,
-    },
-    host: '127.0.0.1',
-    port: 0,
-    historyDir,
-  });
-
+  let started;
   try {
+    started = await startWebServer({
+      runOptions: {
+        repoPath,
+        verbose: false,
+        noGh: true,
+        aiApiKey: 'test-openrouter-key',
+        aiModel: 'gpt-oss-120b',
+      },
+      host: '127.0.0.1',
+      port: 0,
+      historyDir,
+    });
+
     const reportRes = await fetch(`${started.url}/api/report`);
     assert.equal(reportRes.status, 200);
     const payload = await reportRes.json();
@@ -76,6 +136,9 @@ test('web server exposes report and refresh endpoints', async () => {
     const indexHtml = await indexRes.text();
     assert.ok(indexHtml.includes('Agentable'));
   } finally {
-    await started.close();
+    if (started) {
+      await started.close();
+    }
+    restoreFetch();
   }
 });

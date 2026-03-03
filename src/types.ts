@@ -59,7 +59,6 @@ export interface ScoreSummary {
 export interface RunOptions {
   repoPath: string;
   verbose: boolean;
-  noAi: boolean;
   noGh: boolean;
   aiApiKey?: string;
   aiModel?: string;
@@ -139,6 +138,7 @@ export interface EngineMeta {
   repoPath: string;
   model: string;
   aiCache: 'hit' | 'miss';
+  aiProvider: string;
   catalogVersion: string;
   repoIdentifier: string;
 }

@@ -83,6 +83,7 @@ test('buildWebPayload creates category buckets and card metadata', () => {
         repoPath: '/tmp/repo',
         model: 'openai/gpt-4o-mini',
         aiCache: 'miss',
+        aiProvider: 'openrouter',
         catalogVersion: 'v1.0.0',
         repoIdentifier: '/tmp/repo',
       },
