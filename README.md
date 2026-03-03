@@ -9,7 +9,7 @@
 - Required BYOK OpenRouter for AI-assisted criteria
 - AI baseline cache keyed by repository fingerprint
 - Optional GitHub checks via `gh` CLI
-- Terminal output plus interactive localhost web dashboard
+- Web dashboard by default plus optional terminal report mode
 
 ## Install
 
@@ -42,14 +42,15 @@ agentable . --verbose
 ## Usage
 
 ```bash
-agentable [path] [--verbose] [--no-gh] [--web] [--host <ip>] [--port <n>] [--setup]
+agentable [path] [--verbose] [--no-gh] [--web] [--terminal] [--host <ip>] [--port <n>] [--setup]
 ```
 
 Options:
 
 - `--verbose`: print evidence lines for each criterion
 - `--no-gh`: disable GitHub checks
-- `--web`: starts interactive dashboard server on localhost
+- `--web`: force interactive dashboard mode (default)
+- `--terminal`: force terminal report output
 - `--host`: host interface for web mode (default `127.0.0.1`)
 - `--port`: port for web mode (default `4173`)
 - `--setup`: configure OpenRouter API key/model and persist locally
@@ -64,7 +65,7 @@ Exit codes:
 Run web mode:
 
 ```bash
-agentable /absolute/path/to/repo --web
+agentable /absolute/path/to/repo
 ```
 
 Custom host/port:
@@ -76,6 +77,8 @@ agentable /absolute/path/to/repo --web --host 127.0.0.1 --port 4173
 Behavior:
 
 - server stays running until `Ctrl+C`
+- browser opens automatically and CLI still prints the link
+- CLI shows a progress bar while analysis is running
 - dashboard includes clickable criterion cards + detail modal
 - refresh action reruns analysis without restarting the server
 - download actions export JSON or standalone HTML snapshot
@@ -170,7 +173,7 @@ This runs build + tests.
 ### Basic Usage
 
 ```bash
-# Analyze current directory with all features
+# Start dashboard for current directory (default)
 agentable .
 
 # Analyze with verbose output showing evidence
@@ -178,12 +181,15 @@ agentable . --verbose
 
 # Disable GitHub integration
 agentable . --no-gh
+
+# Force terminal report mode
+agentable . --terminal
 ```
 
 ### Web Dashboard
 
 ```bash
-# Start interactive dashboard
+# Start interactive dashboard (same as default)
 agentable . --web
 
 # Custom port

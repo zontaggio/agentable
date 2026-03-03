@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
+import { spawn } from 'node:child_process';
 import { stdin as input, stdout as output } from 'node:process';
 import { createInterface } from 'node:readline/promises';
+import asciiLogo from 'cli-ascii-logo';
 import { DEFAULT_OPENROUTER_MODEL } from './collectors/ai';
 import { runAgentReadiness } from './core/engine';
 import { getUserConfigPath, loadUserConfig, saveUserConfig } from './core/user-config';
@@ -17,6 +19,7 @@ interface CliOptions {
 }
 
 const BRAND_NAME = 'Agentable';
+const ANSI_ESCAPE_REGEX = /\u001b\[[0-9;]*m/g;
 
 const ANSI = {
   reset: '\u001b[0m',
@@ -35,29 +38,34 @@ function paint(text: string, color: keyof typeof ANSI, bold = false): string {
   return `${prefix}${text}${ANSI.reset}`;
 }
 
+function visibleLength(text: string): number {
+  return text.replace(ANSI_ESCAPE_REGEX, '').length;
+}
+
+function padRightAnsi(text: string, width: number): string {
+  const len = visibleLength(text);
+  if (len >= width) {
+    return text;
+  }
+  return `${text}${' '.repeat(width - len)}`;
+}
+
 function printAgentableBanner(): void {
   if (!output.isTTY) {
     return;
   }
 
-  const art = [
-    "    _                    _        _     _      ",
-    "   / \\   __ _  ___ _ __ | |_ __ _| |__ | | ___ ",
-    "  / _ \\ / _` |/ _ \\ '_ \\| __/ _` | '_ \\| |/ _ \\",
-    " / ___ \\ (_| |  __/ | | | || (_| | |_) | |  __/",
-    "/_/   \\_\\__, |\\___|_| |_|\\__\\__,_|_.__/|_|\\___|",
-    "          |___/                                 ",
-  ];
+  const art = asciiLogo.createLogo(BRAND_NAME, 'cyberpunk').split('\n').filter((line) => line.length > 0);
 
   console.log('');
-  console.log(paint(art.join('\n'), 'cyan', true));
+  console.log(art.join('\n'));
   console.log(paint('Deterministic repository readiness scanner', 'dim'));
   console.log('');
 }
 
 function printHelp(): void {
   console.log(
-    `${BRAND_NAME}\n\nUsage:\n  agentable [path] [--verbose] [--no-gh] [--web] [--host <ip>] [--port <n>] [--setup]\n\nOptions:\n  --verbose  Show additional evidence lines\n  --no-gh    Disable GitHub checks via gh CLI\n  --web      Start interactive web dashboard in localhost\n  --host     Host interface for web mode (default: 127.0.0.1)\n  --port     Port for web mode (default: 4173)\n  --setup    Configure OpenRouter API key/model and persist locally\n  --help     Show this help\n\nConfig:\n  OpenRouter AI is required. First run prompts for API key and model.\n  Saved at: ${getUserConfigPath()}\n`,
+    `${BRAND_NAME}\n\nUsage:\n  agentable [path] [--verbose] [--no-gh] [--web] [--terminal] [--host <ip>] [--port <n>] [--setup]\n\nOptions:\n  --verbose   Show additional evidence lines\n  --no-gh     Disable GitHub checks via gh CLI\n  --web       Force interactive web dashboard mode (default)\n  --terminal  Force terminal report output\n  --host      Host interface for web mode (default: 127.0.0.1)\n  --port      Port for web mode (default: 4173)\n  --setup     Configure OpenRouter API key/model and persist locally\n  --help      Show this help\n\nConfig:\n  OpenRouter AI is required. First run prompts for API key and model.\n  Saved at: ${getUserConfigPath()}\n`,
   );
 }
 
@@ -67,7 +75,7 @@ function parseArgs(argv: string[]): CliOptions | null {
   let repoPath = '.';
   let verbose = false;
   let noGh = false;
-  let web = false;
+  let web = true;
   let host = '127.0.0.1';
   let port = 4173;
   let setup = false;
@@ -99,6 +107,11 @@ function parseArgs(argv: string[]): CliOptions | null {
 
     if (arg === '--web') {
       web = true;
+      continue;
+    }
+
+    if (arg === '--terminal') {
+      web = false;
       continue;
     }
 
@@ -268,6 +281,97 @@ async function enrichRunOptions(parsed: CliOptions): Promise<RunOptions> {
   return runOptions;
 }
 
+function drawProgress(label: string, percent: number): void {
+  const width = 24;
+  const clamped = Math.max(0, Math.min(100, percent));
+  const filled = Math.round((clamped / 100) * width);
+  const empty = width - filled;
+  const spinnerFrames = ['◐', '◓', '◑', '◒'];
+  const frame = spinnerFrames[Math.floor(Date.now() / 110) % spinnerFrames.length] ?? '◐';
+  const bar = `${'█'.repeat(filled)}${'░'.repeat(empty)}`;
+  const line = `${paint(frame, 'cyan', true)} ${paint(label, 'cyan', true)}  ${String(Math.round(clamped)).padStart(3)}%  ${paint(`▕${bar}▏`, 'dim')}`;
+  output.write(`\r${line}`);
+}
+
+async function runWithProgress<T>(label: string, task: () => Promise<T>): Promise<T> {
+  if (!output.isTTY) {
+    return task();
+  }
+
+  let percent = 6;
+  let ticks = 0;
+  drawProgress(label, percent);
+
+  const timer = setInterval(() => {
+    ticks += 1;
+    const bump = ticks % 5 === 0 ? 2 : 1;
+    percent = Math.min(95, percent + bump);
+    drawProgress(label, percent);
+  }, 120);
+
+  try {
+    const result = await task();
+    clearInterval(timer);
+    drawProgress(label, 100);
+    output.write('\n');
+    return result;
+  } catch (error) {
+    clearInterval(timer);
+    output.write('\n');
+    throw error;
+  }
+}
+
+function openBrowser(url: string): void {
+  const platform = process.platform;
+
+  let command: string;
+  let args: string[];
+
+  if (platform === 'darwin') {
+    command = 'open';
+    args = [url];
+  } else if (platform === 'win32') {
+    command = 'cmd';
+    args = ['/c', 'start', '', url];
+  } else {
+    command = 'xdg-open';
+    args = [url];
+  }
+
+  const child = spawn(command, args, {
+    stdio: 'ignore',
+    detached: true,
+  });
+
+  child.on('error', () => {
+    // Ignore browser-launch errors; URL is still printed.
+  });
+  child.unref();
+}
+
+function printDashboardReady(url: string): void {
+  if (!output.isTTY) {
+    console.log(`Dashboard: ${url}`);
+    console.log('Stop: Ctrl+C');
+    return;
+  }
+
+  const rows = [
+    `${paint('DASHBOARD', 'cyan', true)} ${paint('LIVE', 'green', true)}`,
+    `${paint('URL ', 'dim')} ${paint(url, 'cyan', true)}`,
+    `${paint('OPEN', 'dim')} ${paint('Browser launched', 'green')}`,
+    `${paint('STOP', 'dim')} ${paint('Ctrl+C', 'magenta', true)}`,
+  ];
+  const contentWidth = rows.reduce((max, row) => Math.max(max, visibleLength(row)), 0);
+
+  console.log(`${paint('┌', 'cyan')}${paint('─'.repeat(contentWidth + 2), 'cyan')}${paint('┐', 'cyan')}`);
+  for (const row of rows) {
+    console.log(`${paint('│', 'cyan')} ${padRightAnsi(row, contentWidth)} ${paint('│', 'cyan')}`);
+  }
+  console.log(`${paint('└', 'cyan')}${paint('─'.repeat(contentWidth + 2), 'cyan')}${paint('┘', 'cyan')}`);
+}
+
 async function main(): Promise<void> {
   try {
     const parsed = parseArgs(process.argv.slice(2));
@@ -281,14 +385,18 @@ async function main(): Promise<void> {
     const runOptions = await enrichRunOptions(parsed);
 
     if (parsed.web) {
-      const started = await startWebServer({
-        runOptions,
-        host: parsed.host,
-        port: parsed.port,
-      });
+      const started = await runWithProgress('Running analysis', async () =>
+        startWebServer({
+          runOptions,
+          host: parsed.host,
+          port: parsed.port,
+        }),
+      );
 
-      console.log(`${BRAND_NAME} dashboard available at ${started.url}`);
-      console.log('Press Ctrl+C to stop the server.');
+      if (output.isTTY) {
+        openBrowser(started.url);
+      }
+      printDashboardReady(started.url);
 
       const shutdown = async (): Promise<void> => {
         await started.close();
@@ -308,7 +416,7 @@ async function main(): Promise<void> {
       return;
     }
 
-    const outputResult = await runAgentReadiness(runOptions);
+    const outputResult = await runWithProgress('Running analysis', async () => runAgentReadiness(runOptions));
     console.log(outputResult.report);
     process.exitCode = 0;
   } catch (error) {

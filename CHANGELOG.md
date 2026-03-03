@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First run automatically opens setup wizard when OpenRouter config is missing.
 - `--setup` remains the only explicit reconfiguration flow for model/API key.
 - AI collector internals now use a provider interface, with OpenRouter as the active provider.
+- Web dashboard mode is now the default CLI behavior.
+- CLI now shows a progress bar while analysis is running.
+- CLI banner now includes an AI ASCII star mark.
+- CLI now opens the dashboard URL in the browser automatically and still prints the link.
 
 ### Removed
 - Removed `--no-ai` CLI option.
