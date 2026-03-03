@@ -1,0 +1,44 @@
+{
+  "name": "agentable",
+  "version": "0.1.0",
+  "description": "Deterministic CLI to assess repository agent readiness with Agentable",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "agentable": "dist/cli.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "test": "npm run build && node --test test/**/*.test.js"
+  },
+  "keywords": [
+    "agent",
+    "readiness",
+    "cli",
+    "audit",
+    "code-quality",
+    "repository",
+    "assessment",
+    "ai",
+    "github"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentable/cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/agentable/cli/issues"
+  },
+  "homepage": "https://github.com/agentable/cli#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  }
+}

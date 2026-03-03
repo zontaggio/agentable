@@ -1,0 +1,27 @@
+# Source files
+src/
+test/
+tsconfig.json
+
+# Config files
+.editorconfig
+.nvmrc
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+
+# Build artifacts
+*.log
+*.tsbuildinfo
+
+# Development
+.DS_Store
+node_modules/
+
+# Documentation (keep README)
+CONTRIBUTING.md
