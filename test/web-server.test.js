@@ -121,6 +121,8 @@ test('web server exposes report and refresh endpoints', async () => {
     const payload = await reportRes.json();
     assert.equal(typeof payload.header.repoPath, 'string');
     assert.ok(Array.isArray(payload.categories));
+    assert.ok(payload.actionPlan);
+    assert.ok(Array.isArray(payload.actionPlan.all));
 
     const refreshRes = await fetch(`${started.url}/api/refresh`, { method: 'POST' });
     assert.equal(refreshRes.status, 200);

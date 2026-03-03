@@ -20,6 +20,16 @@ function computeScore(pass: number, fail: number): number {
   return round2((pass / denominator) * 100);
 }
 
+function confidenceWeight(value: CriterionResult['confidence']): number {
+  if (value === 'high') {
+    return 1;
+  }
+  if (value === 'medium') {
+    return 0.65;
+  }
+  return 0.35;
+}
+
 /**
  * Aggregate criterion results into summary with scores by category
  * @param results - Array of evaluated criterion results
@@ -48,6 +58,13 @@ export function summarizeResults(results: CriterionResult[]): ScoreSummary {
 
   const coverage = counts.total > 0 ? round2((counts.evaluated / counts.total) * 100) : 0;
   const score = computeScore(counts.pass, counts.fail);
+  const evaluatedResults = results.filter((result) => result.status === 'pass' || result.status === 'fail');
+  const totalConfidenceWeight = evaluatedResults.reduce((acc, result) => acc + confidenceWeight(result.confidence), 0);
+  const highConfidenceCount = evaluatedResults.filter((result) => result.confidence === 'high').length;
+  const confidenceScore =
+    evaluatedResults.length > 0 ? round2((totalConfidenceWeight / evaluatedResults.length) * 100) : 0;
+  const highConfidenceCoverage =
+    evaluatedResults.length > 0 ? round2((highConfidenceCount / evaluatedResults.length) * 100) : 0;
 
   const categories = new Map<CategoryId, CriterionResult[]>();
   for (const result of results) {
@@ -65,6 +82,9 @@ export function summarizeResults(results: CriterionResult[]): ScoreSummary {
     let skip = 0;
     let unverified = 0;
     let applicable = 0;
+    let evaluatedCount = 0;
+    let confidenceWeightSum = 0;
+    let highConfidence = 0;
 
     for (const item of items) {
       if (item.status === 'pass') {
@@ -82,6 +102,13 @@ export function summarizeResults(results: CriterionResult[]): ScoreSummary {
       if (item.applicable) {
         applicable += 1;
       }
+      if (item.status === 'pass' || item.status === 'fail') {
+        evaluatedCount += 1;
+        confidenceWeightSum += confidenceWeight(item.confidence);
+        if (item.confidence === 'high') {
+          highConfidence += 1;
+        }
+      }
     }
 
     categoryScores.push({
@@ -92,6 +119,8 @@ export function summarizeResults(results: CriterionResult[]): ScoreSummary {
       unverified,
       applicable,
       score: computeScore(pass, fail),
+      confidenceScore: evaluatedCount > 0 ? round2((confidenceWeightSum / evaluatedCount) * 100) : 0,
+      highConfidenceCoverage: evaluatedCount > 0 ? round2((highConfidence / evaluatedCount) * 100) : 0,
     });
   }
 
@@ -100,6 +129,8 @@ export function summarizeResults(results: CriterionResult[]): ScoreSummary {
   return {
     score,
     coverage,
+    confidenceScore,
+    highConfidenceCoverage,
     counts,
     categoryScores,
   };

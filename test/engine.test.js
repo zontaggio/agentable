@@ -113,6 +113,14 @@ test('engine runs in local-only mode and produces summary/report', async () => {
     assert.equal(typeof result.report, 'string');
     assert.ok(result.report.includes('Agentable Score'));
     assert.ok(result.summary.counts.total > 10);
+    assert.ok(result.actionPlan);
+    assert.ok(Array.isArray(result.actionPlan.all));
+    const gitignoreCriterion = result.results.find((item) => item.id === 'gitignore_comprehensive');
+    assert.ok(gitignoreCriterion);
+    assert.equal(gitignoreCriterion.status, 'pass');
+    const secretsManagementCriterion = result.results.find((item) => item.id === 'secrets_management');
+    assert.ok(secretsManagementCriterion);
+    assert.equal(secretsManagementCriterion.status, 'skip');
 
     const result2 = await runAgentReadiness({
       repoPath,
@@ -124,6 +132,11 @@ test('engine runs in local-only mode and produces summary/report', async () => {
 
     assert.equal(result.summary.score, result2.summary.score);
     assert.equal(result.summary.coverage, result2.summary.coverage);
+    assert.equal(result.actionPlan.all.length, result2.actionPlan.all.length);
+    assert.deepEqual(
+      result.actionPlan.all.map((item) => item.criterionId),
+      result2.actionPlan.all.map((item) => item.criterionId),
+    );
   } finally {
     restoreFetch();
   }

@@ -146,6 +146,7 @@ body::before {
   margin: 14px 0 8px;
   color: var(--muted);
   font-size: 14px;
+  gap: 10px;
 }
 
 .summary-strong {
@@ -202,6 +203,100 @@ body::before {
   gap: 16px;
   margin-bottom: 18px;
   align-items: start;
+}
+
+.action-plan {
+  margin-bottom: 18px;
+  padding: 18px;
+}
+
+.action-title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.action-subtitle {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.action-bucket {
+  border: 1px solid #34505a;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+}
+
+.action-bucket h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #cde2e9;
+}
+
+.action-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 3px;
+}
+
+.action-list.expanded {
+  max-height: 340px;
+}
+
+.action-item {
+  border: 1px solid #3b5964;
+  background: rgba(13, 25, 30, 0.6);
+  padding: 8px 9px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+}
+
+.action-item:hover {
+  border-color: #69b2c5;
+}
+
+.action-toggle {
+  margin-top: 10px;
+  width: 100%;
+  border: 1px solid #436572;
+  background: rgba(17, 31, 37, 0.86);
+  color: #cde2e8;
+  padding: 7px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.action-toggle:hover {
+  border-color: #6bbad0;
+}
+
+.action-item-title {
+  font-size: 13px;
+  color: #f4fbfc;
+}
+
+.action-item-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #a8c0c7;
 }
 
 .analytics-card {
@@ -282,7 +377,7 @@ details[open] > summary .accordion-indicator {
 
 .category-head {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto auto auto;
   align-items: center;
   gap: 14px;
 }
@@ -486,6 +581,18 @@ details[open] > .category-content .criterion-card:nth-child(4n) {
   z-index: 3;
 }
 
+.card-rank {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  border: 1px solid #4a6470;
+  color: #cde2e8;
+  background: rgba(8, 18, 22, 0.85);
+}
+
 .criterion-card.status-pass .card-score {
   background: #193229;
   border-color: #5aa98b;
@@ -571,7 +678,7 @@ details[open] > .category-content .criterion-card:nth-child(4n) {
 
 .modal-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -622,8 +729,37 @@ details[open] > .category-content .criterion-card:nth-child(4n) {
   padding-left: 20px;
 }
 
+.modal-sections {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.modal-section {
+  border: 1px solid #3a535d;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+}
+
+.modal-section-title {
+  color: #c6e0e8;
+  font-size: 13px;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.modal-section ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
 @media (max-width: 1050px) {
   .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-grid {
     grid-template-columns: 1fr;
   }
 
@@ -665,7 +801,7 @@ details[open] > .category-content .criterion-card:nth-child(4n) {
   }
 
   .category-head {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr auto auto;
   }
 
   .category-head .accordion-indicator {
@@ -679,6 +815,7 @@ export const APP_JS = `
   var state = {
     payload: null,
     cardIndex: {},
+    actionPlanExpanded: {},
     loading: false,
     staticExport: Boolean(window.__AGENTABLE_STATIC_EXPORT),
   };
@@ -784,13 +921,18 @@ export const APP_JS = `
 
     for (var i3 = 0; i3 < sides; i3 += 1) {
       var angle = (360 / sides) * i3;
-      var valueRadius = radius * (categories[i3].score / 100);
+      var category = categories[i3] || {};
+      var rawScore = typeof category.score === 'number' ? category.score : 0;
+      var evaluatedCount = Number(category.pass || 0) + Number(category.fail || 0);
+      var ratio = Math.max(0, Math.min(1, rawScore / 100));
+      var minRatio = evaluatedCount > 0 ? 0.04 : 0.12;
+      var valueRadius = radius * Math.max(ratio, minRatio);
       var pp = polarToCartesian(cx, cy, valueRadius, angle);
       points.push(pp.x.toFixed(2) + ',' + pp.y.toFixed(2));
 
       var hp = polarToCartesian(cx, cy, radius * 1.03, angle);
-      var categoryLabel = categories[i3] && categories[i3].label ? categories[i3].label : 'Category';
-      var categoryScore = categories[i3] && typeof categories[i3].score === 'number' ? Math.round(categories[i3].score) : 0;
+      var categoryLabel = category && category.label ? category.label : 'Category';
+      var categoryScore = typeof rawScore === 'number' ? Math.round(rawScore) : 0;
       hoverTargets +=
         '<circle class="radar-hover-target" data-radar-category="' + escapeHtml(categoryLabel) + '" data-radar-score="' + categoryScore + '" cx="' +
         hp.x.toFixed(2) + '" cy="' + hp.y.toFixed(2) + '" r="24" fill="rgba(255,255,255,0.002)" stroke="transparent" pointer-events="all">' +
@@ -908,10 +1050,67 @@ export const APP_JS = `
           '<div class="card-name">' + escapeHtml(card.name) + '</div>' +
           (card.status !== 'pass' ? '<div class="card-hint">Improve tips available</div>' : '') +
           '<div class="card-score">' + escapeHtml(card.scoreLabel) + '</div>' +
+          (card.priorityRank ? '<div class="card-rank">#' + escapeHtml(String(card.priorityRank)) + '</div>' : '') +
           '</button>'
         );
       })
       .join('');
+  }
+
+  function renderActionBucket(title, bucketKey, items) {
+    var list = Array.isArray(items) ? items : [];
+    if (!items || items.length === 0) {
+      return (
+        '<section class="action-bucket">' +
+        '<h3>' + escapeHtml(title) + '</h3>' +
+        '<div class="action-item-meta">No items in this bucket.</div>' +
+        '</section>'
+      );
+    }
+
+    var expanded = Boolean(state.actionPlanExpanded[bucketKey]);
+    var visible = expanded ? list : list.slice(0, 4);
+    var listClass = expanded ? 'action-list expanded' : 'action-list';
+
+    return (
+      '<section class="action-bucket">' +
+      '<h3>' + escapeHtml(title) + '</h3>' +
+      '<ul class="' + listClass + '">' +
+      visible
+        .map(function (item) {
+          return (
+            '<li><button class="action-item" data-card-id="' + escapeHtml(item.criterionId) + '">' +
+            '<div class="action-item-title">#' + item.rank + ' ' + escapeHtml(item.criterionName) + '</div>' +
+            '<div class="action-item-meta">' + escapeHtml(item.status.toUpperCase()) + ' · ' +
+            escapeHtml(String(Math.round(item.priorityScore))) + ' priority</div>' +
+            '</button></li>'
+          );
+        })
+        .join('') +
+      '</ul>' +
+      (list.length > 4
+        ? '<button class="action-toggle" data-action-toggle="' + escapeHtml(bucketKey) + '">' +
+          (expanded ? 'Show less' : 'Show all (' + list.length + ')') +
+          '</button>'
+        : '') +
+      '</section>'
+    );
+  }
+
+  function renderActionPlan(payload) {
+    var actionPlan = payload.actionPlan || { critical: [], highLeverage: [], quickWins: [], all: [] };
+    var aiTag = actionPlan.generatedWithAi ? 'AI refined' : 'Deterministic';
+    return (
+      '<section class="panel action-plan">' +
+      '<h2 class="action-title">Action Plan</h2>' +
+      '<div class="action-subtitle">Prioritized next actions for this repository · ' + escapeHtml(aiTag) + '</div>' +
+      '<div class="action-grid">' +
+      renderActionBucket('Critical', 'critical', actionPlan.critical || []) +
+      renderActionBucket('High Leverage', 'highLeverage', actionPlan.highLeverage || []) +
+      renderActionBucket('Quick Wins', 'quickWins', actionPlan.quickWins || []) +
+      '</div>' +
+      '</section>'
+    );
   }
 
   function renderCategorySections(payload) {
@@ -997,9 +1196,12 @@ export const APP_JS = `
       '<div class="modal-card"><div class="modal-label">Score</div><div id="modal-score" class="modal-value"></div></div>' +
       '<div class="modal-card"><div class="modal-label">Status</div><div id="modal-status" class="modal-value"></div></div>' +
       '</div>' +
-      '<div class="modal-reason" id="modal-reason"></div>' +
-      '<div class="modal-improve" id="modal-improve"></div>' +
-      '<div class="modal-evidence" id="modal-evidence"></div>' +
+      '<div class="modal-sections">' +
+      '<section class="modal-section"><div class="modal-section-title">Why this matters</div><div id="modal-why"></div></section>' +
+      '<section class="modal-section"><div class="modal-section-title">Current evidence</div><div id="modal-evidence"></div></section>' +
+      '<section class="modal-section"><div class="modal-section-title">Implementation next steps</div><div id="modal-next-steps"></div></section>' +
+      '<section class="modal-section"><div class="modal-section-title">Success signal</div><div id="modal-success"></div></section>' +
+      '</div>' +
       '</div>' +
       '</div>'
     );
@@ -1014,38 +1216,53 @@ export const APP_JS = `
     var desc = document.getElementById('modal-description');
     var score = document.getElementById('modal-score');
     var status = document.getElementById('modal-status');
-    var reason = document.getElementById('modal-reason');
-    var improve = document.getElementById('modal-improve');
+    var why = document.getElementById('modal-why');
     var evidence = document.getElementById('modal-evidence');
+    var nextSteps = document.getElementById('modal-next-steps');
+    var success = document.getElementById('modal-success');
 
-    if (!badge || !title || !desc || !score || !status || !reason || !improve || !evidence) return;
+    if (!badge || !title || !desc || !score || !status || !why || !evidence || !nextSteps || !success) return;
 
     badge.innerHTML = '<span class="badge-dot badge-' + escapeHtml(card.badge) + '"></span><span>' + escapeHtml(card.badge) + '</span>';
     title.textContent = card.name;
     desc.textContent = card.description;
     score.textContent = card.scoreLabel;
     status.textContent = String(card.status || '').toUpperCase();
-    reason.textContent = card.reason;
 
-    var tips = card.improvementTips || [];
-    if (!Array.isArray(tips) || tips.length === 0) {
-      improve.innerHTML = '<div class="modal-label">How to improve</div><div>No specific tips available.</div>';
-    } else {
-      improve.innerHTML =
-        '<div class="modal-label">How to improve</div><ul>' +
-        tips.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') +
-        '</ul>';
-    }
+    var guidance = card.guidance || null;
+    why.textContent = guidance && guidance.whyItMatters ? guidance.whyItMatters : card.reason;
 
     var evid = card.evidence || [];
-    if (!Array.isArray(evid) || evid.length === 0) {
-      evidence.innerHTML = '<div class="modal-label">Evidence</div><div>No additional evidence provided.</div>';
+    if ((!Array.isArray(evid) || evid.length === 0) && (!Array.isArray(card.evidenceDetails) || card.evidenceDetails.length === 0)) {
+      evidence.innerHTML = '<div>No additional evidence provided.</div>';
     } else {
-      evidence.innerHTML =
-        '<div class="modal-label">Evidence</div><ul>' +
-        evid.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') +
+      var details = Array.isArray(card.evidenceDetails)
+        ? card.evidenceDetails.map(function (item) {
+            return '<li>' + escapeHtml(String(item.kind || 'signal')) + ' · ' + escapeHtml(String(item.strength || 'low')) + ' · ' + escapeHtml(String(item.detail || '')) + '</li>';
+          })
+        : [];
+      var plain = Array.isArray(evid)
+        ? evid.map(function (item) {
+            return '<li>' + escapeHtml(item) + '</li>';
+          })
+        : [];
+      evidence.innerHTML = '<ul>' + details.concat(plain).join('') + '</ul>';
+    }
+
+    var steps = guidance && Array.isArray(guidance.nextSteps) && guidance.nextSteps.length > 0 ? guidance.nextSteps : card.improvementTips || [];
+    if (!Array.isArray(steps) || steps.length === 0) {
+      nextSteps.innerHTML = '<div>No guided steps available.</div>';
+    } else {
+      nextSteps.innerHTML =
+        '<ul>' +
+        steps.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') +
         '</ul>';
     }
+
+    success.textContent =
+      guidance && guidance.expectedOutcome
+        ? guidance.expectedOutcome
+        : 'This criterion becomes explicit, automatable, and stable over time.';
 
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
@@ -1065,7 +1282,6 @@ export const APP_JS = `
     state.cardIndex = collectCards(payload);
 
     root.innerHTML =
-      '<h1 class="page-title">Agentable</h1>' +
       '<section class="panel hero">' +
       '<div class="hero-top">' +
       '<div class="repo-chip">' +
@@ -1078,7 +1294,7 @@ export const APP_JS = `
       '<div class="hero-actions">' +
       '<span class="last-updated">Last update: ' + escapeHtml(fmtRelative(payload.header.lastUpdated)) + '</span>' +
       '<button class="icon-btn" title="Download HTML report" data-download-html="1">\u2B07</button>' +
-      '<button class="icon-btn" title="Download JSON report" data-download-json="1">{}</button>' +
+      '<button class="icon-btn" title="Download JSON report" data-download-json="1">{  }</button>' +
       (state.staticExport ? '' : '<button class="icon-btn" title="Refresh analysis" data-refresh="1">\u21BB</button>') +
       '</div>' +
       '</div>' +
@@ -1100,6 +1316,8 @@ export const APP_JS = `
       renderTimeline(payload.history) +
       '</div></div>' +
       '</section>' +
+
+      renderActionPlan(payload) +
 
       renderCategorySections(payload) +
       renderModal();
@@ -1153,6 +1371,16 @@ export const APP_JS = `
       var cardId = cardEl.getAttribute('data-card-id');
       if (cardId && state.cardIndex[cardId]) {
         setModal(state.cardIndex[cardId]);
+      }
+      return;
+    }
+
+    var actionToggle = target.closest('[data-action-toggle]');
+    if (actionToggle) {
+      var bucketKey = actionToggle.getAttribute('data-action-toggle');
+      if (bucketKey && state.payload) {
+        state.actionPlanExpanded[bucketKey] = !state.actionPlanExpanded[bucketKey];
+        renderApp(state.payload);
       }
       return;
     }

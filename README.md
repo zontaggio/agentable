@@ -1,15 +1,16 @@
 # Agentable
 
-`agentable` is a deterministic CLI that scores repository agent readiness using a fixed criteria catalog.
+`agentable` evaluates repository agent readiness with deterministic criteria plus mandatory AI-assisted checks, and launches a guided web dashboard.
 
-## Features
+## Highlights
 
-- CLI-first: run with `npx agentable [path]`
-- Deterministic scoring for unchanged repositories
-- Required BYOK OpenRouter for AI-assisted criteria
-- AI baseline cache keyed by repository fingerprint
-- Optional GitHub checks via `gh` CLI
-- Web dashboard by default plus optional terminal report mode
+- Web-only UX (CLI acts as launcher/configurator for dashboard)
+- Mandatory OpenRouter AI for AI-assisted criteria
+- Conservative evaluation policy to reduce false positives
+- Score + coverage + confidence metrics
+- Prioritized action plan (`critical`, `high leverage`, `quick wins`)
+- Hybrid recommendations (deterministic ranking + AI wording refinement)
+- Local history snapshots and export (`.json` / standalone `.html`)
 
 ## Install
 
@@ -18,147 +19,98 @@ npm install
 npm run build
 ```
 
-Or use directly from npm (after publishing):
+Run from source:
 
 ```bash
-npx agentable .
-```
-
-## Quick Start
-
-After installation, run the tool against your repository:
-
-```bash
-# Analyze current directory
-agentable .
-
-# Analyze a specific path
-agentable /path/to/repo
-
-# Run with verbose output
-agentable . --verbose
+node dist/cli.js .
 ```
 
 ## Usage
 
 ```bash
-agentable [path] [--verbose] [--no-gh] [--web] [--terminal] [--host <ip>] [--port <n>] [--setup]
+agentable [path] [--verbose] [--no-gh] [--host <ip>] [--port <n>] [--setup]
 ```
 
 Options:
 
-- `--verbose`: print evidence lines for each criterion
-- `--no-gh`: disable GitHub checks
-- `--web`: force interactive dashboard mode (default)
-- `--terminal`: force terminal report output
-- `--host`: host interface for web mode (default `127.0.0.1`)
-- `--port`: port for web mode (default `4173`)
-- `--setup`: configure OpenRouter API key/model and persist locally
+- `--verbose`: include additional evidence in internal report payloads
+- `--no-gh`: disable GitHub checks via `gh` CLI
+- `--host`: dashboard bind host (default: `127.0.0.1`)
+- `--port`: dashboard port (default: `4173`)
+- `--setup`: reconfigure OpenRouter API key/model
 
-Exit codes:
+Removed options:
 
-- `0`: successful execution (including partial coverage)
-- `1`: operational error (invalid path, unexpected internal error)
+- `--no-ai` was removed (AI is mandatory)
+- `--terminal` was removed (dashboard is the only runtime surface)
 
-## Localhost dashboard mode
+## First run and config
 
-Run web mode:
+AI is required.
 
-```bash
-agentable /absolute/path/to/repo
-```
+On first interactive run (no local config), Agentable opens setup wizard automatically and stores config at:
 
-Custom host/port:
+- `~/.agentable/config.json`
+
+If no TTY is available and config is missing, Agentable fails with instructions to run:
 
 ```bash
-agentable /absolute/path/to/repo --web --host 127.0.0.1 --port 4173
+agentable --setup
 ```
 
-Behavior:
+## Runtime behavior
 
-- server stays running until `Ctrl+C`
-- browser opens automatically and CLI still prints the link
-- CLI shows a progress bar while analysis is running
-- dashboard includes clickable criterion cards + detail modal
-- refresh action reruns analysis without restarting the server
-- download actions export JSON or standalone HTML snapshot
-- timeline chart uses local history snapshots stored per repository
+`agentable .`:
 
-## BYOK OpenRouter
+1. Runs analysis with progress indicator.
+2. Starts local dashboard server.
+3. Opens browser automatically.
+4. Prints dashboard URL and keeps server alive until `Ctrl+C`.
 
-AI is mandatory. Without local OpenRouter config, the run fails and asks you to configure credentials.
-
-Configuration model:
-
-- On first run, CLI asks for:
-  - OpenRouter API key
-  - OpenRouter model (default: `gpt-oss-120b`)
-- Credentials are saved in:
-  - `~/.agentable/config.json`
-- To reconfigure later:
-  - `agentable --setup`
-
-The first successful AI run for a repository fingerprint creates a baseline cache in:
-
-- `~/.cache/agentable/`
-
-Re-running with the same fingerprint reuses baseline and keeps score stable.
-
-## Testing in your own codebase
-
-From this project folder:
-
-```bash
-npm install
-npm run build
-```
-
-Run against any local repository path:
-
-```bash
-node dist/cli.js /absolute/path/to/your-repo
-```
-
-Examples:
-
-```bash
-node dist/cli.js /Users/you/projects/my-api --verbose
-node dist/cli.js /Users/you/projects/my-api --no-gh
-```
-
-## Scoring model
+## Scoring and confidence
 
 - `score = pass / (pass + fail) * 100`
-- `skip` is excluded from denominator
-- `unverified` is excluded from score denominator
-- `coverage = (pass + fail) / total_criteria * 100`
+- `coverage = (pass + fail) / total * 100`
+- `confidenceScore`: weighted confidence of evaluated criteria
+- `highConfidenceCoverage`: percentage of evaluated criteria with high confidence
 
-Always read score together with coverage.
+`skip` and `unverified` are excluded from score denominator.
 
-## Criteria Categories
+## Conservative accuracy policy
 
-Agentable evaluates repositories across 9 comprehensive categories:
+Agentable uses evidence tiers:
 
-1. **Style & Validation** - code quality, linting, formatting, type checking
-2. **Build System** - compilation, bundling, CI/CD pipeline
-3. **Testing** - unit tests, integration tests, coverage
-4. **Documentation** - README, API docs, changelog
-5. **Dev Environment** - setup scripts, dependency management
-6. **Debugging & Observability** - logging, monitoring, error tracking
-7. **Security** - dependency scanning, secrets management
-8. **Task Discovery** - make targets, npm scripts, workflow automation
-9. **Product & Analytics** - feature flags, metrics collection
+- `strong`: explicit dependency/file/API state
+- `medium`: workflow/script corroboration
+- `weak`: generic text mention
 
-Each criterion is scored as: **pass**, **fail**, **skip** (not applicable), or **unverified** (insufficient metadata or API permissions).
+Key high-risk criteria are hardened to avoid keyword-only passes. Permission-limited GitHub metadata is normalized to `unverified` instead of `fail`.
+
+## Guided recommendations
+
+Dashboard includes an `Action Plan` sorted by deterministic priority:
+
+- `critical`
+- `high leverage`
+- `quick wins`
+
+Each recommendation includes:
+
+- why it matters
+- what good looks like
+- high-level next steps
+- expected outcome
+
+If AI refinement fails, deterministic guidance is still shown.
 
 ## GitHub integration
 
-GitHub-specific checks use `gh` CLI when available and authenticated.
+GitHub checks use `gh` CLI.
 
-If `gh` is missing or unauthenticated:
+If `gh` is missing, unauthenticated, or permission-limited:
 
 - run still succeeds
-- GitHub-dependent criteria become `UNVERIFIED`
+- affected criteria become `unverified`
 
 ## Development
 
@@ -166,61 +118,10 @@ If `gh` is missing or unauthenticated:
 npm test
 ```
 
-This runs build + tests.
-
-## Examples
-
-### Basic Usage
-
-```bash
-# Start dashboard for current directory (default)
-agentable .
-
-# Analyze with verbose output showing evidence
-agentable . --verbose
-
-# Disable GitHub integration
-agentable . --no-gh
-
-# Force terminal report mode
-agentable . --terminal
-```
-
-### Web Dashboard
-
-```bash
-# Start interactive dashboard (same as default)
-agentable . --web
-
-# Custom port
-agentable . --web --port 8080
-
-# Bind to specific interface
-agentable . --web --host 0.0.0.0 --port 3000
-```
-
-### Configuration
-
-```bash
-# Configure or reconfigure OpenRouter settings
-agentable --setup
-
-# Run setup then analyze
-agentable --setup
-agentable .
-```
-
-If you run non-interactively and no config is present, use:
-
-```bash
-agentable --setup
-```
-
 ## Architecture
 
-- **Collectors**: Gather data from local files, git, GitHub API, and AI
-- **Evaluators**: Apply criteria logic against collected context
-- **Scoring**: Deterministic aggregation of pass/fail/skip/unverified
-- **Reporter**: Terminal output with ANSI colors
-- **Web Server**: Interactive dashboard with history and drill-down
-- **Cache**: Fingerprint-based persistence for AI baselines
+- `src/collectors`: local/git/gh/ai data collection
+- `src/core/evaluate.ts`: conservative criterion decisions + evidence
+- `src/core/scoring.ts`: score + confidence aggregation
+- `src/web/improvement-tips.ts`: deterministic ranking and fallback guidance
+- `src/web/*`: dashboard server, transforms, templates

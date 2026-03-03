@@ -1,22 +1,28 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { CATALOG_VERSION, CRITERIA } from '../catalog/v1';
-import { collectAiAssessments, DEFAULT_OPENROUTER_MODEL } from '../collectors/ai';
+import {
+  collectAiAssessments,
+  DEFAULT_OPENROUTER_MODEL,
+  enrichActionPlanRecommendations,
+} from '../collectors/ai';
 import { collectGhData } from '../collectors/gh';
 import { collectGitData } from '../collectors/git';
 import { collectLocalProjectContext } from '../collectors/local';
-import { CriterionResult, EngineMeta, EvaluationContext, RunOptions } from '../types';
+import { ActionPlan, CriterionResult, EngineMeta, EvaluationContext, RunOptions } from '../types';
 import { computeRepoFingerprint } from '../utils/hash';
 import { evaluateAllCriteria } from './evaluate';
 import { buildProjectProfile } from './profile';
 import { renderReport } from './reporter';
 import { summarizeResults } from './scoring';
+import { applyActionPlanEnrichment, buildDeterministicActionPlan } from '../web/improvement-tips';
 
 export interface EngineOutput {
   report: string;
   summary: ReturnType<typeof summarizeResults>;
   warnings: string[];
   results: CriterionResult[];
+  actionPlan: ActionPlan;
   meta: EngineMeta;
 }
 
@@ -67,8 +73,26 @@ export async function runAgentReadiness(options: RunOptions): Promise<EngineOutp
   const results = await evaluateAllCriteria(evaluationContext, gitData);
   const summary = summarizeResults(results);
   const generatedAt = new Date().toISOString();
-
   const warnings: string[] = [];
+
+  const deterministicPlan = buildDeterministicActionPlan(results);
+  let actionPlan = deterministicPlan.actionPlan;
+  const recommendationEnrichment = await enrichActionPlanRecommendations({
+    repoIdentifier: gitData.repoIdentifier,
+    fingerprint,
+    local,
+    profile,
+    recommendations: deterministicPlan.seeds,
+    apiKey: options.aiApiKey,
+    model,
+  });
+
+  if (recommendationEnrichment.error) {
+    warnings.push(`Action plan AI enrichment unavailable; using deterministic guidance. ${recommendationEnrichment.error}`);
+  } else if (recommendationEnrichment.usedAi) {
+    actionPlan = applyActionPlanEnrichment(actionPlan, recommendationEnrichment.guidanceByCriterion);
+  }
+
   if (ghData.errors.length > 0) {
     warnings.push(...ghData.errors.slice(0, 2));
   }
@@ -97,6 +121,7 @@ export async function runAgentReadiness(options: RunOptions): Promise<EngineOutp
     summary,
     warnings,
     results,
+    actionPlan,
     meta,
   };
 }

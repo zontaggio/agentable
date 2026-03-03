@@ -5,14 +5,12 @@ import { stdin as input, stdout as output } from 'node:process';
 import { createInterface } from 'node:readline/promises';
 import asciiLogo from 'cli-ascii-logo';
 import { DEFAULT_OPENROUTER_MODEL } from './collectors/ai';
-import { runAgentReadiness } from './core/engine';
 import { getUserConfigPath, loadUserConfig, saveUserConfig } from './core/user-config';
 import { RunOptions } from './types';
 import { startWebServer } from './web/server';
 
 interface CliOptions {
   runOptions: RunOptions;
-  web: boolean;
   host: string;
   port: number;
   setup: boolean;
@@ -65,7 +63,7 @@ function printAgentableBanner(): void {
 
 function printHelp(): void {
   console.log(
-    `${BRAND_NAME}\n\nUsage:\n  agentable [path] [--verbose] [--no-gh] [--web] [--terminal] [--host <ip>] [--port <n>] [--setup]\n\nOptions:\n  --verbose   Show additional evidence lines\n  --no-gh     Disable GitHub checks via gh CLI\n  --web       Force interactive web dashboard mode (default)\n  --terminal  Force terminal report output\n  --host      Host interface for web mode (default: 127.0.0.1)\n  --port      Port for web mode (default: 4173)\n  --setup     Configure OpenRouter API key/model and persist locally\n  --help      Show this help\n\nConfig:\n  OpenRouter AI is required. First run prompts for API key and model.\n  Saved at: ${getUserConfigPath()}\n`,
+    `${BRAND_NAME}\n\nUsage:\n  agentable [path] [--verbose] [--no-gh] [--host <ip>] [--port <n>] [--setup]\n\nOptions:\n  --verbose   Show additional evidence lines\n  --no-gh     Disable GitHub checks via gh CLI\n  --host      Host interface for dashboard server (default: 127.0.0.1)\n  --port      Port for dashboard server (default: 4173)\n  --setup     Configure OpenRouter API key/model and persist locally\n  --help      Show this help\n\nConfig:\n  OpenRouter AI is required. First run prompts for API key and model.\n  Saved at: ${getUserConfigPath()}\n`,
   );
 }
 
@@ -75,7 +73,6 @@ function parseArgs(argv: string[]): CliOptions | null {
   let repoPath = '.';
   let verbose = false;
   let noGh = false;
-  let web = true;
   let host = '127.0.0.1';
   let port = 4173;
   let setup = false;
@@ -105,14 +102,16 @@ function parseArgs(argv: string[]): CliOptions | null {
       continue;
     }
 
+    if (arg === '--terminal') {
+      throw new Error('Option --terminal was removed. Agentable now runs in web dashboard mode only.');
+    }
+
     if (arg === '--web') {
-      web = true;
       continue;
     }
 
-    if (arg === '--terminal') {
-      web = false;
-      continue;
+    if (arg === '--report') {
+      throw new Error('Option --report is not supported. Agentable now runs in web dashboard mode only.');
     }
 
     if (arg === '--setup') {
@@ -176,7 +175,6 @@ function parseArgs(argv: string[]): CliOptions | null {
       verbose,
       noGh,
     },
-    web,
     host,
     port,
     setup,
@@ -281,7 +279,7 @@ async function enrichRunOptions(parsed: CliOptions): Promise<RunOptions> {
   return runOptions;
 }
 
-function drawProgress(label: string, percent: number): void {
+function drawProgress(stageLabel: string, percent: number): string {
   const width = 24;
   const clamped = Math.max(0, Math.min(100, percent));
   const filled = Math.round((clamped / 100) * width);
@@ -289,8 +287,27 @@ function drawProgress(label: string, percent: number): void {
   const spinnerFrames = ['◐', '◓', '◑', '◒'];
   const frame = spinnerFrames[Math.floor(Date.now() / 110) % spinnerFrames.length] ?? '◐';
   const bar = `${'█'.repeat(filled)}${'░'.repeat(empty)}`;
-  const line = `${paint(frame, 'cyan', true)} ${paint(label, 'cyan', true)}  ${String(Math.round(clamped)).padStart(3)}%  ${paint(`▕${bar}▏`, 'dim')}`;
-  output.write(`\r${line}`);
+  const percentText = `${String(Math.round(clamped)).padStart(3)}%`;
+  return `${paint(frame, 'cyan', true)} ${paint(percentText, 'cyan', true)} ${paint(`▕${bar}▏`, 'dim')} ${paint(stageLabel, 'cyan')}`;
+}
+
+function progressPhaseLabel(baseLabel: string, percent: number): string {
+  if (percent < 35) {
+    return `${baseLabel} · Scanning repository`;
+  }
+  if (percent < 60) {
+    return `${baseLabel} · Collecting project signals`;
+  }
+  if (percent < 82) {
+    return `${baseLabel} · Evaluating criteria`;
+  }
+  if (percent < 94) {
+    return `${baseLabel} · Building action plan`;
+  }
+  if (percent < 99) {
+    return `${baseLabel} · Finalizing analysis`;
+  }
+  return `${baseLabel} · Waiting for completion`;
 }
 
 async function runWithProgress<T>(label: string, task: () => Promise<T>): Promise<T> {
@@ -300,19 +317,39 @@ async function runWithProgress<T>(label: string, task: () => Promise<T>): Promis
 
   let percent = 6;
   let ticks = 0;
-  drawProgress(label, percent);
+  let lastLineWidth = 0;
+  const writeProgress = (value: number): void => {
+    const dynamicLabel = progressPhaseLabel(label, value);
+    const line = drawProgress(dynamicLabel, value);
+    const lineWidth = visibleLength(line);
+    const clearPad = lastLineWidth > lineWidth ? ' '.repeat(lastLineWidth - lineWidth) : '';
+    output.write(`\r${line}${clearPad}`);
+    lastLineWidth = Math.max(lastLineWidth, lineWidth);
+  };
+
+  writeProgress(percent);
 
   const timer = setInterval(() => {
     ticks += 1;
-    const bump = ticks % 5 === 0 ? 2 : 1;
-    percent = Math.min(95, percent + bump);
-    drawProgress(label, percent);
+    let bump = 0.12;
+    if (percent < 60) {
+      bump = ticks % 5 === 0 ? 2 : 1.2;
+    } else if (percent < 82) {
+      bump = 0.6;
+    } else if (percent < 94) {
+      bump = 0.25;
+    } else if (percent < 99) {
+      bump = 0.06;
+    }
+    percent = Math.min(99, percent + bump);
+    writeProgress(percent);
   }, 120);
 
   try {
     const result = await task();
     clearInterval(timer);
-    drawProgress(label, 100);
+    ticks += 1;
+    writeProgress(100);
     output.write('\n');
     return result;
   } catch (error) {
@@ -383,42 +420,35 @@ async function main(): Promise<void> {
     printAgentableBanner();
 
     const runOptions = await enrichRunOptions(parsed);
+    const started = await runWithProgress('Running analysis', async () =>
+      startWebServer({
+        runOptions,
+        host: parsed.host,
+        port: parsed.port,
+      }),
+    );
 
-    if (parsed.web) {
-      const started = await runWithProgress('Running analysis', async () =>
-        startWebServer({
-          runOptions,
-          host: parsed.host,
-          port: parsed.port,
-        }),
-      );
-
-      if (output.isTTY) {
-        openBrowser(started.url);
-      }
-      printDashboardReady(started.url);
-
-      const shutdown = async (): Promise<void> => {
-        await started.close();
-        process.exit(0);
-      };
-
-      process.once('SIGINT', () => {
-        void shutdown();
-      });
-      process.once('SIGTERM', () => {
-        void shutdown();
-      });
-
-      await new Promise<void>(() => {
-        // keep process alive while server is running
-      });
-      return;
+    if (output.isTTY) {
+      openBrowser(started.url);
     }
+    printDashboardReady(started.url);
 
-    const outputResult = await runWithProgress('Running analysis', async () => runAgentReadiness(runOptions));
-    console.log(outputResult.report);
-    process.exitCode = 0;
+    const shutdown = async (): Promise<void> => {
+      await started.close();
+      process.exit(0);
+    };
+
+    process.once('SIGINT', () => {
+      void shutdown();
+    });
+    process.once('SIGTERM', () => {
+      void shutdown();
+    });
+
+    await new Promise<void>(() => {
+      // keep process alive while server is running
+    });
+    return;
   } catch (error) {
     console.error(
       `agentable failed: ${error instanceof Error ? error.message : String(error)}`,

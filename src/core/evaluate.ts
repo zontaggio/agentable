@@ -4,8 +4,12 @@ import { GitData } from '../collectors/git';
 import { readReadmeMtimeMs } from '../collectors/local';
 import {
   AiAssessment,
+  CriterionConfidence,
   CriterionDefinition,
+  CriterionEvidenceDetail,
   CriterionResult,
+  EvidenceKind,
+  EvidenceStrength,
   EvaluationContext,
   LocalProjectContext,
   ProjectProfile,
@@ -21,6 +25,27 @@ interface EvalSignals {
   integrationTestFiles: string[];
   unitTestFiles: string[];
 }
+
+const CONSERVATIVE_CRITERIA = new Set<string>([
+  'alerting_configured',
+  'circuit_breakers',
+  'code_quality_metrics',
+  'deployment_observability',
+  'distributed_tracing',
+  'error_tracking_contextualized',
+  'health_checks',
+  'metrics_collection',
+  'profiling_instrumentation',
+  'structured_logging',
+  'log_scrubbing',
+  'pii_handling',
+  'privacy_compliance',
+  'secrets_management',
+  'error_to_insight_pipeline',
+  'product_analytics_instrumentation',
+  'progressive_rollout',
+  'rollback_automation',
+]);
 
 function hasAnyDependency(local: LocalProjectContext, keywords: string[]): boolean {
   const deps = {
@@ -46,17 +71,59 @@ function makeResult(
   status: CriterionResult['status'],
   reason: string,
   evidence: string[] = [],
+  evidenceDetails: CriterionEvidenceDetail[] = [],
+  confidence?: CriterionConfidence,
   applicable = true,
 ): CriterionResult {
+  const normalizedEvidenceDetails =
+    evidenceDetails.length > 0
+      ? evidenceDetails
+      : (evidence.length > 0 ? evidence : [reason]).map((detail) => ({
+          kind: 'text' as const,
+          strength: 'weak' as const,
+          detail,
+        }));
+
+  const finalConfidence = confidence ?? inferConfidence(status, normalizedEvidenceDetails);
+
   return {
     id: criterion.id,
     category: criterion.category,
     status,
+    confidence: finalConfidence,
     reason,
     evidence,
+    evidenceDetails: normalizedEvidenceDetails,
     source: criterion.source,
     applicable,
   };
+}
+
+function evidenceDetail(kind: EvidenceKind, strength: EvidenceStrength, detail: string): CriterionEvidenceDetail {
+  return {
+    kind,
+    strength,
+    detail,
+  };
+}
+
+function inferConfidence(status: CriterionResult['status'], evidenceDetails: CriterionEvidenceDetail[]): CriterionConfidence {
+  if (status === 'unverified') {
+    return 'low';
+  }
+  if (status === 'skip') {
+    return 'medium';
+  }
+
+  const hasStrong = evidenceDetails.some((item) => item.strength === 'strong');
+  if (hasStrong) {
+    return 'high';
+  }
+  const hasMedium = evidenceDetails.some((item) => item.strength === 'medium');
+  if (hasMedium) {
+    return 'medium';
+  }
+  return 'low';
 }
 
 function applyAiIfPresent(
@@ -72,8 +139,10 @@ function applyAiIfPresent(
     id: criterion.id,
     category: criterion.category,
     status: ai.status,
+    confidence: ai.status === 'unverified' ? 'low' : 'medium',
     reason: ai.reason,
     evidence: ai.evidence,
+    evidenceDetails: ai.evidence.map((item) => evidenceDetail('ai', 'medium', item)),
     source: 'ai',
     applicable: true,
   };
@@ -159,6 +228,12 @@ function evaluateApplicabilitySkip(
       return !profile.isService
         ? { skip: true, reason: 'Skipped - runbooks usually apply to deployed services.' }
         : { skip: false };
+    case 'secrets_management': {
+      const hasEnvSurface = hasAnyFilePattern(local, [/^\.env($|\.)/i, /^\.env\.(example|template|sample)$/i]);
+      return !profile.hasExternalServices && !hasEnvSurface
+        ? { skip: true, reason: 'Skipped - no external services or secret surfaces detected.' }
+        : { skip: false };
+    }
     default:
       return { skip: false };
   }
@@ -210,6 +285,82 @@ function includesAny(text: string, keywords: string[]): boolean {
   return keywords.some((keyword) => low.includes(keyword.toLowerCase()));
 }
 
+function countKeywordMatches(text: string, keywords: string[]): number {
+  const low = text.toLowerCase();
+  let count = 0;
+  for (const keyword of keywords) {
+    if (low.includes(keyword.toLowerCase())) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+function parseGitignoreEntries(content: string): Set<string> {
+  const entries = new Set<string>();
+  for (const raw of content.split('\n')) {
+    const line = raw.trim().toLowerCase();
+    if (!line || line.startsWith('#') || line.startsWith('!')) {
+      continue;
+    }
+
+    const normalized = line.startsWith('/') ? line.slice(1) : line;
+    entries.add(normalized);
+  }
+  return entries;
+}
+
+function gitignoreEntryMatches(entries: Set<string>, candidate: string): boolean {
+  const normalizedCandidate = candidate.toLowerCase().replace(/^\//, '');
+  if (entries.has(normalizedCandidate)) {
+    return true;
+  }
+
+  for (const entry of entries) {
+    if (entry === `${normalizedCandidate}/**` || entry === `**/${normalizedCandidate}`) {
+      return true;
+    }
+    if (entry.endsWith('/') && entry.slice(0, -1) === normalizedCandidate) {
+      return true;
+    }
+    if (
+      normalizedCandidate.startsWith('.env') &&
+      (entry === '.env*' || entry === '.env.*' || entry === '**/.env*' || entry === '**/.env.*')
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function enforceConservativeDecision(result: CriterionResult): CriterionResult {
+  if (!CONSERVATIVE_CRITERIA.has(result.id) || result.status !== 'pass') {
+    return result;
+  }
+
+  const strongEvidence = result.evidenceDetails.filter((item) => item.strength === 'strong').length;
+  const mediumEvidence = result.evidenceDetails.filter((item) => item.strength === 'medium').length;
+  if (strongEvidence > 0 || mediumEvidence >= 2) {
+    return result;
+  }
+
+  return {
+    ...result,
+    status: 'unverified',
+    confidence: 'low',
+    reason: `${result.reason} Evidence is not strong enough for a conservative pass decision.`,
+    evidenceDetails: [
+      ...result.evidenceDetails,
+      evidenceDetail(
+        'text',
+        'weak',
+        'Conservative mode requires strong evidence (or multiple corroborating medium signals) for pass.',
+      ),
+    ],
+  };
+}
+
 async function evaluateCriterion(
   criterion: CriterionDefinition,
   ctx: EvaluationContext,
@@ -218,7 +369,7 @@ async function evaluateCriterion(
 ): Promise<CriterionResult> {
   const applicability = evaluateApplicabilitySkip(criterion.id, ctx.profile, ctx.local);
   if (applicability.skip) {
-    return makeResult(criterion, 'skip', applicability.reason ?? 'Skipped - not applicable.', [], false);
+    return makeResult(criterion, 'skip', applicability.reason ?? 'Skipped - not applicable.', [], [], undefined, false);
   }
 
   if (criterion.aiAssisted) {
@@ -238,6 +389,8 @@ async function evaluateCriterion(
           'skip',
           `Skipped - small repository (~${local.locEstimate} lines), module boundaries less meaningful.`,
           [],
+          [],
+          undefined,
           false,
         );
       }
@@ -302,7 +455,21 @@ async function evaluateCriterion(
     case 'n_plus_one_detection':
       return hasAnyDependency(local, ['django-debug-toolbar', 'bullet', 'nplusone']) ||
         includesAny(signals.allTextIndex, ['n+1', 'n plus one'])
-        ? makeResult(criterion, 'pass', 'N+1 detection hints found.')
+        ? hasAnyDependency(local, ['django-debug-toolbar', 'bullet', 'nplusone'])
+          ? makeResult(
+              criterion,
+              'pass',
+              'N+1 detection dependency found.',
+              [],
+              [evidenceDetail('dependency', 'strong', 'Found dependency commonly used for N+1 query detection.')],
+            )
+          : makeResult(
+              criterion,
+              'unverified',
+              'Only weak textual references to N+1 query detection were found.',
+              [],
+              [evidenceDetail('text', 'weak', 'N+1 keywords found in repository text index.')],
+            )
         : makeResult(criterion, 'fail', 'No N+1 detection tooling found.');
 
     case 'naming_consistency':
@@ -439,7 +606,13 @@ async function evaluateCriterion(
 
     case 'progressive_rollout':
       return includesAny(signals.allTextIndex, ['canary', 'progressive rollout', 'blue-green', 'feature flag rollout'])
-        ? makeResult(criterion, 'pass', 'Progressive rollout strategy detected.')
+        ? makeResult(
+            criterion,
+            'unverified',
+            'Text-only rollout references were found; explicit rollout automation evidence is missing.',
+            [],
+            [evidenceDetail('text', 'weak', 'Canary/progressive rollout keywords found in repository text index.')],
+          )
         : makeResult(criterion, 'fail', 'No progressive rollout strategy detected.');
 
     case 'release_automation':
@@ -455,7 +628,13 @@ async function evaluateCriterion(
 
     case 'rollback_automation':
       return includesAny(signals.allTextIndex, ['rollback', 'helm rollback', 'revert deployment'])
-        ? makeResult(criterion, 'pass', 'Rollback automation references detected.')
+        ? makeResult(
+            criterion,
+            'unverified',
+            'Text-only rollback references were found; explicit rollback automation evidence is missing.',
+            [],
+            [evidenceDetail('text', 'weak', 'Rollback keywords found in repository text index.')],
+          )
         : makeResult(criterion, 'fail', 'No rollback automation detected.');
 
     case 'single_command_setup':
@@ -541,6 +720,8 @@ async function evaluateCriterion(
               ? 'AGENTS.md exists but no validation automation detected.'
               : 'Skipped - AGENTS.md is not present.',
             [],
+            [],
+            undefined,
             local.fileSet.has('AGENTS.md'),
           );
 
@@ -631,56 +812,211 @@ async function evaluateCriterion(
         : makeResult(criterion, 'fail', 'No local services setup instructions detected.');
 
     case 'alerting_configured':
-      return hasAnyDependency(local, ['pagerduty', 'opsgenie', 'alertmanager']) ||
-        includesAny(signals.allTextIndex, ['pagerduty', 'opsgenie', 'alerts'])
-        ? makeResult(criterion, 'pass', 'Alerting integration signals found.')
-        : makeResult(criterion, 'fail', 'No alerting configuration detected.');
+      if (hasAnyDependency(local, ['pagerduty', 'opsgenie', 'alertmanager'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Alerting integration dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found alerting dependency (PagerDuty/Opsgenie/Alertmanager).')],
+        );
+      }
+      if (countKeywordMatches(signals.workflowText, ['pagerduty', 'opsgenie', 'alertmanager', 'alerts']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Alerting integration signals found in CI/workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow mentions alerting integration/alerts path.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['pagerduty', 'opsgenie', 'alerts']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak text mentions for alerting were found; explicit integration evidence is missing.',
+          [],
+          [evidenceDetail('text', 'weak', 'Generic alerting keywords found in repository text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No alerting configuration detected.');
 
     case 'circuit_breakers':
-      return hasAnyDependency(local, ['opossum', 'resilience4j', 'hystrix']) ||
-        includesAny(signals.allTextIndex, ['circuit breaker'])
-        ? makeResult(criterion, 'pass', 'Circuit breaker signals found.')
-        : makeResult(criterion, 'fail', 'No circuit breaker configuration detected.');
+      if (hasAnyDependency(local, ['opossum', 'resilience4j', 'hystrix'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Circuit breaker dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found circuit breaker library dependency.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['circuit breaker']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only textual references to circuit breaker patterns were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Repository text includes "circuit breaker" mention.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No circuit breaker configuration detected.');
 
     case 'code_quality_metrics':
-      return includesAny(signals.workflowText, ['codeql', 'coveralls', 'codecov', 'sonar']) ||
-        hasAnyDependency(local, ['coveralls', 'codecov', 'sonar'])
-        ? makeResult(criterion, 'pass', 'Code quality metrics tooling detected.')
-        : makeResult(criterion, 'fail', 'No code quality metrics tooling detected.');
+      if (hasAnyDependency(local, ['coveralls', 'codecov', 'sonar'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Code quality metrics dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found code quality metrics dependency (Codecov/Coveralls/Sonar).')],
+        );
+      }
+      if (countKeywordMatches(signals.workflowText, ['codeql', 'coveralls', 'codecov', 'sonar']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Code quality metrics signals detected in workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow contains CodeQL/Codecov/Coveralls/Sonar references.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No code quality metrics tooling detected.');
 
     case 'deployment_observability':
-      return includesAny(signals.allTextIndex, ['deployment dashboard', 'deploy notify', 'release monitor'])
-        ? makeResult(criterion, 'pass', 'Deployment observability signals found.')
-        : makeResult(criterion, 'fail', 'No deployment observability signals detected.');
+      if (countKeywordMatches(signals.workflowText, ['deploy notify', 'release monitor']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Deployment observability signals detected in workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow references deploy notification/release monitoring.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['deployment dashboard', 'deploy notify', 'release monitor']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak textual references to deployment observability were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Repository text includes deploy dashboard/notify keywords.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No deployment observability signals detected.');
 
     case 'distributed_tracing':
-      return hasAnyDependency(local, ['opentelemetry', 'jaeger', 'zipkin']) ||
-        includesAny(signals.allTextIndex, ['traceid', 'request-id propagation'])
-        ? makeResult(criterion, 'pass', 'Distributed tracing instrumentation detected.')
-        : makeResult(criterion, 'fail', 'No distributed tracing instrumentation detected.');
+      if (hasAnyDependency(local, ['opentelemetry', 'jaeger', 'zipkin'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Distributed tracing dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found OpenTelemetry/Jaeger/Zipkin dependency.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['traceid', 'request-id propagation']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak textual references to trace propagation were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Trace propagation keywords detected in text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No distributed tracing instrumentation detected.');
 
     case 'error_tracking_contextualized':
-      return hasAnyDependency(local, ['sentry', 'bugsnag', 'rollbar']) ||
-        includesAny(signals.allTextIndex, ['sentry', 'bugsnag', 'rollbar'])
-        ? makeResult(criterion, 'pass', 'Error tracking tooling detected.')
-        : makeResult(criterion, 'fail', 'No contextualized error tracking tooling detected.');
+      if (hasAnyDependency(local, ['sentry', 'bugsnag', 'rollbar'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Error tracking dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found Sentry/Bugsnag/Rollbar dependency.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['sentry', 'bugsnag', 'rollbar']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak textual references to error tracking were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Sentry/Bugsnag/Rollbar mentioned in repository text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No contextualized error tracking tooling detected.');
 
     case 'health_checks':
-      return hasAnyFilePattern(local, [/health/i, /ready/i, /live/i]) ||
-        includesAny(signals.allTextIndex, ['/health', 'healthcheck'])
-        ? makeResult(criterion, 'pass', 'Health check endpoints/signals detected.')
-        : makeResult(criterion, 'fail', 'No health checks detected.');
+      if (hasAnyFilePattern(local, [/health/i, /ready/i, /live/i])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Health check files/routes detected.',
+          [],
+          [evidenceDetail('file', 'strong', 'Found files/routes matching health/ready/live patterns.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['/health', 'healthcheck']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak textual mentions of health checks were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Healthcheck keywords found in text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No health checks detected.');
 
     case 'metrics_collection':
-      return hasAnyDependency(local, ['prom-client', 'prometheus', 'datadog', 'statsd', 'opentelemetry']) ||
-        includesAny(signals.allTextIndex, ['metrics', 'telemetry'])
-        ? makeResult(criterion, 'pass', 'Metrics/telemetry collection signals detected.')
-        : makeResult(criterion, 'fail', 'No metrics collection instrumentation detected.');
+      if (hasAnyDependency(local, ['prom-client', 'prometheus', 'datadog', 'statsd', 'opentelemetry'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Metrics/telemetry dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found metrics/telemetry dependency.')],
+        );
+      }
+      if (countKeywordMatches(signals.workflowText, ['prometheus', 'datadog', 'statsd', 'telemetry']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Metrics/telemetry signals detected in workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow references metrics/telemetry systems.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['metrics', 'telemetry']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only generic metrics/telemetry mentions were found; instrumentation evidence is missing.',
+          [],
+          [evidenceDetail('text', 'weak', 'Generic metrics/telemetry keywords present in repository text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No metrics collection instrumentation detected.');
 
     case 'profiling_instrumentation':
-      return includesAny(signals.allTextIndex, ['profiling', 'pyroscope', '0x'])
-        ? makeResult(criterion, 'pass', 'Profiling instrumentation references detected.')
-        : makeResult(criterion, 'fail', 'No profiling instrumentation detected.');
+      if (hasAnyDependency(local, ['pyroscope', '0x'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Profiling dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found profiling dependency (pyroscope/0x).')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['profiling', 'pyroscope', '0x']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak textual references to profiling were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Profiling-related keywords present in text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No profiling instrumentation detected.');
 
     case 'runbooks_documented': {
       if (hasAnyFilePattern(local, [/runbook/i, /playbook/i, /oncall/i])) {
@@ -700,12 +1036,24 @@ async function evaluateCriterion(
 
     case 'structured_logging':
       return hasAnyDependency(local, ['pino', 'winston', 'bunyan', 'debug'])
-        ? makeResult(criterion, 'pass', 'Structured logging dependency detected.')
+        ? makeResult(
+            criterion,
+            'pass',
+            'Structured logging dependency detected.',
+            [],
+            [evidenceDetail('dependency', 'strong', 'Found structured logging dependency (pino/winston/bunyan/debug).')],
+          )
         : makeResult(criterion, 'fail', 'No structured logging tooling detected.');
 
     case 'automated_security_review':
       return includesAny(signals.workflowText, ['codeql', 'snyk', 'semgrep'])
-        ? makeResult(criterion, 'pass', 'Automated security review workflow detected.')
+        ? makeResult(
+            criterion,
+            'pass',
+            'Automated security review workflow detected.',
+            [],
+            [evidenceDetail('workflow', 'medium', 'Workflow includes CodeQL/Snyk/Semgrep references.')],
+          )
         : makeResult(criterion, 'fail', 'No automated security review workflow detected.');
 
     case 'branch_protection':
@@ -734,33 +1082,120 @@ async function evaluateCriterion(
         local.fileSet.has('.github/dependabot.yaml') ||
         local.fileSet.has('.github/renovate.json') ||
         local.fileSet.has('renovate.json')
-        ? makeResult(criterion, 'pass', 'Dependency update automation configuration detected.')
+        ? makeResult(
+            criterion,
+            'pass',
+            'Dependency update automation configuration detected.',
+            [],
+            [evidenceDetail('file', 'strong', 'Dependabot/Renovate configuration file detected.')],
+          )
         : makeResult(criterion, 'fail', 'No Dependabot/Renovate configuration found.');
 
     case 'gitignore_comprehensive': {
-      const required = ['.env', '.ds_store', '.idea', '.vscode'];
-      const content = local.gitignoreContent.toLowerCase();
-      const missing = required.filter((entry) => !content.includes(entry));
+      if (!local.fileSet.has('.gitignore')) {
+        return makeResult(criterion, 'fail', '.gitignore file is missing.');
+      }
 
-      return missing.length === 0
-        ? makeResult(criterion, 'pass', '.gitignore includes common sensitive/local artifacts.')
-        : makeResult(criterion, 'fail', `.gitignore missing entries: ${missing.join(', ')}.`);
+      const entries = parseGitignoreEntries(local.gitignoreContent);
+      const hasEnvIgnore =
+        gitignoreEntryMatches(entries, '.env') ||
+        gitignoreEntryMatches(entries, '.env.local') ||
+        gitignoreEntryMatches(entries, '.env.production') ||
+        gitignoreEntryMatches(entries, '.env.development');
+
+      if (!hasEnvIgnore) {
+        return makeResult(
+          criterion,
+          'fail',
+          '.gitignore exists but does not ignore common environment secret files (for example `.env` or `.env*`).',
+          [],
+          [evidenceDetail('file', 'strong', '.gitignore found without explicit environment secret ignore entries.')],
+        );
+      }
+
+      const recommendedLocal = ['.vscode', '.idea', '.ds_store'];
+      const missingRecommended = recommendedLocal.filter((entry) => !gitignoreEntryMatches(entries, entry));
+      if (missingRecommended.length === 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          '.gitignore includes environment-secret and common local artifact ignores.',
+          [],
+          [evidenceDetail('file', 'strong', '.gitignore includes `.env` and common local artifact ignore entries.')],
+        );
+      }
+
+      return makeResult(
+        criterion,
+        'pass',
+        `.gitignore covers environment secrets. Optional local entries missing: ${missingRecommended.join(', ')}.`,
+        [],
+        [evidenceDetail('file', 'medium', '.gitignore includes secret-file ignores but not all optional local artifacts.')],
+      );
     }
 
     case 'log_scrubbing':
-      return includesAny(signals.allTextIndex, ['redact', 'scrub', 'mask', 'sanitize'])
-        ? makeResult(criterion, 'pass', 'Log scrubbing/redaction signals detected.')
-        : makeResult(criterion, 'fail', 'No log scrubbing mechanism detected.');
+      if (countKeywordMatches(signals.workflowText, ['redact', 'scrub', 'mask', 'sanitize']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Log scrubbing/redaction checks detected in workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow references log scrubbing/redaction checks.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['redact', 'scrub', 'mask', 'sanitize']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak textual references to log scrubbing were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Redaction/scrubbing keywords present in repository text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No log scrubbing mechanism detected.');
 
     case 'pii_handling':
-      return includesAny(signals.allTextIndex, ['pii', 'data classification', 'personal data'])
-        ? makeResult(criterion, 'pass', 'PII handling controls referenced.')
-        : makeResult(criterion, 'fail', 'No explicit PII handling controls detected.');
+      if (countKeywordMatches(signals.workflowText, ['pii', 'data classification', 'personal data']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'PII handling controls referenced in workflow/policy automation.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow references PII handling checks/policies.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['pii', 'data classification', 'personal data']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only textual references to PII handling were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'PII-related keywords present in text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No explicit PII handling controls detected.');
 
     case 'privacy_compliance':
-      return includesAny(signals.allTextIndex, ['gdpr', 'ccpa', 'privacy policy'])
-        ? makeResult(criterion, 'pass', 'Privacy compliance references detected.')
-        : makeResult(criterion, 'fail', 'No privacy compliance references detected.');
+      if (countKeywordMatches(signals.workflowText, ['gdpr', 'ccpa', 'privacy policy']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Privacy compliance checks/policies detected in workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow references GDPR/CCPA/privacy policy checks.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['gdpr', 'ccpa', 'privacy policy']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only textual privacy-compliance references were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'GDPR/CCPA/privacy policy keywords present in text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No privacy compliance references detected.');
 
     case 'secret_scanning':
       if (!ghData.available || !ghData.authenticated) {
@@ -776,7 +1211,21 @@ async function evaluateCriterion(
     case 'secrets_management':
       return hasAnyDependency(local, ['aws-secrets-manager', 'vault', 'doppler', 'sops']) ||
         includesAny(signals.allTextIndex, ['secret manager', 'vault', 'kms'])
-        ? makeResult(criterion, 'pass', 'Secrets management tooling/pattern detected.')
+        ? hasAnyDependency(local, ['aws-secrets-manager', 'vault', 'doppler', 'sops'])
+          ? makeResult(
+              criterion,
+              'pass',
+              'Secrets management dependency detected.',
+              [],
+              [evidenceDetail('dependency', 'strong', 'Found dependency for secrets management integration.')],
+            )
+          : makeResult(
+              criterion,
+              'unverified',
+              'Only weak textual references to secrets management were found.',
+              [],
+              [evidenceDetail('text', 'weak', 'Secret manager/vault/KMS keywords found in text index.')],
+            )
         : makeResult(criterion, 'fail', 'No secrets management integration detected.');
 
     case 'backlog_health': {
@@ -810,6 +1259,13 @@ async function evaluateCriterion(
       if (ghData.labelsCount && ghData.labelsCount >= 5) {
         return makeResult(criterion, 'pass', `Repository has ${ghData.labelsCount} labels configured.`);
       }
+      if (ghData.available && ghData.authenticated && ghData.labelsCount === undefined) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Issue label metadata is unavailable (likely permission-limited).',
+        );
+      }
       return hasAnyFilePattern(local, [/\.github\/labels\.ya?ml$/, /\.github\/labeler\.ya?ml$/])
         ? makeResult(criterion, 'pass', 'Labeling automation/configuration detected in repository.')
         : ghData.available && ghData.authenticated
@@ -827,15 +1283,55 @@ async function evaluateCriterion(
         : makeResult(criterion, 'fail', 'No pull request template found.');
 
     case 'error_to_insight_pipeline':
-      return includesAny(signals.allTextIndex, ['sentry', 'github issue', 'error automation', 'incident to issue'])
-        ? makeResult(criterion, 'pass', 'Error-to-insight automation references found.')
-        : makeResult(criterion, 'fail', 'No error-to-insight pipeline detected.');
+      if (countKeywordMatches(signals.workflowText, ['sentry', 'github issue', 'error automation', 'incident']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Error-to-insight automation signals detected in workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow links errors/incidents to issue automation.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['sentry', 'github issue', 'error automation', 'incident to issue']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only weak textual references to error-to-insight flows were found.',
+          [],
+          [evidenceDetail('text', 'weak', 'Error-to-insight keywords present in text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No error-to-insight pipeline detected.');
 
     case 'product_analytics_instrumentation':
-      return hasAnyDependency(local, ['mixpanel', 'amplitude', 'posthog', 'segment', 'plausible']) ||
-        includesAny(signals.allTextIndex, ['mixpanel', 'amplitude', 'posthog', 'analytics'])
-        ? makeResult(criterion, 'pass', 'Product analytics tooling detected.')
-        : makeResult(criterion, 'fail', 'No product analytics instrumentation detected.');
+      if (hasAnyDependency(local, ['mixpanel', 'amplitude', 'posthog', 'segment', 'plausible'])) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Product analytics dependency detected.',
+          [],
+          [evidenceDetail('dependency', 'strong', 'Found product analytics dependency (Mixpanel/Amplitude/PostHog/Segment/Plausible).')],
+        );
+      }
+      if (countKeywordMatches(signals.workflowText, ['mixpanel', 'amplitude', 'posthog', 'segment', 'plausible']) > 0) {
+        return makeResult(
+          criterion,
+          'pass',
+          'Product analytics signals detected in workflows.',
+          [],
+          [evidenceDetail('workflow', 'medium', 'Workflow references product analytics tooling.')],
+        );
+      }
+      if (countKeywordMatches(signals.allTextIndex, ['mixpanel', 'amplitude', 'posthog', 'analytics']) > 0) {
+        return makeResult(
+          criterion,
+          'unverified',
+          'Only generic analytics text mentions were found; instrumentation evidence is missing.',
+          [],
+          [evidenceDetail('text', 'weak', 'Generic analytics keywords present in repository text index.')],
+        );
+      }
+      return makeResult(criterion, 'fail', 'No product analytics instrumentation detected.');
 
     default:
       return makeResult(criterion, 'unverified', 'Criterion evaluator not implemented yet.');
@@ -851,7 +1347,7 @@ export async function evaluateAllCriteria(
   const results: CriterionResult[] = [];
 
   for (const criterion of CRITERIA) {
-    const result = await evaluateCriterion(criterion, ctx, gitData, signals);
+    const result = enforceConservativeDecision(await evaluateCriterion(criterion, ctx, gitData, signals));
     results.push(result);
   }
 

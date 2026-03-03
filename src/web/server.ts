@@ -76,6 +76,7 @@ async function computePayload(
       results: engineOutput.results,
       warnings: engineOutput.warnings,
       meta: engineOutput.meta,
+      actionPlan: engineOutput.actionPlan,
     },
     history,
   );
@@ -88,6 +89,7 @@ async function computePayload(
       results: engineOutput.results,
       warnings: engineOutput.warnings,
       meta: engineOutput.meta,
+      actionPlan: engineOutput.actionPlan,
     },
     history,
   );

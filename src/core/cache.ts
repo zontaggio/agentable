@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { AiBaseline } from '../types';
+import { AiBaseline, AiRecommendationBaseline } from '../types';
 
 const CACHE_DIR = path.join(os.homedir(), '.cache', 'agentable');
 
@@ -11,6 +11,10 @@ async function ensureCacheDir(): Promise<void> {
 
 function baselinePath(key: string): string {
   return path.join(CACHE_DIR, `${key}.json`);
+}
+
+function recommendationPath(key: string): string {
+  return path.join(CACHE_DIR, `recommendation-${key}.json`);
 }
 
 export async function loadAiBaseline(key: string): Promise<AiBaseline | null> {
@@ -27,6 +31,23 @@ export async function loadAiBaseline(key: string): Promise<AiBaseline | null> {
 export async function saveAiBaseline(baseline: AiBaseline): Promise<void> {
   await ensureCacheDir();
   const filePath = baselinePath(baseline.key);
+  await fs.writeFile(filePath, JSON.stringify(baseline, null, 2), 'utf8');
+}
+
+export async function loadAiRecommendationBaseline(key: string): Promise<AiRecommendationBaseline | null> {
+  const filePath = recommendationPath(key);
+  try {
+    const content = await fs.readFile(filePath, 'utf8');
+    const parsed = JSON.parse(content) as AiRecommendationBaseline;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveAiRecommendationBaseline(baseline: AiRecommendationBaseline): Promise<void> {
+  await ensureCacheDir();
+  const filePath = recommendationPath(baseline.key);
   await fs.writeFile(filePath, JSON.stringify(baseline, null, 2), 'utf8');
 }
 

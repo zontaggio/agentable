@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { CATEGORY_LABELS, CRITERIA } from '../catalog/v1';
 import {
+  ActionPlan,
   CategoryId,
   CriterionResult,
   EngineMeta,
@@ -18,6 +19,7 @@ export interface WebTransformInput {
   results: CriterionResult[];
   warnings: string[];
   meta: EngineMeta;
+  actionPlan: ActionPlan;
 }
 
 function createCategoryBuckets(): Record<CategoryId, WebCriterionCard[]> {
@@ -65,6 +67,44 @@ function toScoreLabel(status: CriterionResult['status'], maxPoints: number): str
   return 'N/A';
 }
 
+function cardSort(a: WebCriterionCard, b: WebCriterionCard): number {
+  const rankA = a.priorityRank ?? Number.MAX_SAFE_INTEGER;
+  const rankB = b.priorityRank ?? Number.MAX_SAFE_INTEGER;
+  if (rankA !== rankB) {
+    return rankA - rankB;
+  }
+
+  const statusWeight = (status: WebCriterionCard['status']): number => {
+    if (status === 'fail') {
+      return 0;
+    }
+    if (status === 'unverified') {
+      return 1;
+    }
+    if (status === 'pass') {
+      return 2;
+    }
+    return 3;
+  };
+
+  const statusDiff = statusWeight(a.status) - statusWeight(b.status);
+  if (statusDiff !== 0) {
+    return statusDiff;
+  }
+
+  return a.name.localeCompare(b.name);
+}
+
+function emptyActionPlan(): ActionPlan {
+  return {
+    critical: [],
+    highLeverage: [],
+    quickWins: [],
+    all: [],
+    generatedWithAi: false,
+  };
+}
+
 export function scoreToLevel(score: number): number {
   if (score < 20) {
     return 1;
@@ -83,9 +123,13 @@ export function scoreToLevel(score: number): number {
 
 export function buildWebPayload(input: WebTransformInput, history: WebHistoryPoint[]): WebReportPayload {
   const criteriaByCategory = createCategoryBuckets();
+  const actionPlan = input.actionPlan ?? emptyActionPlan();
+  const guidanceByCriterion = new Map(actionPlan.all.map((item) => [item.criterionId, item]));
 
   for (const result of input.results) {
     const cardMeta = getCardMeta(result.id);
+    const guidance = guidanceByCriterion.get(result.id);
+
     const card: WebCriterionCard = {
       id: result.id,
       name: cardMeta.name,
@@ -95,9 +139,13 @@ export function buildWebPayload(input: WebTransformInput, history: WebHistoryPoi
       maxPoints: cardMeta.maxPoints,
       scoreLabel: toScoreLabel(result.status, cardMeta.maxPoints),
       status: result.status,
+      confidence: result.confidence,
       reason: result.reason,
       evidence: result.evidence,
-      improvementTips: getImprovementTips(result),
+      evidenceDetails: result.evidenceDetails,
+      improvementTips: getImprovementTips(result, guidance),
+      guidance,
+      priorityRank: guidance?.rank,
       source: result.source,
       applicable: result.applicable,
     };
@@ -106,7 +154,7 @@ export function buildWebPayload(input: WebTransformInput, history: WebHistoryPoi
   }
 
   for (const category of Object.keys(criteriaByCategory) as CategoryId[]) {
-    criteriaByCategory[category].sort((a, b) => a.name.localeCompare(b.name));
+    criteriaByCategory[category].sort(cardSort);
   }
 
   const categories: WebCategorySummary[] = categoryOrder().map((category) => {
@@ -115,6 +163,8 @@ export function buildWebPayload(input: WebTransformInput, history: WebHistoryPoi
       id: category,
       label: CATEGORY_LABELS[category],
       score: row?.score ?? 0,
+      confidenceScore: row?.confidenceScore ?? 0,
+      highConfidenceCoverage: row?.highConfidenceCoverage ?? 0,
       pass: row?.pass ?? 0,
       fail: row?.fail ?? 0,
       skip: row?.skip ?? 0,
@@ -132,9 +182,12 @@ export function buildWebPayload(input: WebTransformInput, history: WebHistoryPoi
       level: scoreToLevel(input.summary.score),
       score: input.summary.score,
       coverage: input.summary.coverage,
+      confidenceScore: input.summary.confidenceScore,
+      highConfidenceCoverage: input.summary.highConfidenceCoverage,
       fingerprint: input.meta.fingerprint,
     },
     summary: input.summary,
+    actionPlan,
     categories,
     criteriaByCategory,
     history,

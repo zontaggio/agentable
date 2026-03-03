@@ -8,8 +8,10 @@ test('score ignores skip and unverified in denominator', () => {
       id: 'a',
       category: 'testing',
       status: 'pass',
+      confidence: 'high',
       reason: '',
       evidence: [],
+      evidenceDetails: [],
       source: 'local',
       applicable: true,
     },
@@ -17,8 +19,10 @@ test('score ignores skip and unverified in denominator', () => {
       id: 'b',
       category: 'testing',
       status: 'fail',
+      confidence: 'high',
       reason: '',
       evidence: [],
+      evidenceDetails: [],
       source: 'local',
       applicable: true,
     },
@@ -26,8 +30,10 @@ test('score ignores skip and unverified in denominator', () => {
       id: 'c',
       category: 'testing',
       status: 'skip',
+      confidence: 'medium',
       reason: '',
       evidence: [],
+      evidenceDetails: [],
       source: 'local',
       applicable: false,
     },
@@ -35,8 +41,10 @@ test('score ignores skip and unverified in denominator', () => {
       id: 'd',
       category: 'testing',
       status: 'unverified',
+      confidence: 'low',
       reason: '',
       evidence: [],
+      evidenceDetails: [],
       source: 'gh',
       applicable: true,
     },
@@ -48,4 +56,6 @@ test('score ignores skip and unverified in denominator', () => {
   assert.equal(summary.counts.fail, 1);
   assert.equal(summary.counts.skip, 1);
   assert.equal(summary.counts.unverified, 1);
+  assert.ok(summary.confidenceScore > 0);
+  assert.ok(summary.highConfidenceCoverage > 0);
 });

@@ -12,6 +12,15 @@ export type CategoryId =
 export type CriterionStatus = 'pass' | 'fail' | 'skip' | 'unverified';
 
 export type CriterionSource = 'local' | 'gh' | 'ai' | 'hybrid';
+export type CriterionConfidence = 'high' | 'medium' | 'low';
+export type EvidenceKind = 'dependency' | 'file' | 'workflow' | 'gh' | 'ai' | 'text';
+export type EvidenceStrength = 'strong' | 'medium' | 'weak';
+
+export interface CriterionEvidenceDetail {
+  kind: EvidenceKind;
+  strength: EvidenceStrength;
+  detail: string;
+}
 
 export interface CriterionDefinition {
   id: string;
@@ -25,8 +34,10 @@ export interface CriterionResult {
   id: string;
   category: CategoryId;
   status: CriterionStatus;
+  confidence: CriterionConfidence;
   reason: string;
   evidence: string[];
+  evidenceDetails: CriterionEvidenceDetail[];
   source: CriterionSource;
   applicable: boolean;
 }
@@ -39,11 +50,15 @@ export interface CategoryScore {
   unverified: number;
   applicable: number;
   score: number;
+  confidenceScore: number;
+  highConfidenceCoverage: number;
 }
 
 export interface ScoreSummary {
   score: number;
   coverage: number;
+  confidenceScore: number;
+  highConfidenceCoverage: number;
   counts: {
     pass: number;
     fail: number;
@@ -123,6 +138,22 @@ export interface AiBaseline {
   assessments: Record<string, AiAssessment>;
 }
 
+export interface AiRecommendationGuidance {
+  whyItMatters?: string;
+  whatGoodLooksLike?: string;
+  nextSteps?: string[];
+  expectedOutcome?: string;
+}
+
+export interface AiRecommendationBaseline {
+  key: string;
+  fingerprint: string;
+  model: string;
+  provider: string;
+  createdAt: string;
+  guidanceByCriterion: Record<string, AiRecommendationGuidance>;
+}
+
 export interface EvaluationContext {
   options: RunOptions;
   local: LocalProjectContext;
@@ -145,6 +176,32 @@ export interface EngineMeta {
 
 export type CardBadge = 'BASIC' | 'INTERMEDIATE' | 'ADVANCED';
 
+export type ActionPlanBucket = 'critical' | 'highLeverage' | 'quickWins';
+
+export interface RecommendationItem {
+  id: string;
+  criterionId: string;
+  criterionName: string;
+  category: CategoryId;
+  status: Exclude<CriterionStatus, 'skip' | 'pass'>;
+  confidence: CriterionConfidence;
+  bucket: ActionPlanBucket;
+  priorityScore: number;
+  rank: number;
+  whyItMatters: string;
+  whatGoodLooksLike: string;
+  nextSteps: string[];
+  expectedOutcome: string;
+}
+
+export interface ActionPlan {
+  critical: RecommendationItem[];
+  highLeverage: RecommendationItem[];
+  quickWins: RecommendationItem[];
+  all: RecommendationItem[];
+  generatedWithAi: boolean;
+}
+
 export interface WebHistoryPoint {
   timestamp: string;
   score: number;
@@ -157,6 +214,8 @@ export interface WebCategorySummary {
   id: CategoryId;
   label: string;
   score: number;
+  confidenceScore: number;
+  highConfidenceCoverage: number;
   pass: number;
   fail: number;
   skip: number;
@@ -172,9 +231,13 @@ export interface WebCriterionCard {
   maxPoints: number;
   scoreLabel: string;
   status: CriterionStatus;
+  confidence: CriterionConfidence;
   reason: string;
   evidence: string[];
+  evidenceDetails: CriterionEvidenceDetail[];
   improvementTips: string[];
+  guidance?: RecommendationItem;
+  priorityRank?: number;
   source: CriterionSource;
   applicable: boolean;
 }
@@ -186,12 +249,15 @@ export interface WebHeader {
   level: number;
   score: number;
   coverage: number;
+  confidenceScore: number;
+  highConfidenceCoverage: number;
   fingerprint: string;
 }
 
 export interface WebReportPayload {
   header: WebHeader;
   summary: ScoreSummary;
+  actionPlan: ActionPlan;
   categories: WebCategorySummary[];
   criteriaByCategory: Record<CategoryId, WebCriterionCard[]>;
   history: WebHistoryPoint[];

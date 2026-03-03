@@ -13,6 +13,15 @@ function parseJson<T>(input: string): T | null {
   }
 }
 
+function parseGhHttpStatus(stderr: string): number | undefined {
+  const match = stderr.match(/HTTP\s+(\d{3})/i);
+  if (!match || !match[1]) {
+    return undefined;
+  }
+  const code = Number.parseInt(match[1], 10);
+  return Number.isInteger(code) ? code : undefined;
+}
+
 export async function collectGhData(repoPath: string, enabled: boolean): Promise<GhData> {
   if (!enabled) {
     return {
@@ -98,8 +107,14 @@ export async function collectGhData(repoPath: string, enabled: boolean): Promise
   if (protectionRes.ok) {
     branchProtectionEnabled = true;
   } else {
-    branchProtectionEnabled = false;
-    errors.push('Branch protection API unavailable or insufficient permission.');
+    const httpStatus = parseGhHttpStatus(protectionRes.stderr);
+    const notProtected = /branch not protected/i.test(protectionRes.stderr) || /not protected/i.test(protectionRes.stdout);
+    if (httpStatus === 404 && notProtected) {
+      branchProtectionEnabled = false;
+    } else {
+      branchProtectionEnabled = undefined;
+      errors.push('Branch protection API unavailable or permission-limited.');
+    }
   }
 
   let secretScanningEnabled: boolean | undefined;
@@ -114,13 +129,20 @@ export async function collectGhData(repoPath: string, enabled: boolean): Promise
       errors.push('Secret scanning status unavailable (likely permission-limited).');
     }
   } else {
-    errors.push('Repository security metadata unavailable.');
+    const httpStatus = parseGhHttpStatus(securityRes.stderr);
+    if (httpStatus === 401 || httpStatus === 403) {
+      errors.push('Repository security metadata unavailable due to insufficient permissions.');
+    } else {
+      errors.push('Repository security metadata unavailable.');
+    }
   }
 
   let labelsCount: number | undefined;
   if (labelsRes.ok) {
     const labels = parseJson<Array<{ name?: string }>>(labelsRes.stdout) ?? [];
     labelsCount = labels.length;
+  } else {
+    errors.push('Issue labels metadata unavailable (likely permission-limited).');
   }
 
   let issueStats:
@@ -171,7 +193,7 @@ export async function collectGhData(repoPath: string, enabled: boolean): Promise
       goodTitleAndLabels,
     };
   } else {
-    errors.push('Issue metrics unavailable from gh issue list.');
+    errors.push('Issue metrics unavailable from gh issue list (possibly permission-limited).');
   }
 
   return {

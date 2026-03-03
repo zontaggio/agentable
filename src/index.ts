@@ -15,4 +15,7 @@ export type {
   WebCategorySummary,
   WebCriterionCard,
   EngineMeta,
+  ActionPlan,
+  RecommendationItem,
+  CriterionEvidenceDetail,
 } from './types';
