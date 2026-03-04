@@ -1,9 +1,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fsSync = require('node:fs');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { collectAiAssessments } = require('../dist/collectors/ai');
+
+const testHome = fsSync.mkdtempSync(path.join(os.tmpdir(), 'agentable-ai-home-'));
+process.env.HOME = testHome;
+
+const { collectAiAssessments, enrichActionPlanRecommendations } = require('../dist/collectors/ai');
 
 function makeLocalContext(rootPath) {
   return {
@@ -33,6 +38,27 @@ function makeProfile() {
     hasExternalServices: false,
     hasPiiSignals: false,
     hasFrontendBundle: false,
+  };
+}
+
+function makeRecommendationSeed(index) {
+  return {
+    criterionId: `criterion_${String(index).padStart(2, '0')}`,
+    criterionName: `Criterion ${index}`,
+    category: 'security',
+    status: 'fail',
+    confidence: 'high',
+    priorityScore: 100 - index,
+    rank: index + 1,
+    reason: `Reason ${index}`,
+    evidence: [`Evidence ${index}`],
+    evidenceDetails: [`Detail ${index}`],
+    deterministic: {
+      whyItMatters: `Why ${index}`,
+      whatGoodLooksLike: `Good ${index}`,
+      nextSteps: [`Step ${index}`],
+      expectedOutcome: `Outcome ${index}`,
+    },
   };
 }
 
@@ -88,6 +114,108 @@ test('collectAiAssessments throws on provider request failure', async () => {
         }),
       /AI provider request failed: OpenRouter request failed: 401 Unauthorized/,
     );
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+
+test('enrichActionPlanRecommendations batches and caches guidance', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-ai-enrich-cache-'));
+  const local = makeLocalContext(root);
+  const profile = makeProfile();
+  const recommendations = Array.from({ length: 13 }, (_, index) => makeRecommendationSeed(index + 1));
+  const fingerprint = `fp-${Date.now()}-enrich-cache`;
+
+  const realFetch = global.fetch;
+  let recommendationCalls = 0;
+
+  global.fetch = async (url, init) => {
+    const target = typeof url === 'string' ? url : String(url);
+    if (!target.includes('openrouter.ai/api/v1/chat/completions')) {
+      return realFetch(url, init);
+    }
+
+    const payload = JSON.parse(String(init && init.body ? init.body : '{}'));
+    const userContent = payload.messages?.[1]?.content ?? '';
+    if (!userContent.includes('Recommendations JSON:')) {
+      return {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        async json() {
+          return {
+            choices: [
+              {
+                message: {
+                  content: JSON.stringify({ recommendations: [] }),
+                },
+              },
+            ],
+          };
+        },
+      };
+    }
+
+    recommendationCalls += 1;
+    const marker = 'Recommendations JSON:\n\n';
+    const markerIndex = userContent.indexOf(marker);
+    const batchJson = markerIndex === -1 ? '[]' : userContent.slice(markerIndex + marker.length).trim();
+    const batch = JSON.parse(batchJson);
+
+    return {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      async json() {
+        return {
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  recommendations: batch.map((item) => ({
+                    criterionId: item.criterionId,
+                    why_it_matters: `Why ${item.criterionId}`,
+                    what_good_looks_like: `Good ${item.criterionId}`,
+                    next_steps: [`Step 1 ${item.criterionId}`, `Step 2 ${item.criterionId}`],
+                    expected_outcome: `Outcome ${item.criterionId}`,
+                  })),
+                }),
+              },
+            },
+          ],
+        };
+      },
+    };
+  };
+
+  try {
+    const first = await enrichActionPlanRecommendations({
+      repoIdentifier: 'owner/repo',
+      fingerprint,
+      local,
+      profile,
+      recommendations,
+      apiKey: 'fake-key',
+      model: 'gpt-oss-120b',
+    });
+
+    assert.equal(Object.keys(first.guidanceByCriterion).length, recommendations.length);
+    assert.equal(first.error, undefined);
+    assert.ok(recommendationCalls >= 2);
+
+    const callsAfterFirst = recommendationCalls;
+    const second = await enrichActionPlanRecommendations({
+      repoIdentifier: 'owner/repo',
+      fingerprint,
+      local,
+      profile,
+      recommendations,
+      apiKey: 'fake-key',
+      model: 'gpt-oss-120b',
+    });
+
+    assert.equal(Object.keys(second.guidanceByCriterion).length, recommendations.length);
+    assert.equal(recommendationCalls, callsAfterFirst);
   } finally {
     global.fetch = realFetch;
   }
