@@ -35,6 +35,10 @@ test('deterministic action plan spreads buckets for larger weak sets', () => {
   assert.ok(plan.highLeverage.length > 0);
   assert.ok(plan.quickWins.length > 0);
   assert.equal(plan.critical.length + plan.highLeverage.length + plan.quickWins.length, input.length);
+  for (const item of plan.all) {
+    assert.equal(typeof item.actionabilityScore, 'number');
+    assert.ok(item.actionabilityScore >= 0 && item.actionabilityScore <= 100);
+  }
 });
 
 test('deterministic action plan keeps all three buckets for exactly three items', () => {

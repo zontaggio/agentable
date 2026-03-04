@@ -7,12 +7,54 @@ import {
   defaultWhatGoodLooksLike,
   defaultWhyItMatters,
 } from './defaults';
-import { computePriorityScore } from './priority';
+import { computeActionabilityScore, computePriorityScore } from './priority';
 import {
   DeterministicActionPlanResult,
   RecommendationEnrichment,
   RecommendationSeed,
 } from './types';
+
+const VAGUE_TERMS = /(improve|optimi[sz]e|enhance|consider|etc|best practice|as needed|when possible|review regularly)/i;
+
+function isSpecificText(value: string, minLength: number): boolean {
+  const text = value.trim();
+  if (text.length < minLength) {
+    return false;
+  }
+  return !VAGUE_TERMS.test(text);
+}
+
+function sanitizeText(value: string | undefined, fallback: string, minLength: number): string {
+  if (!value) {
+    return fallback;
+  }
+  const text = value.trim();
+  if (!isSpecificText(text, minLength)) {
+    return fallback;
+  }
+  return text;
+}
+
+function sanitizeNextSteps(nextSteps: string[] | undefined, fallback: string[]): string[] {
+  if (!Array.isArray(nextSteps) || nextSteps.length === 0) {
+    return fallback;
+  }
+
+  const cleaned = Array.from(
+    new Set(
+      nextSteps
+        .map((step) => step.trim())
+        .filter((step) => step.length > 0),
+    ),
+  ).slice(0, 5);
+
+  const concreteCount = cleaned.filter((step) => isSpecificText(step, 18)).length;
+  if (cleaned.length === 0 || concreteCount < 2) {
+    return fallback;
+  }
+
+  return cleaned;
+}
 
 export function buildDeterministicActionPlan(results: CriterionResult[]): DeterministicActionPlanResult {
   const weakResults = results.filter(
@@ -30,6 +72,13 @@ export function buildDeterministicActionPlan(results: CriterionResult[]): Determ
       const nextSteps = defaultNextSteps(result);
       const expectedOutcome = defaultExpectedOutcome(result);
       const status = result.status as Exclude<CriterionResult['status'], 'pass' | 'skip'>;
+      const actionabilityScore = computeActionabilityScore({
+        status,
+        confidence: result.confidence,
+        nextSteps,
+        whyItMatters,
+        expectedOutcome,
+      });
 
       const recommendation: RecommendationItem = {
         id: `rec-${result.id}`,
@@ -40,6 +89,7 @@ export function buildDeterministicActionPlan(results: CriterionResult[]): Determ
         confidence: result.confidence,
         bucket: 'quickWins',
         priorityScore,
+        actionabilityScore,
         rank: 0,
         whyItMatters,
         whatGoodLooksLike,
@@ -55,6 +105,9 @@ export function buildDeterministicActionPlan(results: CriterionResult[]): Determ
     .sort((a, b) => {
       if (b.recommendation.priorityScore !== a.recommendation.priorityScore) {
         return b.recommendation.priorityScore - a.recommendation.priorityScore;
+      }
+      if (b.recommendation.actionabilityScore !== a.recommendation.actionabilityScore) {
+        return b.recommendation.actionabilityScore - a.recommendation.actionabilityScore;
       }
       return a.recommendation.criterionId.localeCompare(b.recommendation.criterionId);
     })
@@ -88,6 +141,7 @@ export function buildDeterministicActionPlan(results: CriterionResult[]): Determ
     status: recommendation.status,
     confidence: recommendation.confidence,
     priorityScore: recommendation.priorityScore,
+    actionabilityScore: recommendation.actionabilityScore,
     rank: recommendation.rank,
     reason: result.reason,
     evidence: result.evidence.slice(0, 4),
@@ -128,16 +182,26 @@ export function applyActionPlanEnrichment(
     }
 
     const nextSteps =
-      Array.isArray(enriched.nextSteps) && enriched.nextSteps.length > 0
-        ? enriched.nextSteps.filter((step) => step.trim().length > 0).slice(0, 5)
-        : item.nextSteps;
+      sanitizeNextSteps(enriched.nextSteps, item.nextSteps);
+
+    const whyItMatters = sanitizeText(enriched.whyItMatters, item.whyItMatters, 60);
+    const whatGoodLooksLike = sanitizeText(enriched.whatGoodLooksLike, item.whatGoodLooksLike, 40);
+    const expectedOutcome = sanitizeText(enriched.expectedOutcome, item.expectedOutcome, 45);
+    const actionabilityScore = computeActionabilityScore({
+      status: item.status,
+      confidence: item.confidence,
+      nextSteps,
+      whyItMatters,
+      expectedOutcome,
+    });
 
     const updated: RecommendationItem = {
       ...item,
-      whyItMatters: enriched.whyItMatters?.trim() ? enriched.whyItMatters.trim() : item.whyItMatters,
-      whatGoodLooksLike: enriched.whatGoodLooksLike?.trim() ? enriched.whatGoodLooksLike.trim() : item.whatGoodLooksLike,
+      whyItMatters,
+      whatGoodLooksLike,
       nextSteps,
-      expectedOutcome: enriched.expectedOutcome?.trim() ? enriched.expectedOutcome.trim() : item.expectedOutcome,
+      expectedOutcome,
+      actionabilityScore,
     };
     enrichedCount += 1;
     return updated;

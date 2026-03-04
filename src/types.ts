@@ -75,6 +75,7 @@ export interface RunOptions {
   repoPath: string;
   verbose: boolean;
   noGh: boolean;
+  aiFailureMode?: 'fallback' | 'strict';
   aiApiKey?: string;
   aiModel?: string;
 }
@@ -187,6 +188,7 @@ export interface RecommendationItem {
   confidence: CriterionConfidence;
   bucket: ActionPlanBucket;
   priorityScore: number;
+  actionabilityScore: number;
   rank: number;
   whyItMatters: string;
   whatGoodLooksLike: string;
@@ -262,6 +264,8 @@ export interface WebReportPayload {
   criteriaByCategory: Record<CategoryId, WebCriterionCard[]>;
   history: WebHistoryPoint[];
   warnings: string[];
+  knownLimitations: string[];
+  qualityGateVersion: string;
   generatedAt: string;
   meta: EngineMeta;
 }

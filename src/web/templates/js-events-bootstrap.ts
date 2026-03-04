@@ -29,6 +29,29 @@ export const APP_JS_EVENTS_BOOTSTRAP = `
     }
   }
 
+  async function submitFeedback(useful) {
+    if (!state.payload) return;
+    var modal = document.getElementById('card-modal');
+    if (!modal) return;
+    var criterionId = modal.getAttribute('data-criterion-id');
+    if (!criterionId) return;
+
+    var reason = window.prompt('Optional feedback reason:', '') || '';
+    var response = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        criterionId: criterionId,
+        useful: Boolean(useful),
+        reason: String(reason || ''),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Feedback failed: ' + response.status);
+    }
+  }
+
   function animateAccordion(details, open) {
     var content = details.querySelector('.category-content');
     if (!content) { details.open = open; return; }
@@ -110,6 +133,15 @@ export const APP_JS_EVENTS_BOOTSTRAP = `
         state.actionPlanExpanded[bucketKey] = !state.actionPlanExpanded[bucketKey];
         renderApp(state.payload);
       }
+      return;
+    }
+
+    var feedbackButton = target.closest('[data-feedback-useful]');
+    if (feedbackButton) {
+      var usefulRaw = feedbackButton.getAttribute('data-feedback-useful');
+      submitFeedback(usefulRaw === 'true').catch(function (error) {
+        alert(String(error && error.message ? error.message : error));
+      });
       return;
     }
 

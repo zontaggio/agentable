@@ -1,7 +1,7 @@
 export { runAgentReadiness } from './core/engine';
 export { CATALOG_VERSION, CRITERIA, CATEGORY_LABELS } from './catalog/v1';
 export { startWebServer } from './web/server';
-export { buildWebPayload, scoreToLevel } from './web/transform';
+export { buildWebPayload, QUALITY_GATE_VERSION, scoreToLevel } from './web/transform';
 export { computeRepoKey, loadHistory, appendHistory } from './web/history';
 export type {
   CriterionResult,

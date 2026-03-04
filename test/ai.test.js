@@ -49,6 +49,7 @@ function makeRecommendationSeed(index) {
     status: 'fail',
     confidence: 'high',
     priorityScore: 100 - index,
+    actionabilityScore: 80 - (index % 7),
     rank: index + 1,
     reason: `Reason ${index}`,
     evidence: [`Evidence ${index}`],

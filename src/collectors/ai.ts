@@ -76,6 +76,7 @@ function computeRecommendationCacheKey(
       criterionId: item.criterionId,
       status: item.status,
       priorityScore: item.priorityScore,
+      actionabilityScore: item.actionabilityScore,
       rank: item.rank,
       reason: item.reason,
       evidence: item.evidence,

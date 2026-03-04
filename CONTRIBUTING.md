@@ -46,6 +46,12 @@ Validate max-line rule only:
 npm run check:max-lines
 ```
 
+Run functional launch gates (requires benchmark dataset):
+
+```bash
+npm run quality:gates
+```
+
 Test against a real repository:
 
 ```bash

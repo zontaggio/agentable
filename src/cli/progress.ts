@@ -1,5 +1,5 @@
 import { stdout as output } from 'node:process';
-import { paint } from './ansi';
+import { paint, visibleLength } from './ansi';
 
 export type ProgressReporter = (step: string) => void;
 
@@ -19,14 +19,17 @@ const STEPS = [
   'Enriching recommendations',
 ];
 
-function drawBar(percent: number): string {
+function drawProgress(label: string, stepLabel: string, percent: number): string {
   const width = 24;
   const clamped = Math.max(0, Math.min(100, percent));
   const filled = Math.round((clamped / 100) * width);
   const empty = width - filled;
+  const spinnerFrames = ['◐', '◓', '◑', '◒'];
+  const frame = spinnerFrames[Math.floor(Date.now() / 110) % spinnerFrames.length] ?? '◐';
   const bar = `${'█'.repeat(filled)}${'░'.repeat(empty)}`;
   const percentText = `${String(Math.round(clamped)).padStart(3)}%`;
-  return `${paint(percentText, 'cyan', true)} ${paint(`▕${bar}▏`, 'dim')}`;
+  const stepPart = stepLabel ? ` · ${stepLabel}` : '';
+  return `${paint(frame, 'cyan', true)} ${paint(percentText, 'cyan', true)} ${paint(`▕${bar}▏`, 'dim')} ${paint(label, 'cyan')}${paint(stepPart, 'dim')}`;
 }
 
 export function createProgressReporter(label: string): ProgressHandle {
@@ -34,28 +37,20 @@ export function createProgressReporter(label: string): ProgressHandle {
     return { reporter: () => {}, done: () => {}, fail: () => {} };
   }
 
-  const spinnerFrames = ['◐', '◓', '◑', '◒'];
   let currentStep = '';
   let percent = 0;
+  let lastLineWidth = 0;
 
-  // Write two lines; cursor ends at start of line 1 ready to overwrite
-  const writeLines = (finalize = false): void => {
-    const frame = spinnerFrames[Math.floor(Date.now() / 110) % spinnerFrames.length] ?? '◐';
-    const stepPart = currentStep ? ` · ${currentStep}` : '';
-    const line1 = `${paint(frame, 'cyan', true)} ${paint(label, 'cyan')}${paint(stepPart, 'dim')}`;
-    const line2 = `  ${drawBar(percent)}`;
-    const eol = '\x1b[K'; // clear to end of line
-
-    if (finalize) {
-      output.write(`\r${eol}${line1}\n\r${eol}${line2}\n`);
-    } else {
-      // Write both lines then move cursor back to line 1
-      output.write(`\r${eol}${line1}\n\r${eol}${line2}\x1b[1A`);
-    }
+  const writeProgress = (): void => {
+    const line = drawProgress(label, currentStep, percent);
+    const lineWidth = visibleLength(line);
+    const clearPad = lastLineWidth > lineWidth ? ' '.repeat(lastLineWidth - lineWidth) : '';
+    output.write(`\r${line}${clearPad}`);
+    lastLineWidth = Math.max(lastLineWidth, lineWidth);
   };
 
-  writeLines();
-  const timer = setInterval(writeLines, 110);
+  writeProgress();
+  const timer = setInterval(writeProgress, 110);
 
   return {
     reporter: (step) => {
@@ -64,17 +59,18 @@ export function createProgressReporter(label: string): ProgressHandle {
       if (idx >= 0) {
         percent = Math.round((idx / STEPS.length) * 100);
       }
-      writeLines();
+      writeProgress();
     },
     done: () => {
       clearInterval(timer);
-      percent = 100;
       currentStep = '';
-      writeLines(true);
+      percent = 100;
+      writeProgress();
+      output.write('\n');
     },
     fail: () => {
       clearInterval(timer);
-      output.write('\n\n');
+      output.write('\n');
     },
   };
 }

@@ -40,11 +40,13 @@ async function enrichRecommendationBatch(
   const userPrompt = [
     'Refine these deterministic recommendations for clarity and repo context.',
     'Use English.',
+    'Audience: solo maintainer. Prefer high-impact and low-effort actions first.',
     `This is batch ${input.batchIndex}/${input.totalBatches}.`,
     'Return recommendations only for criterionIds included in this batch.',
     'For each item return:',
     '{"criterionId":"string","why_it_matters":"string","what_good_looks_like":"string","next_steps":["string"],"expected_outcome":"string"}',
     'Keep next_steps to 3-5 concise and practical implementation actions.',
+    'Avoid vague wording such as "improve", "optimize", "consider", or "best practices".',
     'When useful, suggest concrete tooling options by name (for example OpenTelemetry, Sentry, Renovate, CodeQL).',
     'Repository context JSON:',
     input.repositoryContextJson,

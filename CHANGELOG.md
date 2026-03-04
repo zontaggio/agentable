@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- AI is now mandatory for all runs.
+- Added configurable AI failure behavior (`fallback` default, `strict` optional) and deterministic fallback flow for AI outages.
+- Added `actionabilityScore` to prioritized recommendations and stricter filtering of vague AI-enriched guidance.
+- Added web payload metadata for launch governance (`knownLimitations`, `qualityGateVersion`).
+- Added `POST /api/feedback` endpoint for recommendation usefulness feedback.
+- Added functional launch quality-gate runner (`npm run quality:gates`) with benchmark dataset template.
+- AI strict mode remains available, while fallback mode allows deterministic execution when AI is unavailable.
 - First run automatically opens setup wizard when OpenRouter config is missing.
 - `--setup` remains the only explicit reconfiguration flow for model/API key.
 - AI collector internals now use a provider interface, with OpenRouter as the active provider.

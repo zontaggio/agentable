@@ -4,6 +4,7 @@ import { runAgentReadiness } from '../core/engine';
 import { RunOptions, WebHistoryPoint, WebReportPayload } from '../types';
 import { APP_CSS, APP_JS, renderIndexHtml, renderStandaloneHtml } from './templates';
 import { buildWebPayload, scoreToLevel } from './transform';
+import { appendRecommendationFeedback } from './feedback';
 import { appendHistory, computeRepoKey, loadHistory } from './history';
 
 export interface StartWebServerOptions {
@@ -11,6 +12,7 @@ export interface StartWebServerOptions {
   host: string;
   port: number;
   historyDir?: string;
+  feedbackDir?: string;
 }
 
 export interface StartedWebServer {
@@ -21,6 +23,15 @@ export interface StartedWebServer {
 interface WebServerState {
   payload: WebReportPayload;
   history: WebHistoryPoint[];
+}
+
+class HttpError extends Error {
+  statusCode: number;
+
+  constructor(statusCode: number, message: string) {
+    super(message);
+    this.statusCode = statusCode;
+  }
 }
 
 function json(res: ServerResponse, statusCode: number, data: unknown): void {
@@ -42,14 +53,48 @@ function notFound(res: ServerResponse): void {
   text(res, 404, 'text/plain', 'Not found');
 }
 
-async function readBody(req: IncomingMessage): Promise<string> {
+async function readBody(req: IncomingMessage, maxBytes = 1_000_000): Promise<string> {
   const chunks: Buffer[] = [];
+  let bytes = 0;
 
   for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    bytes += buffer.length;
+    if (bytes > maxBytes) {
+      throw new HttpError(413, 'Request payload too large.');
+    }
+    chunks.push(buffer);
   }
 
   return Buffer.concat(chunks).toString('utf8');
+}
+
+function parseFeedbackPayload(body: string): { criterionId: string; useful: boolean; reason: string } {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    throw new HttpError(400, 'Feedback payload must be valid JSON.');
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
+    throw new HttpError(400, 'Feedback payload must be an object.');
+  }
+
+  const record = parsed as Record<string, unknown>;
+  const criterionId = typeof record.criterionId === 'string' ? record.criterionId.trim() : '';
+  const useful = typeof record.useful === 'boolean' ? record.useful : null;
+  const reasonRaw = typeof record.reason === 'string' ? record.reason : '';
+  const reason = reasonRaw.trim().slice(0, 600);
+
+  if (!criterionId) {
+    throw new HttpError(400, 'Feedback payload missing criterionId.');
+  }
+  if (useful === null) {
+    throw new HttpError(400, 'Feedback payload missing useful boolean.');
+  }
+
+  return { criterionId, useful, reason };
 }
 
 function toHistorySnapshot(payload: WebReportPayload): WebHistoryPoint {
@@ -139,11 +184,43 @@ export async function startWebServer(
       }
 
       if (method === 'POST' && pathname === '/api/refresh') {
-        await readBody(req);
+        await readBody(req, 16_000);
         const next = await computePayload(options, state.history);
         state.payload = next.payload;
         state.history = next.history;
         json(res, 200, { ok: true, generatedAt: state.payload.generatedAt });
+        return;
+      }
+
+      if (method === 'POST' && pathname === '/api/feedback') {
+        const body = await readBody(req, 16_000);
+        const payload = parseFeedbackPayload(body);
+        const knownCriteria = new Set<string>();
+        for (const cards of Object.values(state.payload.criteriaByCategory)) {
+          for (const card of cards) {
+            knownCriteria.add(card.id);
+          }
+        }
+        if (!knownCriteria.has(payload.criterionId)) {
+          throw new HttpError(400, `Unknown criterionId: ${payload.criterionId}`);
+        }
+
+        const repoIdentifier = state.payload.meta.repoIdentifier || state.payload.meta.repoPath;
+        const repoKey = computeRepoKey(repoIdentifier);
+        await appendRecommendationFeedback(
+          {
+            criterionId: payload.criterionId,
+            useful: payload.useful,
+            reason: payload.reason,
+            timestamp: new Date().toISOString(),
+            repoKey,
+            repoIdentifier,
+            fingerprint: state.payload.meta.fingerprint,
+          },
+          options.feedbackDir,
+        );
+
+        json(res, 200, { ok: true });
         return;
       }
 
@@ -171,6 +248,10 @@ export async function startWebServer(
 
       notFound(res);
     } catch (error) {
+      if (error instanceof HttpError) {
+        json(res, error.statusCode, { error: error.message });
+        return;
+      }
       json(res, 500, {
         error: error instanceof Error ? error.message : String(error),
       });

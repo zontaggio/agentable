@@ -151,7 +151,24 @@ test('engine propagates AI configuration errors', async () => {
         repoPath,
         verbose: false,
         noGh: true,
+        aiFailureMode: 'strict',
       }),
     /OpenRouter API key is missing/,
   );
+});
+
+test('engine falls back to deterministic mode when AI is unavailable', async () => {
+  const repoPath = await createRepoFixture();
+
+  const result = await runAgentReadiness({
+    repoPath,
+    verbose: false,
+    noGh: true,
+    aiFailureMode: 'fallback',
+  });
+
+  assert.ok(result.warnings.some((item) => item.includes('fallback mode enabled')));
+  const modularization = result.results.find((item) => item.id === 'code_modularization');
+  assert.ok(modularization);
+  assert.equal(modularization.status, 'unverified');
 });

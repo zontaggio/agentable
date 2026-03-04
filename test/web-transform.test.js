@@ -110,6 +110,7 @@ test('buildWebPayload creates category buckets and card metadata', () => {
             confidence: 'medium',
             bucket: 'critical',
             priorityScore: 90,
+            actionabilityScore: 82,
             rank: 1,
             whyItMatters: 'Complexity increases change risk.',
             whatGoodLooksLike: 'Complexity is bounded by policy.',
@@ -129,6 +130,7 @@ test('buildWebPayload creates category buckets and card metadata', () => {
             confidence: 'medium',
             bucket: 'critical',
             priorityScore: 90,
+            actionabilityScore: 82,
             rank: 1,
             whyItMatters: 'Complexity increases change risk.',
             whatGoodLooksLike: 'Complexity is bounded by policy.',
@@ -157,6 +159,8 @@ test('buildWebPayload creates category buckets and card metadata', () => {
   assert.equal(payload.criteriaByCategory.style_validation.length, 2);
   assert.equal(payload.criteriaByCategory.build_system.length, 1);
   assert.equal(payload.actionPlan.critical.length, 1);
+  assert.equal(typeof payload.qualityGateVersion, 'string');
+  assert.ok(Array.isArray(payload.knownLimitations));
 
   const formatterCard = payload.criteriaByCategory.style_validation.find((item) => item.id === 'formatter');
   assert.ok(formatterCard);

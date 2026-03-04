@@ -28,7 +28,7 @@ test('cli rejects removed --terminal flag with explicit error', () => {
 test('cli fails in non-interactive mode when AI config is missing', () => {
   const cliPath = path.join(__dirname, '..', 'dist', 'cli.js');
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'agentable-cli-home-'));
-  const result = spawnSync(process.execPath, [cliPath, '.'], {
+  const result = spawnSync(process.execPath, [cliPath, '.', '--ai-failure-mode', 'strict'], {
     cwd: path.join(__dirname, '..'),
     encoding: 'utf8',
     env: {
@@ -38,6 +38,6 @@ test('cli fails in non-interactive mode when AI config is missing', () => {
   });
 
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /OpenRouter config not found and AI is required/);
+  assert.match(result.stderr, /OpenRouter config not found and strict AI mode is enabled/);
   assert.match(result.stderr, /agentable --setup/);
 });

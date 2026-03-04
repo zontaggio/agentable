@@ -123,6 +123,32 @@ test('web server exposes report and refresh endpoints', async () => {
     assert.ok(Array.isArray(payload.categories));
     assert.ok(payload.actionPlan);
     assert.ok(Array.isArray(payload.actionPlan.all));
+    assert.equal(typeof payload.qualityGateVersion, 'string');
+    assert.ok(Array.isArray(payload.knownLimitations));
+
+    const targetCriterionId = payload.actionPlan.all[0] && payload.actionPlan.all[0].criterionId;
+    assert.ok(typeof targetCriterionId === 'string');
+
+    const feedbackRes = await fetch(`${started.url}/api/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        criterionId: targetCriterionId,
+        useful: true,
+        reason: 'Actionable and clear.',
+      }),
+    });
+    assert.equal(feedbackRes.status, 200);
+
+    const invalidFeedbackRes = await fetch(`${started.url}/api/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        criterionId: 'unknown_criterion',
+        useful: false,
+      }),
+    });
+    assert.equal(invalidFeedbackRes.status, 400);
 
     const refreshRes = await fetch(`${started.url}/api/refresh`, { method: 'POST' });
     assert.equal(refreshRes.status, 200);

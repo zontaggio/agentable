@@ -37,6 +37,31 @@ function findAiCriteriaIds(): string[] {
   return CRITERIA.filter((criterion) => criterion.aiAssisted).map((criterion) => criterion.id);
 }
 
+function buildFallbackAiAssessments(criteriaIds: string[], reason: string): Record<string, {
+  id: string;
+  status: 'unverified';
+  reason: string;
+  evidence: string[];
+}> {
+  const output: Record<string, {
+    id: string;
+    status: 'unverified';
+    reason: string;
+    evidence: string[];
+  }> = {};
+
+  for (const criterionId of criteriaIds) {
+    output[criterionId] = {
+      id: criterionId,
+      status: 'unverified',
+      reason: `AI assessment unavailable; deterministic fallback applied. ${reason}`,
+      evidence: ['AI provider unavailable or misconfigured during this run.'],
+    };
+  }
+
+  return output;
+}
+
 export async function runAgentReadiness(
   options: RunOptions,
   onProgress?: (step: string) => void,
@@ -56,18 +81,40 @@ export async function runAgentReadiness(
   const ghData = await collectGhData(repoPath, !options.noGh);
 
   onProgress?.('Running AI assessments');
+  const aiFailureMode = options.aiFailureMode ?? 'fallback';
   const model = options.aiModel || DEFAULT_OPENROUTER_MODEL;
   const aiCriteriaIds = findAiCriteriaIds();
-  const aiResult = await collectAiAssessments({
-    repoPath,
-    repoIdentifier: gitData.repoIdentifier,
-    fingerprint,
-    criteriaIds: aiCriteriaIds,
-    local,
-    profile,
-    apiKey: options.aiApiKey,
-    model,
-  });
+  const warnings: string[] = [];
+  let aiFallbackError: string | null = null;
+  let aiResult: Awaited<ReturnType<typeof collectAiAssessments>>;
+
+  try {
+    aiResult = await collectAiAssessments({
+      repoPath,
+      repoIdentifier: gitData.repoIdentifier,
+      fingerprint,
+      criteriaIds: aiCriteriaIds,
+      local,
+      profile,
+      apiKey: options.aiApiKey,
+      model,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (aiFailureMode === 'strict') {
+      throw error;
+    }
+
+    aiFallbackError = message;
+    warnings.push(`AI assessments unavailable; fallback mode enabled. ${message}`);
+    aiResult = {
+      assessments: buildFallbackAiAssessments(aiCriteriaIds, message),
+      cacheKey: `fallback-${fingerprint}`,
+      model,
+      provider: 'openrouter',
+      fromCache: false,
+    };
+  }
 
   const evaluationContext: EvaluationContext = {
     options,
@@ -82,27 +129,30 @@ export async function runAgentReadiness(
   const results = await evaluateAllCriteria(evaluationContext, gitData);
   const summary = summarizeResults(results);
   const generatedAt = new Date().toISOString();
-  const warnings: string[] = [];
 
   onProgress?.('Building action plan');
   const deterministicPlan = buildDeterministicActionPlan(results);
   let actionPlan = deterministicPlan.actionPlan;
 
-  onProgress?.('Enriching recommendations');
-  const recommendationEnrichment = await enrichActionPlanRecommendations({
-    repoIdentifier: gitData.repoIdentifier,
-    fingerprint,
-    local,
-    profile,
-    recommendations: deterministicPlan.seeds,
-    apiKey: options.aiApiKey,
-    model,
-  });
+  if (!aiFallbackError) {
+    onProgress?.('Enriching recommendations');
+    const recommendationEnrichment = await enrichActionPlanRecommendations({
+      repoIdentifier: gitData.repoIdentifier,
+      fingerprint,
+      local,
+      profile,
+      recommendations: deterministicPlan.seeds,
+      apiKey: options.aiApiKey,
+      model,
+    });
 
-  if (recommendationEnrichment.error) {
-    warnings.push(`Action plan AI enrichment unavailable; using deterministic guidance. ${recommendationEnrichment.error}`);
-  } else if (recommendationEnrichment.usedAi) {
-    actionPlan = applyActionPlanEnrichment(actionPlan, recommendationEnrichment.guidanceByCriterion);
+    if (recommendationEnrichment.error) {
+      warnings.push(`Action plan AI enrichment unavailable; using deterministic guidance. ${recommendationEnrichment.error}`);
+    } else if (recommendationEnrichment.usedAi) {
+      actionPlan = applyActionPlanEnrichment(actionPlan, recommendationEnrichment.guidanceByCriterion);
+    }
+  } else {
+    warnings.push('Action plan AI enrichment skipped because AI assessments were unavailable.');
   }
 
   if (ghData.errors.length > 0) {

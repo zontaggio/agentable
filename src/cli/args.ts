@@ -7,6 +7,7 @@ export function parseArgs(argv: string[]): CliOptions | null {
   let repoPath = '.';
   let verbose = false;
   let noGh = false;
+  let aiFailureMode: 'fallback' | 'strict' = 'fallback';
   let host = '127.0.0.1';
   let port = 4173;
   let setup = false;
@@ -50,6 +51,28 @@ export function parseArgs(argv: string[]): CliOptions | null {
 
     if (arg === '--setup') {
       setup = true;
+      continue;
+    }
+
+    if (arg === '--ai-failure-mode') {
+      const value = args[i + 1];
+      if (!value) {
+        throw new Error('--ai-failure-mode expects one of: fallback, strict.');
+      }
+      if (value !== 'fallback' && value !== 'strict') {
+        throw new Error(`Invalid --ai-failure-mode value: ${value}`);
+      }
+      aiFailureMode = value;
+      i += 1;
+      continue;
+    }
+
+    if (arg.startsWith('--ai-failure-mode=')) {
+      const value = arg.split('=', 2)[1];
+      if (value !== 'fallback' && value !== 'strict') {
+        throw new Error(`Invalid --ai-failure-mode value: ${value ?? ''}`);
+      }
+      aiFailureMode = value;
       continue;
     }
 
@@ -108,6 +131,7 @@ export function parseArgs(argv: string[]): CliOptions | null {
       repoPath,
       verbose,
       noGh,
+      aiFailureMode,
     },
     host,
     port,

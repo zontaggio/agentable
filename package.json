@@ -12,6 +12,7 @@
     "build": "tsc -p tsconfig.json",
     "check:max-lines": "node scripts/check-max-lines.mjs",
     "clean": "rm -rf dist",
+    "quality:gates": "node scripts/check-functional-gates.mjs fixtures/quality-gates/functional-benchmark.json",
     "test": "npm run build && npm run check:max-lines && node --test test/**/*.test.js"
   },
   "keywords": [

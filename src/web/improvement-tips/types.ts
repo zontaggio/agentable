@@ -7,6 +7,7 @@ export interface RecommendationSeed {
   status: Exclude<CriterionResult['status'], 'pass' | 'skip'>;
   confidence: CriterionConfidence;
   priorityScore: number;
+  actionabilityScore: number;
   rank: number;
   reason: string;
   evidence: string[];

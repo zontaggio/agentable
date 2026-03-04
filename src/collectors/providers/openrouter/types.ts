@@ -5,6 +5,7 @@ export interface OpenRouterRecommendationPromptItem {
   status: 'fail' | 'unverified';
   confidence: 'high' | 'medium' | 'low';
   priorityScore: number;
+  actionabilityScore: number;
   rank: number;
   reason: string;
   evidence: string[];

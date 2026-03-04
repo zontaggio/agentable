@@ -1,11 +1,11 @@
 # Agentable
 
-`agentable` evaluates repository agent readiness with deterministic criteria plus mandatory AI-assisted checks, and launches a guided web dashboard.
+`agentable` evaluates repository agent readiness with deterministic criteria plus AI-assisted checks, and launches a guided web dashboard.
 
 ## Highlights
 
 - Web-only UX (CLI acts as launcher/configurator for dashboard)
-- Mandatory OpenRouter AI for AI-assisted criteria
+- Configurable AI failure mode (`fallback` default, `strict` optional)
 - Conservative evaluation policy to reduce false positives
 - Score + coverage + confidence metrics
 - Prioritized action plan (`critical`, `high leverage`, `quick wins`)
@@ -28,35 +28,36 @@ node dist/cli.js .
 ## Usage
 
 ```bash
-agentable [path] [--verbose] [--no-gh] [--host <ip>] [--port <n>] [--setup]
+agentable [path] [--verbose] [--no-gh] [--ai-failure-mode <fallback|strict>] [--host <ip>] [--port <n>] [--setup]
 ```
 
 Options:
 
 - `--verbose`: include additional evidence in internal report payloads
 - `--no-gh`: disable GitHub checks via `gh` CLI
+- `--ai-failure-mode`: AI behavior on provider/config failure (`fallback` default, `strict` optional)
 - `--host`: dashboard bind host (default: `127.0.0.1`)
 - `--port`: dashboard port (default: `4173`)
 - `--setup`: reconfigure OpenRouter API key/model
 
 Removed options:
 
-- `--no-ai` was removed (AI is mandatory)
+- `--no-ai` was removed (use `--ai-failure-mode=strict` when AI must be mandatory)
 - `--terminal` was removed (dashboard is the only runtime surface)
 
 ## First run and config
 
-AI is required.
-
-On first interactive run (no local config), Agentable opens setup wizard automatically and stores config at:
+On first interactive setup, Agentable stores OpenRouter config at:
 
 - `~/.agentable/config.json`
 
-If no TTY is available and config is missing, Agentable fails with instructions to run:
+Strict mode requires configured OpenRouter credentials. If no TTY is available and config is missing, strict mode fails with instructions to run:
 
 ```bash
 agentable --setup
 ```
+
+Fallback mode runs even without config and marks AI-assisted criteria as `unverified`.
 
 ## Runtime behavior
 
@@ -102,6 +103,7 @@ Each recommendation includes:
 - expected outcome
 
 If AI refinement fails, deterministic guidance is still shown.
+Each recommendation also includes an `actionabilityScore` (0-100) to help triage execution order.
 
 ## GitHub integration
 
@@ -117,6 +119,15 @@ If `gh` is missing, unauthenticated, or permission-limited:
 ```bash
 npm test
 ```
+
+Run functional launch quality gates:
+
+```bash
+npm run quality:gates
+```
+
+Dataset template is available at `fixtures/quality-gates/functional-benchmark.template.json`.
+`quality:gates` is a strict launch gate and is expected to fail until your benchmark dataset reaches required thresholds.
 
 ## Architecture
 

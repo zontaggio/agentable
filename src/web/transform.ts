@@ -22,6 +22,14 @@ export interface WebTransformInput {
   actionPlan: ActionPlan;
 }
 
+export const QUALITY_GATE_VERSION = 'functional-v1.0.0';
+
+const KNOWN_LIMITATIONS = [
+  'AI-assisted criteria can degrade to UNVERIFIED when provider requests fail or are unavailable.',
+  'Signals are intentionally conservative to reduce false positives, which may reduce coverage in edge cases.',
+  'Actionability scores are heuristic guidance for prioritization, not execution guarantees.',
+];
+
 function createCategoryBuckets(): Record<CategoryId, WebCriterionCard[]> {
   return {
     style_validation: [],
@@ -192,6 +200,8 @@ export function buildWebPayload(input: WebTransformInput, history: WebHistoryPoi
     criteriaByCategory,
     history,
     warnings: input.warnings,
+    knownLimitations: KNOWN_LIMITATIONS,
+    qualityGateVersion: QUALITY_GATE_VERSION,
     generatedAt: input.meta.generatedAt,
     meta: input.meta,
   };

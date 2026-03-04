@@ -43,7 +43,8 @@ export const APP_JS_SECTIONS = `
             '<li><button class="action-item" data-card-id="' + escapeHtml(item.criterionId) + '">' +
             '<div class="action-item-title">#' + item.rank + ' ' + escapeHtml(item.criterionName) + '</div>' +
             '<div class="action-item-meta">' + escapeHtml(item.status.toUpperCase()) + ' · ' +
-            escapeHtml(String(Math.round(item.priorityScore))) + ' priority</div>' +
+            escapeHtml(String(Math.round(item.priorityScore))) + ' priority · ' +
+            escapeHtml(String(Math.round(item.actionabilityScore || 0))) + ' actionability</div>' +
             '</button></li>'
           );
         })
@@ -70,6 +71,23 @@ export const APP_JS_SECTIONS = `
       renderActionBucket('High Leverage', 'highLeverage', actionPlan.highLeverage || []) +
       renderActionBucket('Quick Wins', 'quickWins', actionPlan.quickWins || []) +
       '</div>' +
+      '</section>'
+    );
+  }
+
+  function renderLimitations(payload) {
+    var limits = Array.isArray(payload.knownLimitations) ? payload.knownLimitations : [];
+    if (limits.length === 0) {
+      return '';
+    }
+
+    return (
+      '<section class="panel action-plan">' +
+      '<h2 class="action-title">Known Limitations</h2>' +
+      '<div class="action-subtitle">Quality gate version: ' + escapeHtml(payload.qualityGateVersion || 'n/a') + '</div>' +
+      '<ul class="action-list expanded">' +
+      limits.map(function (item) { return '<li><div class="action-item-meta">' + escapeHtml(item) + '</div></li>'; }).join('') +
+      '</ul>' +
       '</section>'
     );
   }

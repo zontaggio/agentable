@@ -35,3 +35,50 @@ export function computePriorityScore(result: CriterionResult, weakCriteria: Set<
 
   return Math.round(score * 10) / 10;
 }
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function countConcreteSteps(nextSteps: string[]): number {
+  const vagueTerms = /(improve|optimi[sz]e|enhance|consider|etc|best practice|as needed|when possible)/i;
+  return nextSteps.filter((step) => {
+    const text = step.trim();
+    if (text.length < 18) {
+      return false;
+    }
+    return !vagueTerms.test(text);
+  }).length;
+}
+
+export function computeActionabilityScore(input: {
+  status: Exclude<CriterionResult['status'], 'pass' | 'skip'>;
+  confidence: CriterionConfidence;
+  nextSteps: string[];
+  whyItMatters: string;
+  expectedOutcome: string;
+}): number {
+  let score = 45;
+
+  score += input.status === 'fail' ? 15 : 9;
+
+  if (input.confidence === 'high') {
+    score += 14;
+  } else if (input.confidence === 'medium') {
+    score += 10;
+  } else {
+    score += 6;
+  }
+
+  const concreteSteps = countConcreteSteps(input.nextSteps);
+  score += Math.min(20, concreteSteps * 5);
+
+  if (input.whyItMatters.trim().length >= 60) {
+    score += 4;
+  }
+  if (input.expectedOutcome.trim().length >= 45) {
+    score += 4;
+  }
+
+  return Math.round(clamp(score, 0, 100));
+}

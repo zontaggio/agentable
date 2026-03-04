@@ -1,0 +1,55 @@
+{
+  "version": "functional-v1.0.0",
+  "repos": [
+    {
+      "id": "sample-repo",
+      "criticalTop3": ["branch_protection", "metrics_collection", "formatter"],
+      "groundTruthCritical": ["branch_protection", "metrics_collection", "secrets_management"],
+      "criticalFalsePositives": ["formatter"],
+      "recommendations": [
+        {
+          "criterionId": "branch_protection",
+          "bucket": "critical",
+          "whyItMatters": "Protected branches prevent unsafe merges.",
+          "evidence": ["No protection rules detected on default branch."],
+          "expectedOutcome": "Only validated changes are merged.",
+          "actionabilityRubric": {
+            "clarity": 2,
+            "executability": 2,
+            "impact": 2,
+            "specificity": 2
+          }
+        },
+        {
+          "criterionId": "metrics_collection",
+          "bucket": "highLeverage",
+          "whyItMatters": "Operational blind spots delay incident response.",
+          "evidence": ["No metrics library or telemetry pipeline detected."],
+          "expectedOutcome": "Faster debugging and measurable service health.",
+          "actionabilityRubric": {
+            "clarity": 2,
+            "executability": 2,
+            "impact": 2,
+            "specificity": 1
+          }
+        }
+      ],
+      "repeatRuns": [
+        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.2 },
+        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.1 },
+        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.3 },
+        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.2 },
+        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.0 }
+      ],
+      "highRiskPassCriteria": [
+        { "id": "secrets_management", "evidenceStrengths": ["strong"] }
+      ],
+      "aiFailureRecovered": true,
+      "firstRunToThreeStepsMinutes": 7
+    }
+  ],
+  "uxStudy": {
+    "participants": 8,
+    "successes": 7
+  }
+}

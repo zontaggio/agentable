@@ -74,6 +74,8 @@ async function promptAndSaveUserConfig(currentModel?: string, hasExistingKey = f
 
 export async function enrichRunOptions(parsed: CliOptions): Promise<RunOptions> {
   const runOptions: RunOptions = { ...parsed.runOptions };
+  const aiFailureMode = runOptions.aiFailureMode ?? 'fallback';
+  runOptions.aiFailureMode = aiFailureMode;
 
   const existingConfig = await loadUserConfig();
 
@@ -88,15 +90,23 @@ export async function enrichRunOptions(parsed: CliOptions): Promise<RunOptions> 
   }
 
   if (!existingConfig) {
-    if (!input.isTTY || !output.isTTY) {
+    if (aiFailureMode === 'strict' && (!input.isTTY || !output.isTTY)) {
       throw new Error(
-        `OpenRouter config not found and AI is required. Run \`agentable --setup\` in an interactive terminal. Config path: ${getUserConfigPath()}`,
+        `OpenRouter config not found and strict AI mode is enabled. Run \`agentable --setup\` in an interactive terminal or switch to --ai-failure-mode=fallback. Config path: ${getUserConfigPath()}`,
       );
     }
-    console.log(`${BRAND_NAME} first-time setup: configure your OpenRouter credentials.`);
-    const configured = await promptAndSaveUserConfig(DEFAULT_OPENROUTER_MODEL, false);
-    runOptions.aiApiKey = configured.openRouterApiKey;
-    runOptions.aiModel = configured.openRouterModel;
+
+    if (aiFailureMode === 'strict') {
+      console.log(`${BRAND_NAME} first-time setup: configure your OpenRouter credentials.`);
+      const configured = await promptAndSaveUserConfig(DEFAULT_OPENROUTER_MODEL, false);
+      runOptions.aiApiKey = configured.openRouterApiKey;
+      runOptions.aiModel = configured.openRouterModel;
+      return runOptions;
+    }
+
+    console.log(
+      `${BRAND_NAME}: OpenRouter config not found. Continuing in fallback mode with AI-assisted criteria marked as unverified.`,
+    );
     return runOptions;
   }
 
