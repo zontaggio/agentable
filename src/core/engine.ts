@@ -37,17 +37,25 @@ function findAiCriteriaIds(): string[] {
   return CRITERIA.filter((criterion) => criterion.aiAssisted).map((criterion) => criterion.id);
 }
 
-export async function runAgentReadiness(options: RunOptions): Promise<EngineOutput> {
+export async function runAgentReadiness(
+  options: RunOptions,
+  onProgress?: (step: string) => void,
+): Promise<EngineOutput> {
   const repoPath = path.resolve(options.repoPath);
   await ensureDirectory(repoPath);
 
+  onProgress?.('Scanning repository');
   const local = await collectLocalProjectContext(repoPath);
   const profile = buildProjectProfile(local);
   const fingerprint = await computeRepoFingerprint(repoPath, local.files);
 
+  onProgress?.('Collecting git data');
   const gitData = await collectGitData(repoPath);
+
+  onProgress?.('Checking GitHub');
   const ghData = await collectGhData(repoPath, !options.noGh);
 
+  onProgress?.('Running AI assessments');
   const model = options.aiModel || DEFAULT_OPENROUTER_MODEL;
   const aiCriteriaIds = findAiCriteriaIds();
   const aiResult = await collectAiAssessments({
@@ -70,13 +78,17 @@ export async function runAgentReadiness(options: RunOptions): Promise<EngineOutp
     aiAssessments: aiResult.assessments,
   };
 
+  onProgress?.('Evaluating criteria');
   const results = await evaluateAllCriteria(evaluationContext, gitData);
   const summary = summarizeResults(results);
   const generatedAt = new Date().toISOString();
   const warnings: string[] = [];
 
+  onProgress?.('Building action plan');
   const deterministicPlan = buildDeterministicActionPlan(results);
   let actionPlan = deterministicPlan.actionPlan;
+
+  onProgress?.('Enriching recommendations');
   const recommendationEnrichment = await enrichActionPlanRecommendations({
     repoIdentifier: gitData.repoIdentifier,
     fingerprint,

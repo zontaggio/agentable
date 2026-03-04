@@ -3,7 +3,7 @@ import { parseArgs } from './args';
 import { printAgentableBanner } from './banner';
 import { openBrowser } from './browser';
 import { printDashboardReady } from './dashboard';
-import { runWithProgress } from './progress';
+import { createProgressReporter } from './progress';
 import { enrichRunOptions } from './setup';
 import { startWebServer } from '../web/server';
 
@@ -18,13 +18,19 @@ export async function runCli(): Promise<void> {
     printAgentableBanner();
 
     const runOptions = await enrichRunOptions(parsed);
-    const started = await runWithProgress('Running analysis', async () =>
-      startWebServer({
-        runOptions,
-        host: parsed.host,
-        port: parsed.port,
-      }),
-    );
+    const progress = createProgressReporter('Running analysis');
+
+    let started;
+    try {
+      started = await startWebServer(
+        { runOptions, host: parsed.host, port: parsed.port },
+        progress.reporter,
+      );
+      progress.done();
+    } catch (error) {
+      progress.fail();
+      throw error;
+    }
 
     if (output.isTTY) {
       openBrowser(started.url);

@@ -65,8 +65,9 @@ function toHistorySnapshot(payload: WebReportPayload): WebHistoryPoint {
 async function computePayload(
   options: StartWebServerOptions,
   previousHistory: WebHistoryPoint[] | null,
+  onProgress?: (step: string) => void,
 ): Promise<{ payload: WebReportPayload; history: WebHistoryPoint[] }> {
-  const engineOutput = await runAgentReadiness(options.runOptions);
+  const engineOutput = await runAgentReadiness(options.runOptions, onProgress);
   const repoKey = computeRepoKey(engineOutput.meta.repoIdentifier || engineOutput.meta.repoPath);
 
   let history = previousHistory ?? (await loadHistory(repoKey, options.historyDir));
@@ -100,8 +101,11 @@ async function computePayload(
   };
 }
 
-export async function startWebServer(options: StartWebServerOptions): Promise<StartedWebServer> {
-  const initial = await computePayload(options, null);
+export async function startWebServer(
+  options: StartWebServerOptions,
+  onProgress?: (step: string) => void,
+): Promise<StartedWebServer> {
+  const initial = await computePayload(options, null, onProgress);
 
   const state: WebServerState = {
     payload: initial.payload,
