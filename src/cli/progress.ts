@@ -9,6 +9,26 @@ export interface ProgressHandle {
   fail: () => void;
 }
 
+const STEPS = [
+  'Scanning repository',
+  'Collecting git data',
+  'Checking GitHub',
+  'Running AI assessments',
+  'Evaluating criteria',
+  'Building action plan',
+  'Enriching recommendations',
+];
+
+function drawBar(percent: number): string {
+  const width = 24;
+  const clamped = Math.max(0, Math.min(100, percent));
+  const filled = Math.round((clamped / 100) * width);
+  const empty = width - filled;
+  const bar = `${'█'.repeat(filled)}${'░'.repeat(empty)}`;
+  const percentText = `${String(Math.round(clamped)).padStart(3)}%`;
+  return `${paint(percentText, 'cyan', true)} ${paint(`▕${bar}▏`, 'dim')}`;
+}
+
 export function createProgressReporter(label: string): ProgressHandle {
   if (!output.isTTY) {
     return { reporter: () => {}, done: () => {}, fail: () => {} };
@@ -16,32 +36,45 @@ export function createProgressReporter(label: string): ProgressHandle {
 
   const spinnerFrames = ['◐', '◓', '◑', '◒'];
   let currentStep = '';
-  let lastLineWidth = 0;
+  let percent = 0;
 
-  const writeLine = (): void => {
+  // Write two lines; cursor ends at start of line 1 ready to overwrite
+  const writeLines = (finalize = false): void => {
     const frame = spinnerFrames[Math.floor(Date.now() / 110) % spinnerFrames.length] ?? '◐';
     const stepPart = currentStep ? ` · ${currentStep}` : '';
-    const line = `${paint(frame, 'cyan', true)} ${paint(label, 'cyan')}${paint(stepPart, 'dim')}`;
-    const pad = lastLineWidth > line.length ? ' '.repeat(lastLineWidth - line.length) : '';
-    output.write(`\r${line}${pad}`);
-    lastLineWidth = Math.max(lastLineWidth, line.length);
+    const line1 = `${paint(frame, 'cyan', true)} ${paint(label, 'cyan')}${paint(stepPart, 'dim')}`;
+    const line2 = `  ${drawBar(percent)}`;
+    const eol = '\x1b[K'; // clear to end of line
+
+    if (finalize) {
+      output.write(`\r${eol}${line1}\n\r${eol}${line2}\n`);
+    } else {
+      // Write both lines then move cursor back to line 1
+      output.write(`\r${eol}${line1}\n\r${eol}${line2}\x1b[1A`);
+    }
   };
 
-  writeLine();
-  const timer = setInterval(writeLine, 110);
+  writeLines();
+  const timer = setInterval(writeLines, 110);
 
   return {
     reporter: (step) => {
       currentStep = step;
-      writeLine();
+      const idx = STEPS.indexOf(step);
+      if (idx >= 0) {
+        percent = Math.round((idx / STEPS.length) * 100);
+      }
+      writeLines();
     },
     done: () => {
       clearInterval(timer);
-      output.write('\n');
+      percent = 100;
+      currentStep = '';
+      writeLines(true);
     },
     fail: () => {
       clearInterval(timer);
-      output.write('\n');
+      output.write('\n\n');
     },
   };
 }
