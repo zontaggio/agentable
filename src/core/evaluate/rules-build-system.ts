@@ -3,6 +3,17 @@ import { hasAnyDependency, hasAnyFilePattern, hasAnyScript, includesAny } from '
 import { makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
+const AGENT_COMMIT_SIGNAL_PATTERNS = [
+  /\bco-authored-by\s*:/i,
+  /\bcopilot\b/i,
+  /\bchatgpt\b/i,
+  /\bclaude\b/i,
+] as const;
+
+function hasAgentCommitSignals(text: string): boolean {
+  return AGENT_COMMIT_SIGNAL_PATTERNS.some((pattern) => pattern.test(text));
+}
+
 export async function evaluateBuildSystem(
   input: CriterionEvaluatorInput,
 ) {
@@ -21,10 +32,7 @@ export async function evaluateBuildSystem(
 
       if (gitData.isGitRepo) {
         const logCheck = await runCommand('git', ['log', '--format=%B', '-n', '25'], local.rootPath);
-        if (
-          logCheck.ok &&
-          includesAny(logCheck.stdout, ['co-authored-by', 'copilot', 'claude', 'chatgpt', 'ai'])
-        ) {
+        if (logCheck.ok && hasAgentCommitSignals(logCheck.stdout)) {
           return makeResult(criterion, 'pass', 'Recent git history indicates agent-assisted contributions.');
         }
       }

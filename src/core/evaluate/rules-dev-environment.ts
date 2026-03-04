@@ -26,10 +26,24 @@ export async function evaluateDevEnvironment(
       const content = await safeReadText(configPath);
       try {
         const parsed = JSON.parse(content) as Record<string, unknown>;
+        const image = typeof parsed.image === 'string' ? parsed.image.trim() : '';
+        const dockerFile = typeof parsed.dockerFile === 'string' ? parsed.dockerFile.trim() : '';
+        const build =
+          parsed.build && typeof parsed.build === 'object' && !Array.isArray(parsed.build)
+            ? (parsed.build as Record<string, unknown>)
+            : null;
+        const buildContext = typeof build?.context === 'string' ? build.context.trim() : '';
+        const buildDockerfile =
+          typeof build?.dockerfile === 'string'
+            ? build.dockerfile.trim()
+            : typeof build?.dockerFile === 'string'
+              ? build.dockerFile.trim()
+              : '';
         const hasRuntime =
-          typeof parsed.image === 'string' ||
-          typeof parsed.dockerFile === 'string' ||
-          typeof parsed.build === 'object';
+          image.length > 0 ||
+          dockerFile.length > 0 ||
+          buildContext.length > 0 ||
+          buildDockerfile.length > 0;
         return hasRuntime
           ? makeResult(criterion, 'pass', 'Devcontainer has runtime definition and appears runnable.')
           : makeResult(criterion, 'fail', 'Devcontainer exists but missing image/dockerFile/build settings.');

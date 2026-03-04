@@ -9,9 +9,7 @@ export const APP_JS_SECTIONS = `
           '<span>' + escapeHtml(card.badge) + '</span>' +
           '</div>' +
           '<div class="card-name">' + escapeHtml(card.name) + '</div>' +
-          (card.status !== 'pass' ? '<div class="card-hint">Improve tips available</div>' : '') +
           '<div class="card-score">' + escapeHtml(card.scoreLabel) + '</div>' +
-          (card.priorityRank ? '<div class="card-rank">#' + escapeHtml(String(card.priorityRank)) + '</div>' : '') +
           '</button>'
         );
       })
@@ -71,23 +69,6 @@ export const APP_JS_SECTIONS = `
       renderActionBucket('High Leverage', 'highLeverage', actionPlan.highLeverage || []) +
       renderActionBucket('Quick Wins', 'quickWins', actionPlan.quickWins || []) +
       '</div>' +
-      '</section>'
-    );
-  }
-
-  function renderLimitations(payload) {
-    var limits = Array.isArray(payload.knownLimitations) ? payload.knownLimitations : [];
-    if (limits.length === 0) {
-      return '';
-    }
-
-    return (
-      '<section class="panel action-plan">' +
-      '<h2 class="action-title">Known Limitations</h2>' +
-      '<div class="action-subtitle">Quality gate version: ' + escapeHtml(payload.qualityGateVersion || 'n/a') + '</div>' +
-      '<ul class="action-list expanded">' +
-      limits.map(function (item) { return '<li><div class="action-item-meta">' + escapeHtml(item) + '</div></li>'; }).join('') +
-      '</ul>' +
       '</section>'
     );
   }

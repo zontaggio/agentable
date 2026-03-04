@@ -68,12 +68,6 @@ export const APP_JS_MODAL = `
       '<section class="modal-section"><div class="modal-section-title">Current evidence</div><div id="modal-evidence"></div></section>' +
       '<section class="modal-section"><div class="modal-section-title">Implementation next steps</div><div id="modal-next-steps"></div></section>' +
       '<section class="modal-section"><div class="modal-section-title">Success signal</div><div id="modal-success"></div></section>' +
-      '<section class="modal-section"><div class="modal-section-title">Was this recommendation useful?</div>' +
-      '<div class="hero-actions">' +
-      '<button class="icon-btn" data-feedback-useful="true" title="Helpful">Yes</button>' +
-      '<button class="icon-btn" data-feedback-useful="false" title="Not helpful">No</button>' +
-      '</div>' +
-      '</section>' +
       '</div>' +
       '</div>' +
       '</div>'
@@ -192,8 +186,6 @@ export const APP_JS_MODAL = `
       '</section>' +
 
       renderActionPlan(payload) +
-      renderLimitations(payload) +
-
       renderCategorySections(payload) +
       renderModal();
 

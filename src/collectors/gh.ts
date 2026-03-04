@@ -78,9 +78,10 @@ export async function collectGhData(repoPath: string, enabled: boolean): Promise
 
   const repo = repoJson.nameWithOwner;
   const defaultBranch = repoJson.defaultBranchRef?.name ?? 'main';
+  const encodedDefaultBranch = encodeURIComponent(defaultBranch);
 
   const [protectionRes, securityRes, labelsRes, issuesRes] = await Promise.all([
-    runCommand('gh', ['api', `repos/${repo}/branches/${defaultBranch}/protection`], repoPath),
+    runCommand('gh', ['api', `repos/${repo}/branches/${encodedDefaultBranch}/protection`], repoPath),
     runCommand('gh', ['api', `repos/${repo}`], repoPath),
     runCommand('gh', ['api', `repos/${repo}/labels?per_page=100`], repoPath),
     runCommand(
