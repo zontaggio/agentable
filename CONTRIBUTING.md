@@ -30,6 +30,7 @@ Thank you for your interest in contributing to Agentable!
 - Follow existing patterns and conventions
 - Add JSDoc comments for public APIs
 - Keep functions focused and testable
+- Keep each `src/**/*.ts` file at 300 lines or fewer
 
 ## Testing
 
@@ -37,6 +38,12 @@ Run the full test suite:
 
 ```bash
 npm test
+```
+
+Validate max-line rule only:
+
+```bash
+npm run check:max-lines
 ```
 
 Test against a real repository:
