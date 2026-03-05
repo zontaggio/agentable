@@ -65,6 +65,10 @@ Execution flow:
 
 Use this checklist to avoid incomplete registrations.
 
+0. Generate scaffold files (recommended)
+   - Run `npm run new:criterion -- <criterion_id> <category> [source] [--ai-assisted]`.
+   - The command creates starter snippets in `scaffolds/criteria/<criterion_id>/`.
+
 1. Define criterion metadata
    - Add the criterion definition in the appropriate `src/catalog/v1/*.criteria.ts` file.
    - Ensure `id`, `category`, `description`, and `aiAssisted` flags are accurate.
