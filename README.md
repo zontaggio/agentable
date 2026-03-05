@@ -60,6 +60,28 @@ agentable --setup
 
 Fallback mode runs even without config and marks AI-assisted criteria as `unverified`.
 
+## Project overrides (`.agentable.json`)
+
+You can skip criteria or mark specific criteria as not applicable per repository:
+
+```json
+{
+  "skip": ["criterion_id"],
+  "overrides": {
+    "criterion_id": {
+      "applicable": false,
+      "reason": "Optional explanation shown in report"
+    }
+  }
+}
+```
+
+Behavior:
+
+- `skip`: force criterion status to `skip`
+- `overrides.<id>.applicable: false`: force status to `skip` with optional custom reason
+- applied before normal applicability and evaluation logic
+
 ## Runtime behavior
 
 `agentable .`:

@@ -182,3 +182,42 @@ test('engine falls back to deterministic mode when AI is unavailable', async () 
   assert.ok(modularization);
   assert.equal(modularization.status, 'unverified');
 });
+
+test('engine applies .agentable.json skip and applicability overrides', async () => {
+  const repoPath = await createRepoFixture();
+
+  await fs.writeFile(
+    path.join(repoPath, '.agentable.json'),
+    JSON.stringify(
+      {
+        skip: ['unit_tests_exist'],
+        overrides: {
+          secrets_management: {
+            applicable: false,
+            reason: 'Managed by platform defaults for this fixture.',
+          },
+        },
+      },
+      null,
+      2,
+    ),
+    'utf8',
+  );
+
+  const result = await runAgentReadiness({
+    repoPath,
+    verbose: false,
+    noGh: true,
+    aiFailureMode: 'fallback',
+  });
+
+  const unitTestsExist = result.results.find((item) => item.id === 'unit_tests_exist');
+  assert.ok(unitTestsExist);
+  assert.equal(unitTestsExist.status, 'skip');
+  assert.match(unitTestsExist.reason, /\.agentable\.json/);
+
+  const secretsManagement = result.results.find((item) => item.id === 'secrets_management');
+  assert.ok(secretsManagement);
+  assert.equal(secretsManagement.status, 'skip');
+  assert.equal(secretsManagement.reason, 'Managed by platform defaults for this fixture.');
+});

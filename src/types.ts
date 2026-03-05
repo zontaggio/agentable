@@ -12,6 +12,16 @@ export type CategoryId =
 export type CriterionStatus = 'pass' | 'fail' | 'skip' | 'unverified';
 export type AiProviderName = 'openrouter' | 'openai';
 
+export interface AgentableCriterionOverride {
+  applicable?: boolean;
+  reason?: string;
+}
+
+export interface AgentableProjectConfig {
+  skip: string[];
+  overrides: Record<string, AgentableCriterionOverride>;
+}
+
 export type CriterionSource = 'local' | 'gh' | 'ai' | 'hybrid';
 export type CriterionConfidence = 'high' | 'medium' | 'low';
 export type EvidenceKind = 'dependency' | 'file' | 'workflow' | 'gh' | 'ai' | 'text';
@@ -87,6 +97,7 @@ export interface LocalProjectContext {
   rootPath: string;
   files: string[];
   fileSet: Set<string>;
+  projectConfig: AgentableProjectConfig;
   packageJson: Record<string, unknown> | null;
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;

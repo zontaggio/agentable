@@ -11,6 +11,22 @@ interface CatalogDryRunRow {
   skipReason: string | null;
 }
 
+function skipReasonFromProjectConfig(
+  criterionId: string,
+  local: Awaited<ReturnType<typeof collectLocalProjectContext>>,
+): string | null {
+  const override = local.projectConfig.overrides[criterionId];
+  if (override?.applicable === false) {
+    return override.reason || 'Skipped via .agentable.json override.';
+  }
+
+  if (local.projectConfig.skip.includes(criterionId)) {
+    return 'Skipped via .agentable.json skip list.';
+  }
+
+  return null;
+}
+
 function tableRow(values: string[]): string {
   return `| ${values.map((value) => value.replaceAll('\n', ' ').replaceAll('|', '\\|')).join(' | ')} |`;
 }
@@ -66,10 +82,13 @@ export async function runDryRun(repoPath: string): Promise<void> {
   const profile = buildProjectProfile(local);
 
   const rows: CatalogDryRunRow[] = CRITERIA.map((criterion) => {
+    const configuredSkip = skipReasonFromProjectConfig(criterion.id, local);
     const applicability = evaluateApplicabilitySkip(criterion.id, profile, local);
     return {
       criterion,
-      skipReason: applicability.skip ? (applicability.reason ?? 'Skipped by profile') : null,
+      skipReason:
+        configuredSkip ||
+        (applicability.skip ? (applicability.reason ?? 'Skipped by profile') : null),
     };
   });
 

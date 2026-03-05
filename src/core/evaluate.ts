@@ -10,12 +10,47 @@ import { getCriterionEvaluator } from './evaluate/rules-index';
 import { buildSignals } from './evaluate/signals';
 import { EvalSignals } from './evaluate/types';
 
+function evaluateProjectConfigSkip(
+  criterion: CriterionDefinition,
+  ctx: EvaluationContext,
+): { skip: boolean; reason?: string } {
+  const override = ctx.local.projectConfig.overrides[criterion.id];
+  if (override?.applicable === false) {
+    return {
+      skip: true,
+      reason: override.reason || 'Skipped via .agentable.json override.',
+    };
+  }
+
+  if (ctx.local.projectConfig.skip.includes(criterion.id)) {
+    return {
+      skip: true,
+      reason: 'Skipped via .agentable.json skip list.',
+    };
+  }
+
+  return { skip: false };
+}
+
 async function evaluateCriterion(
   criterion: CriterionDefinition,
   ctx: EvaluationContext,
   gitData: GitData,
   signals: EvalSignals,
 ): Promise<CriterionResult> {
+  const configuredSkip = evaluateProjectConfigSkip(criterion, ctx);
+  if (configuredSkip.skip) {
+    return makeResult(
+      criterion,
+      'skip',
+      configuredSkip.reason ?? 'Skipped via .agentable.json.',
+      [],
+      [],
+      undefined,
+      false,
+    );
+  }
+
   const applicability = evaluateApplicabilitySkip(criterion.id, ctx.profile, ctx.local);
   if (applicability.skip) {
     return makeResult(
