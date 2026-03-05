@@ -28,7 +28,7 @@ node dist/cli.js .
 ## Usage
 
 ```bash
-agentable [path] [--verbose] [--no-gh] [--ai-failure-mode <fallback|strict>] [--host <ip>] [--port <n>] [--setup]
+agentable [path] [--verbose] [--no-gh] [--ai-failure-mode <fallback|strict>] [--host <ip>] [--port <n>] [--setup] [--dry-run]
 ```
 
 Options:
@@ -39,6 +39,7 @@ Options:
 - `--host`: dashboard bind host (default: `127.0.0.1`)
 - `--port`: dashboard port (default: `4173`)
 - `--setup`: reconfigure OpenRouter API key/model
+- `--dry-run`: print full criteria catalog + applicability preview, then exit without analysis/server/AI calls
 
 Removed options:
 

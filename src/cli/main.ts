@@ -3,6 +3,7 @@ import { parseArgs } from './args';
 import { printAgentableBanner } from './banner';
 import { openBrowser } from './browser';
 import { printDashboardReady } from './dashboard';
+import { runDryRun } from './dry-run';
 import { createProgressReporter } from './progress';
 import { enrichRunOptions } from './setup';
 import { startWebServer } from '../web/server';
@@ -16,6 +17,12 @@ export async function runCli(): Promise<void> {
     }
 
     printAgentableBanner();
+
+    if (parsed.dryRun) {
+      await runDryRun(parsed.runOptions.repoPath);
+      process.exitCode = 0;
+      return;
+    }
 
     const runOptions = await enrichRunOptions(parsed);
     const progress = createProgressReporter('Running analysis');

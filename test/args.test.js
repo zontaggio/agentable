@@ -21,3 +21,16 @@ test('parseArgs rejects invalid ai failure mode', () => {
     /Invalid --ai-failure-mode value/,
   );
 });
+
+test('parseArgs enables dry-run mode', () => {
+  const parsed = parseArgs(['.', '--dry-run']);
+  assert.ok(parsed);
+  assert.equal(parsed.dryRun, true);
+});
+
+test('parseArgs rejects --setup with --dry-run', () => {
+  assert.throws(
+    () => parseArgs(['.', '--setup', '--dry-run']),
+    /--setup and --dry-run cannot be used together/,
+  );
+});

@@ -11,6 +11,7 @@ export function parseArgs(argv: string[]): CliOptions | null {
   let host = '127.0.0.1';
   let port = 4173;
   let setup = false;
+  let dryRun = false;
 
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
@@ -55,6 +56,11 @@ export function parseArgs(argv: string[]): CliOptions | null {
 
     if (arg === '--setup') {
       setup = true;
+      continue;
+    }
+
+    if (arg === '--dry-run') {
+      dryRun = true;
       continue;
     }
 
@@ -130,6 +136,10 @@ export function parseArgs(argv: string[]): CliOptions | null {
     repoPath = arg;
   }
 
+  if (setup && dryRun) {
+    throw new Error('Options --setup and --dry-run cannot be used together.');
+  }
+
   return {
     runOptions: {
       repoPath,
@@ -139,6 +149,7 @@ export function parseArgs(argv: string[]): CliOptions | null {
     },
     host,
     port,
+    dryRun,
     setup,
   };
 }
