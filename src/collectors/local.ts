@@ -29,16 +29,29 @@ async function estimateLoc(rootPath: string, files: string[]): Promise<number> {
   const codeFiles = files.filter((f) =>
     /\.(ts|tsx|js|jsx|mjs|cjs|py|go|rb|java|kt|rs|php|cs|scala|swift|md)$/i.test(f),
   );
+  const LOC_SAMPLE_LIMIT = 1200;
+  const LOC_READ_CONCURRENCY = 50;
+  const sampledFiles = codeFiles.slice(0, LOC_SAMPLE_LIMIT);
+
+  if (sampledFiles.length === 0) {
+    return 0;
+  }
 
   let loc = 0;
-  for (const rel of codeFiles.slice(0, 1200)) {
-    const abs = path.join(rootPath, rel);
-    try {
-      const content = await fs.readFile(abs, 'utf8');
-      loc += content.split('\n').length;
-    } catch {
-      // ignore unreadable files
-    }
+  for (let index = 0; index < sampledFiles.length; index += LOC_READ_CONCURRENCY) {
+    const batch = sampledFiles.slice(index, index + LOC_READ_CONCURRENCY);
+    const counts = await Promise.all(
+      batch.map(async (rel) => {
+        const abs = path.join(rootPath, rel);
+        try {
+          const content = await fs.readFile(abs, 'utf8');
+          return content.split('\n').length;
+        } catch {
+          return 0;
+        }
+      }),
+    );
+    loc += counts.reduce((sum, count) => sum + count, 0);
   }
 
   return loc;
