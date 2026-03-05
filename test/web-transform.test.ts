@@ -93,7 +93,7 @@ test('buildWebPayload creates category buckets and card metadata', () => {
         fingerprint: 'abc123',
         generatedAt: '2026-03-01T00:00:00.000Z',
         repoPath: '/tmp/repo',
-        model: 'openai/gpt-4o-mini',
+        model: 'gpt-oss-120b',
         aiCache: 'miss',
         aiProvider: 'openrouter',
         catalogVersion: 'v1.0.0',
@@ -170,6 +170,7 @@ test('buildWebPayload creates category buckets and card metadata', () => {
   assert.equal(formatterCard.scoreLabel, '1/1');
   assert.ok(Array.isArray(formatterCard.improvementTips));
   assert.ok(formatterCard.improvementTips.length > 0);
+  assert.equal(formatterCard.remediationPrompt, undefined);
 
   const complexityCard = payload.criteriaByCategory.style_validation.find(
     (item) => item.id === 'cyclomatic_complexity',
@@ -178,6 +179,14 @@ test('buildWebPayload creates category buckets and card metadata', () => {
   assert.equal(complexityCard.badge, 'ADVANCED');
   assert.equal(complexityCard.scoreLabel, '0/2');
   assert.equal(complexityCard.priorityRank, 1);
+  assert.equal(typeof complexityCard.remediationPrompt, 'string');
+  assert.match(complexityCard.remediationPrompt, /\[Readiness Fix\] repo Cyclomatic Complexity/);
+
+  const skipCard = payload.criteriaByCategory.build_system.find(
+    (item) => item.id === 'single_command_setup',
+  );
+  assert.ok(skipCard);
+  assert.equal(skipCard.remediationPrompt, undefined);
 });
 
 export {};

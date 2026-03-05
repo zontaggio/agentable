@@ -1,35 +1,67 @@
 import { stdin as input, stdout as output } from 'node:process';
-import { createInterface, Interface } from 'node:readline/promises';
-import {
-  DEFAULT_AI_PROVIDER,
-  DEFAULT_OPENAI_MODEL,
-  DEFAULT_OPENROUTER_MODEL,
-} from '../collectors/ai';
-import { DEFAULT_OPENAI_BASE_URL } from '../collectors/providers/openai/http';
+import { emitKeypressEvents } from 'node:readline';
+import { createInterface } from 'node:readline/promises';
+import { DEFAULT_AI_PROVIDER } from '../collectors/ai';
 import {
   AgentReadinessUserConfig,
   getUserConfigPath,
   loadUserConfig,
   saveUserConfig,
 } from '../core/user-config';
-import { AiProviderName, RunOptions } from '../types';
+import { RunOptions } from '../types';
 import { paint } from './ansi';
 import { BRAND_NAME } from './constants';
 import { CliOptions } from './types';
 
-function providerLabel(provider: AiProviderName): string {
-  return provider === 'openai' ? 'OpenAI-compatible' : 'OpenRouter';
+type OpenRouterModelPresetId = 'default' | 'top' | 'premium';
+
+interface OpenRouterModelPreset {
+  id: OpenRouterModelPresetId;
+  label: string;
+  model: string;
+  description: string;
 }
+
+interface ArrowMenuOption<T> {
+  value: T;
+  label: string;
+  description?: string;
+}
+
+const DEFAULT_MODEL = 'gpt-oss-120b';
+const TOP_MODEL = 'claude-sonnet-4.6';
+const PREMIUM_MODEL = 'claude-opus-4.6';
+
+const OPENROUTER_MODEL_PRESETS: OpenRouterModelPreset[] = [
+  {
+    id: 'default',
+    label: 'Default',
+    model: DEFAULT_MODEL,
+    description: 'mais barato',
+  },
+  {
+    id: 'top',
+    label: 'Top',
+    model: TOP_MODEL,
+    description: 'melhor custo-beneficio',
+  },
+  {
+    id: 'premium',
+    label: 'Premium',
+    model: PREMIUM_MODEL,
+    description: 'mais caro',
+  },
+];
 
 function printSetupHeader(isReconfigure: boolean): void {
   const title = isReconfigure
-    ? `${BRAND_NAME} Setup (Reconfigure)`
+    ? `${BRAND_NAME} Setup (Reconfigure OpenRouter)`
     : `${BRAND_NAME} First-Time Setup`;
   const lines = [
     '┌─────────────────────────────────────────────────────────────────────┐',
     `│ ${title.padEnd(67)}│`,
     '├─────────────────────────────────────────────────────────────────────┤',
-    '│ We store your AI provider config locally on this machine only.     │',
+    '│ OpenRouter is the default provider for this release.               │',
     `│ Config: ${getUserConfigPath().padEnd(57)}│`,
     '└─────────────────────────────────────────────────────────────────────┘',
   ];
@@ -39,31 +71,108 @@ function printSetupHeader(isReconfigure: boolean): void {
   console.log('');
 }
 
-function normalizeProvider(value: string, fallback: AiProviderName): AiProviderName {
-  const low = value.trim().toLowerCase();
-  if (!low) {
-    return fallback;
+function chooseInput(currentValue: string, userInput: string): string {
+  const normalized = userInput.trim();
+  if (normalized) {
+    return normalized;
   }
-
-  if (low === '1' || low === 'openrouter' || low === 'router') {
-    return 'openrouter';
-  }
-  if (low === '2' || low === 'openai' || low === 'openai-compatible') {
-    return 'openai';
-  }
-
-  throw new Error('Invalid provider. Choose openrouter or openai.');
+  return currentValue;
 }
 
-async function promptProvider(
-  rl: Interface,
-  existingConfig: AgentReadinessUserConfig | null,
-): Promise<AiProviderName> {
-  const current = existingConfig?.provider ?? DEFAULT_AI_PROVIDER;
-  const answer = await rl.question(
-    `${paint('AI provider', 'cyan', true)} [1=openrouter, 2=openai] (${current}): `,
-  );
-  return normalizeProvider(answer, current);
+function modelPresetForValue(value: string): OpenRouterModelPreset | null {
+  return OPENROUTER_MODEL_PRESETS.find((item) => item.model === value) ?? null;
+}
+
+function initialModelMenuIndex(currentModel: string): number {
+  const presetIndex = OPENROUTER_MODEL_PRESETS.findIndex((item) => item.model === currentModel);
+  return presetIndex === -1 ? OPENROUTER_MODEL_PRESETS.length : presetIndex;
+}
+
+async function selectWithArrows<T>(
+  title: string,
+  options: ArrowMenuOption<T>[],
+  initialIndex = 0,
+): Promise<T> {
+  if (options.length === 0) {
+    throw new Error('Menu options cannot be empty.');
+  }
+
+  const safeInitialIndex = Math.min(Math.max(initialIndex, 0), options.length - 1);
+  let selectedIndex = safeInitialIndex;
+  let renderedLines = 0;
+
+  const render = () => {
+    const lines = [
+      paint(title, 'cyan', true),
+      ...options.map((option, index) => {
+        const marker = index === selectedIndex ? '●' : '○';
+        const details = option.description ? ` (${option.description})` : '';
+        return `  ${marker} ${option.label}${details}`;
+      }),
+      paint('Use ↑/↓ and Enter to select.', 'dim'),
+    ];
+
+    if (renderedLines > 0) {
+      output.write(`\u001B[${renderedLines}A`);
+    }
+
+    for (const line of lines) {
+      output.write(`\u001B[2K\r${line}\n`);
+    }
+
+    renderedLines = lines.length;
+  };
+
+  return new Promise<T>((resolve, reject) => {
+    emitKeypressEvents(input);
+    const stream = input as NodeJS.ReadStream;
+    const wasRaw = Boolean(stream.isRaw);
+    if (!wasRaw) {
+      stream.setRawMode?.(true);
+    }
+
+    const cleanup = () => {
+      input.off('keypress', onKeyPress);
+      if (!wasRaw) {
+        stream.setRawMode?.(false);
+      }
+      output.write('\n');
+    };
+
+    const onKeyPress = (_chunk: string, key: { name?: string; ctrl?: boolean }) => {
+      if (key.ctrl && key.name === 'c') {
+        cleanup();
+        reject(new Error('Setup interrupted by user.'));
+        return;
+      }
+
+      if (key.name === 'up') {
+        selectedIndex = (selectedIndex - 1 + options.length) % options.length;
+        render();
+        return;
+      }
+
+      if (key.name === 'down') {
+        selectedIndex = (selectedIndex + 1) % options.length;
+        render();
+        return;
+      }
+
+      if (key.name === 'return' || key.name === 'enter') {
+        const selected = options[selectedIndex];
+        if (!selected) {
+          cleanup();
+          reject(new Error('Menu selection failed.'));
+          return;
+        }
+        cleanup();
+        resolve(selected.value);
+      }
+    };
+
+    input.on('keypress', onKeyPress);
+    render();
+  });
 }
 
 async function promptAndSaveUserConfig(
@@ -76,73 +185,45 @@ async function promptAndSaveUserConfig(
   }
 
   printSetupHeader(Boolean(existingConfig));
+  const previousApiKey = existingConfig?.apiKey ?? '';
+  const previousModel = existingConfig?.model ?? DEFAULT_MODEL;
 
   const rl = createInterface({ input, output });
   try {
-    const provider = await promptProvider(rl, existingConfig);
-    const isSameProvider = existingConfig?.provider === provider;
+    console.log(`${paint('Provider', 'cyan', true)}: OpenRouter`);
+    console.log('');
 
-    if (provider === 'openrouter') {
-      const previousKey = isSameProvider ? (existingConfig?.apiKey ?? '') : '';
-      const previousModel =
-        isSameProvider && existingConfig?.model ? existingConfig.model : DEFAULT_OPENROUTER_MODEL;
+    const apiKeyPrompt = previousApiKey
+      ? `${paint('OpenRouter API key', 'cyan', true)} (Enter keeps current): `
+      : `${paint('OpenRouter API key', 'cyan', true)} (required): `;
+    const apiKey = chooseInput(previousApiKey, await rl.question(apiKeyPrompt));
 
-      const apiPrompt = previousKey
-        ? `${paint('OpenRouter API key', 'cyan', true)} (press Enter to keep current): `
-        : `${paint('OpenRouter API key', 'cyan', true)}: `;
-      const apiInput = (await rl.question(apiPrompt)).trim();
+    const modelOptions: ArrowMenuOption<string>[] = [
+      { value: DEFAULT_MODEL, label: DEFAULT_MODEL, description: 'Default - mais barato' },
+      { value: TOP_MODEL, label: TOP_MODEL, description: 'Top - melhor custo-beneficio' },
+      { value: PREMIUM_MODEL, label: PREMIUM_MODEL, description: 'Premium - mais caro' },
+      { value: '__custom__', label: 'Custom model', description: 'digitar manualmente' },
+    ];
 
-      const modelInput = (
-        await rl.question(`${paint('OpenRouter model', 'cyan', true)} [${previousModel}]: `)
-      ).trim();
-      const model = modelInput || previousModel;
-      const apiKey = apiInput || previousKey;
+    const selectedModel = await selectWithArrows(
+      paint('Select OpenRouter model', 'cyan', true),
+      modelOptions,
+      initialModelMenuIndex(previousModel),
+    );
 
-      if (!apiKey) {
-        throw new Error('OpenRouter API key is required for provider=openrouter.');
-      }
-
-      const saved = await saveUserConfig({
-        provider,
-        apiKey,
-        model,
-      });
-
-      console.log('');
-      console.log(paint(`Saved ${BRAND_NAME} config at ${getUserConfigPath()}`, 'green', true));
-      console.log('');
-
-      return saved;
+    let model = selectedModel;
+    if (selectedModel === '__custom__') {
+      const customDefault = modelPresetForValue(previousModel) ? '' : previousModel;
+      const customPrompt = customDefault
+        ? `${paint('Custom model id', 'cyan', true)} [${customDefault}]: `
+        : `${paint('Custom model id', 'cyan', true)}: `;
+      model = chooseInput(customDefault, await rl.question(customPrompt));
     }
 
-    const previousKey = isSameProvider ? (existingConfig?.apiKey ?? '') : '';
-    const previousModel =
-      isSameProvider && existingConfig?.model ? existingConfig.model : DEFAULT_OPENAI_MODEL;
-    const previousBaseUrl =
-      isSameProvider && existingConfig?.baseUrl ? existingConfig.baseUrl : DEFAULT_OPENAI_BASE_URL;
-
-    const apiPrompt = previousKey
-      ? `${paint('OpenAI API key', 'cyan', true)} (optional, Enter keeps current): `
-      : `${paint('OpenAI API key', 'cyan', true)} (optional): `;
-    const apiInput = (await rl.question(apiPrompt)).trim();
-
-    const modelInput = (
-      await rl.question(`${paint('OpenAI model', 'cyan', true)} [${previousModel}]: `)
-    ).trim();
-    const model = modelInput || previousModel;
-
-    const baseUrlInput = (
-      await rl.question(
-        `${paint('OpenAI base URL', 'cyan', true)} [${previousBaseUrl}] (for Ollama/vLLM/etc): `,
-      )
-    ).trim();
-    const baseUrl = baseUrlInput || previousBaseUrl;
-
     const saved = await saveUserConfig({
-      provider,
-      apiKey: apiInput || previousKey,
+      provider: 'openrouter',
+      apiKey,
       model,
-      baseUrl,
     });
 
     console.log('');
@@ -159,7 +240,7 @@ function applyConfigToRunOptions(runOptions: RunOptions, config: AgentReadinessU
   runOptions.aiProvider = config.provider;
   runOptions.aiApiKey = config.apiKey;
   runOptions.aiModel = config.model;
-  runOptions.aiBaseUrl = config.provider === 'openai' ? config.baseUrl : undefined;
+  runOptions.aiBaseUrl = undefined;
 }
 
 export async function enrichRunOptions(parsed: CliOptions): Promise<RunOptions> {
@@ -167,37 +248,41 @@ export async function enrichRunOptions(parsed: CliOptions): Promise<RunOptions> 
   const aiFailureMode = runOptions.aiFailureMode ?? 'fallback';
   runOptions.aiFailureMode = aiFailureMode;
 
-  const existingConfig = await loadUserConfig();
+  const loaded = await loadUserConfig();
+  for (const warning of loaded.warnings) {
+    console.log(paint(`${BRAND_NAME}: ${warning}`, 'magenta', true));
+  }
 
   if (parsed.setup) {
-    const configured = await promptAndSaveUserConfig(existingConfig);
+    const configured = await promptAndSaveUserConfig(loaded.config);
     applyConfigToRunOptions(runOptions, configured);
     return runOptions;
   }
 
-  if (!existingConfig) {
+  if (!loaded.config) {
     if (aiFailureMode === 'strict' && (!input.isTTY || !output.isTTY)) {
       throw new Error(
-        `AI config not found and strict AI mode is enabled. Run \`agentable --setup\` in an interactive terminal or switch to --ai-failure-mode=fallback. Config path: ${getUserConfigPath()}`,
+        `AI config not found or invalid and strict AI mode is enabled. Run \`agentable --setup\` in an interactive terminal or switch to --ai-failure-mode=fallback. Config path: ${getUserConfigPath()}`,
       );
     }
 
     if (aiFailureMode === 'strict') {
-      console.log(`${BRAND_NAME} first-time setup: configure your AI provider credentials.`);
+      const setupReason = loaded.needsSetup
+        ? 'previous config must be replaced'
+        : 'configuration is required';
+      console.log(`${BRAND_NAME} setup required: ${setupReason}.`);
       const configured = await promptAndSaveUserConfig(null);
       applyConfigToRunOptions(runOptions, configured);
       return runOptions;
     }
 
     console.log(
-      `${BRAND_NAME}: AI config not found. Continuing in fallback mode with AI-assisted criteria marked as unverified.`,
+      `${BRAND_NAME}: OpenRouter config not found. Continuing in fallback mode with AI-assisted criteria marked as unverified.`,
     );
     return runOptions;
   }
 
-  applyConfigToRunOptions(runOptions, existingConfig);
-  console.log(
-    `${BRAND_NAME}: using configured AI provider ${providerLabel(existingConfig.provider)} (${existingConfig.provider}).`,
-  );
+  applyConfigToRunOptions(runOptions, loaded.config);
+  console.log(`${BRAND_NAME}: using configured AI provider (${DEFAULT_AI_PROVIDER}).`);
   return runOptions;
 }

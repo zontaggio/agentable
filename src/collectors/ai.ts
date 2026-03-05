@@ -87,9 +87,9 @@ async function buildPromptContext(
 }
 
 export async function collectAiAssessments(input: AiCollectionInput): Promise<AiCollectionOutput> {
-  const provider = resolveAiProvider(input.provider);
+  const provider = resolveAiProvider();
   const providerName = provider.name as AiProviderName;
-  const model = input.model || defaultModelForProvider(providerName);
+  const model = input.model || defaultModelForProvider();
   const cacheKey = computeAssessmentCacheKey({
     repoIdentifier: input.repoIdentifier,
     fingerprint: input.fingerprint,
@@ -175,9 +175,9 @@ export async function enrichActionPlanRecommendations(input: {
   model?: string;
   baseUrl?: string;
 }): Promise<RecommendationEnrichmentOutput> {
-  const provider = resolveAiProvider(input.provider);
+  const provider = resolveAiProvider();
   const providerName = provider.name as AiProviderName;
-  const model = input.model || defaultModelForProvider(providerName);
+  const model = input.model || defaultModelForProvider();
 
   if (input.recommendations.length === 0) {
     return {
@@ -219,7 +219,6 @@ export async function enrichActionPlanRecommendations(input: {
       RECOMMENDATION_CONTEXT_LIMITS,
     );
     const guidanceByCriterion = await enrichRecommendationsByProvider({
-      provider: providerName,
       config,
       repositoryContextJson,
       recommendations: input.recommendations,
@@ -251,4 +250,4 @@ export async function enrichActionPlanRecommendations(input: {
   }
 }
 
-export { DEFAULT_AI_PROVIDER, DEFAULT_OPENAI_MODEL, DEFAULT_OPENROUTER_MODEL } from './ai-helpers';
+export { DEFAULT_AI_PROVIDER, DEFAULT_OPENROUTER_MODEL } from './ai-helpers';

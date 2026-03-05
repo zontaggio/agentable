@@ -43,7 +43,7 @@ function installAiMock() {
   const previousFetch = global.fetch;
   global.fetch = (async (url, init) => {
     const target = typeof url === 'string' ? url : String(url);
-    if (target.includes('openrouter.ai/api/v1/chat/completions')) {
+    if (target.includes('/chat/completions')) {
       return {
         ok: true,
         status: 200,

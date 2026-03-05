@@ -4,7 +4,6 @@ import { CATALOG_VERSION, CRITERIA } from '../catalog/v1';
 import {
   collectAiAssessments,
   DEFAULT_AI_PROVIDER,
-  DEFAULT_OPENAI_MODEL,
   DEFAULT_OPENROUTER_MODEL,
   enrichActionPlanRecommendations,
 } from '../collectors/ai';
@@ -94,8 +93,7 @@ export async function runAgentReadiness(
   onProgress?.('Running AI assessments');
   const aiFailureMode = options.aiFailureMode ?? 'fallback';
   const provider = options.aiProvider ?? DEFAULT_AI_PROVIDER;
-  const defaultModel = provider === 'openai' ? DEFAULT_OPENAI_MODEL : DEFAULT_OPENROUTER_MODEL;
-  const model = options.aiModel || defaultModel;
+  const model = options.aiModel || DEFAULT_OPENROUTER_MODEL;
   const aiCriteriaIds = findAiCriteriaIds();
   const warnings: string[] = [];
   let aiFallbackError: string | null = null;

@@ -10,7 +10,7 @@ export type CategoryId =
   | 'product_analytics';
 
 export type CriterionStatus = 'pass' | 'fail' | 'skip' | 'unverified';
-export type AiProviderName = 'openrouter' | 'openai';
+export type AiProviderName = 'openrouter';
 
 export interface AgentableCriterionOverride {
   applicable?: boolean;
@@ -252,6 +252,7 @@ export interface WebCriterionCard {
   evidence: string[];
   evidenceDetails: CriterionEvidenceDetail[];
   improvementTips: string[];
+  remediationPrompt?: string;
   guidance?: RecommendationItem;
   priorityRank?: number;
   source: CriterionSource;

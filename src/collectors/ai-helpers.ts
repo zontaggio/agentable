@@ -1,8 +1,7 @@
 import { createHash } from 'node:crypto';
 import { CATALOG_VERSION } from '../catalog/v1';
-import { AiProviderName, AiRecommendationGuidance } from '../types';
+import { AiRecommendationGuidance } from '../types';
 import { AiProviderConfig } from './ai-provider';
-import { enrichRecommendationsWithOpenAi, openAiProvider } from './providers/openai';
 import {
   enrichRecommendationsWithOpenRouter,
   OpenRouterRecommendationPromptItem,
@@ -10,20 +9,14 @@ import {
 } from './providers/openrouter';
 
 export const DEFAULT_OPENROUTER_MODEL = 'gpt-oss-120b';
-export const DEFAULT_OPENAI_MODEL = 'gpt-4o-mini';
-export const DEFAULT_AI_PROVIDER: AiProviderName = 'openrouter';
+export const DEFAULT_AI_PROVIDER = 'openrouter' as const;
 
-const AI_PROVIDERS: Record<AiProviderName, typeof openRouterProvider | typeof openAiProvider> = {
-  openrouter: openRouterProvider,
-  openai: openAiProvider,
-};
-
-export function resolveAiProvider(provider?: AiProviderName) {
-  return AI_PROVIDERS[provider ?? DEFAULT_AI_PROVIDER] ?? openRouterProvider;
+export function resolveAiProvider() {
+  return openRouterProvider;
 }
 
-export function defaultModelForProvider(provider: AiProviderName): string {
-  return provider === 'openai' ? DEFAULT_OPENAI_MODEL : DEFAULT_OPENROUTER_MODEL;
+export function defaultModelForProvider(): string {
+  return DEFAULT_OPENROUTER_MODEL;
 }
 
 export function computeAssessmentCacheKey(input: {
@@ -73,18 +66,10 @@ export function computeRecommendationCacheKey(input: {
 }
 
 export async function enrichRecommendationsByProvider(input: {
-  provider: AiProviderName;
   config: AiProviderConfig;
   repositoryContextJson: string;
   recommendations: OpenRouterRecommendationPromptItem[];
 }): Promise<Record<string, AiRecommendationGuidance>> {
-  if (input.provider === 'openai') {
-    return enrichRecommendationsWithOpenAi(input.config, {
-      repositoryContextJson: input.repositoryContextJson,
-      recommendations: input.recommendations,
-    });
-  }
-
   return enrichRecommendationsWithOpenRouter(input.config, {
     repositoryContextJson: input.repositoryContextJson,
     recommendations: input.recommendations,

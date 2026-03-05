@@ -13,6 +13,7 @@ import {
 } from '../types';
 import { getCardMeta } from './card-meta';
 import { getImprovementTips } from './improvement-tips';
+import { buildRemediationPrompt } from './remediation-template';
 
 export interface WebTransformInput {
   summary: ScoreSummary;
@@ -136,25 +137,41 @@ export function buildWebPayload(
   const criteriaByCategory = createCategoryBuckets();
   const actionPlan = input.actionPlan ?? emptyActionPlan();
   const guidanceByCriterion = new Map(actionPlan.all.map((item) => [item.criterionId, item]));
+  const repoName = path.basename(input.meta.repoPath);
 
   for (const result of input.results) {
     const cardMeta = getCardMeta(result.id);
     const guidance = guidanceByCriterion.get(result.id);
+    const description = getDescription(result.id);
+    const scoreLabel = toScoreLabel(result.status, cardMeta.maxPoints);
+    const remediationPrompt =
+      result.status === 'fail' || result.status === 'unverified'
+        ? buildRemediationPrompt({
+            repoName,
+            signalName: cardMeta.name,
+            scoreLabel,
+            description,
+            reason: result.reason,
+            evidence: result.evidence,
+            evidenceDetails: result.evidenceDetails,
+          })
+        : undefined;
 
     const card: WebCriterionCard = {
       id: result.id,
       name: cardMeta.name,
-      description: getDescription(result.id),
+      description,
       category: result.category,
       badge: cardMeta.badge,
       maxPoints: cardMeta.maxPoints,
-      scoreLabel: toScoreLabel(result.status, cardMeta.maxPoints),
+      scoreLabel,
       status: result.status,
       confidence: result.confidence,
       reason: result.reason,
       evidence: result.evidence,
       evidenceDetails: result.evidenceDetails,
       improvementTips: getImprovementTips(result, guidance),
+      remediationPrompt,
       guidance,
       priorityRank: guidance?.rank,
       source: result.source,
@@ -182,8 +199,6 @@ export function buildWebPayload(
       unverified: row?.unverified ?? 0,
     };
   });
-
-  const repoName = path.basename(input.meta.repoPath);
 
   return {
     header: {

@@ -225,8 +225,8 @@ test('enrichActionPlanRecommendations batches and caches guidance', async () => 
   }
 });
 
-test('collectAiAssessments supports openai-compatible provider and custom base URL', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-ai-openai-provider-'));
+test('collectAiAssessments uses OpenRouter provider', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-ai-openrouter-provider-'));
   const realFetch = global.fetch;
   let requestedUrl = '';
 
@@ -239,7 +239,7 @@ test('collectAiAssessments supports openai-compatible provider and custom base U
     }
 
     const payload = JSON.parse(String(init && init.body ? init.body : '{}'));
-    assert.equal(payload.model, 'gpt-4o-mini');
+    assert.equal(payload.model, 'gpt-oss-120b');
 
     return {
       ok: true,
@@ -272,17 +272,17 @@ test('collectAiAssessments supports openai-compatible provider and custom base U
     const result = await collectAiAssessments({
       repoPath: root,
       repoIdentifier: 'owner/repo',
-      fingerprint: `fp-${Date.now()}-openai-provider`,
+      fingerprint: `fp-${Date.now()}-openrouter-provider`,
       criteriaIds: ['code_modularization'],
       local: makeLocalContext(root),
       profile: makeProfile(),
-      provider: 'openai',
-      model: 'gpt-4o-mini',
-      baseUrl: 'http://127.0.0.1:11434/v1',
+      provider: 'openrouter',
+      model: 'gpt-oss-120b',
+      apiKey: 'fake-key',
     });
 
-    assert.equal(result.provider, 'openai');
-    assert.ok(requestedUrl.startsWith('http://127.0.0.1:11434/v1/chat/completions'));
+    assert.equal(result.provider, 'openrouter');
+    assert.equal(requestedUrl, 'https://openrouter.ai/api/v1/chat/completions');
     assert.equal(result.assessments.code_modularization.status, 'pass');
   } finally {
     global.fetch = realFetch;

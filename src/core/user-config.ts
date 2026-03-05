@@ -1,15 +1,19 @@
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { AiProviderName } from '../types';
 
 export interface AgentReadinessUserConfig {
-  provider: AiProviderName;
-  apiKey?: string;
+  provider: 'openrouter';
+  apiKey: string;
   model: string;
-  baseUrl?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UserConfigLoadResult {
+  config: AgentReadinessUserConfig | null;
+  warnings: string[];
+  needsSetup: boolean;
 }
 
 const CONFIG_DIR = path.join(os.homedir(), '.agentable');
@@ -19,88 +23,165 @@ function normalizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function normalizeOptionalString(value: unknown): string | undefined {
-  const normalized = normalizeString(value);
-  return normalized.length > 0 ? normalized : undefined;
-}
-
-function normalizeProvider(value: unknown): AiProviderName {
-  return value === 'openai' ? 'openai' : 'openrouter';
-}
-
-function parseConfig(value: unknown): AgentReadinessUserConfig | null {
+function parseOpenRouterConfig(value: unknown): AgentReadinessUserConfig | null {
   if (!value || typeof value !== 'object') {
     return null;
   }
 
   const raw = value as Record<string, unknown>;
-  const provider = normalizeProvider(raw.provider);
+  const providerRaw = normalizeString(raw.provider).toLowerCase();
+  const provider = providerRaw || 'openrouter';
+  const apiKey = normalizeString(raw.apiKey) || normalizeString(raw.openRouterApiKey);
   const model = normalizeString(raw.model) || normalizeString(raw.openRouterModel);
-  const apiKey =
-    normalizeOptionalString(raw.apiKey) || normalizeOptionalString(raw.openRouterApiKey);
-  const baseUrl =
-    normalizeOptionalString(raw.baseUrl) || normalizeOptionalString(raw.openAiBaseUrl);
   const createdAt = normalizeString(raw.createdAt);
   const updatedAt = normalizeString(raw.updatedAt);
 
-  if (!model || !createdAt || !updatedAt) {
+  if (provider !== 'openrouter') {
     return null;
   }
-
-  if (provider === 'openrouter' && !apiKey) {
+  if (!apiKey || !model || !createdAt || !updatedAt) {
     return null;
   }
 
   return {
-    provider,
+    provider: 'openrouter',
     apiKey,
     model,
-    baseUrl,
     createdAt,
     updatedAt,
   };
+}
+
+function parseLegacyCompatConfigForMigration(value: unknown): {
+  apiKey: string;
+  model: string;
+  createdAt?: string;
+} | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const raw = value as Record<string, unknown>;
+  const provider = normalizeString(raw.provider);
+  if (provider !== 'openai_compatible') {
+    return null;
+  }
+
+  const apiKey = normalizeString(raw.apiKey);
+  const model = normalizeString(raw.model);
+  const createdAt = normalizeString(raw.createdAt);
+  if (!apiKey || !model) {
+    return null;
+  }
+
+  return {
+    apiKey,
+    model,
+    createdAt: createdAt || undefined,
+  };
+}
+
+async function loadPersistedConfig(): Promise<AgentReadinessUserConfig | null> {
+  try {
+    const raw = await fs.readFile(CONFIG_FILE, 'utf8');
+    const parsed = JSON.parse(raw) as unknown;
+    return parseOpenRouterConfig(parsed);
+  } catch {
+    return null;
+  }
 }
 
 export function getUserConfigPath(): string {
   return CONFIG_FILE;
 }
 
-export async function loadUserConfig(): Promise<AgentReadinessUserConfig | null> {
+export async function loadUserConfig(): Promise<UserConfigLoadResult> {
+  let rawText: string;
   try {
-    const raw = await fs.readFile(CONFIG_FILE, 'utf8');
-    const parsed = JSON.parse(raw) as unknown;
-    return parseConfig(parsed);
+    rawText = await fs.readFile(CONFIG_FILE, 'utf8');
   } catch {
-    return null;
+    return {
+      config: null,
+      warnings: [],
+      needsSetup: false,
+    };
   }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawText) as unknown;
+  } catch {
+    return {
+      config: null,
+      warnings: [
+        `Existing AI config at ${CONFIG_FILE} is not valid JSON. Run \`agentable --setup\` to replace it.`,
+      ],
+      needsSetup: true,
+    };
+  }
+
+  const current = parseOpenRouterConfig(parsed);
+  if (current) {
+    return {
+      config: current,
+      warnings: [],
+      needsSetup: false,
+    };
+  }
+
+  const legacyCompat = parseLegacyCompatConfigForMigration(parsed);
+  if (legacyCompat) {
+    const migrated = await saveUserConfig(
+      {
+        provider: 'openrouter',
+        apiKey: legacyCompat.apiKey,
+        model: legacyCompat.model,
+      },
+      { createdAt: legacyCompat.createdAt },
+    );
+    return {
+      config: migrated,
+      warnings: [`Migrated previous AI config to OpenRouter mode at ${CONFIG_FILE}.`],
+      needsSetup: false,
+    };
+  }
+
+  return {
+    config: null,
+    warnings: [
+      `Existing AI config at ${CONFIG_FILE} is incompatible with OpenRouter mode. Run \`agentable --setup\`.`,
+    ],
+    needsSetup: true,
+  };
 }
 
 export async function saveUserConfig(
-  config: Pick<AgentReadinessUserConfig, 'provider' | 'apiKey' | 'model' | 'baseUrl'>,
+  config: Pick<AgentReadinessUserConfig, 'provider' | 'apiKey' | 'model'>,
+  options?: { createdAt?: string },
 ): Promise<AgentReadinessUserConfig> {
   await fs.mkdir(CONFIG_DIR, { recursive: true, mode: 0o700 });
 
-  const existing = await loadUserConfig();
+  const existing = await loadPersistedConfig();
   const now = new Date().toISOString();
   const provider = config.provider;
-  const apiKey = normalizeOptionalString(config.apiKey);
+  const apiKey = normalizeString(config.apiKey);
   const model = normalizeString(config.model);
-  const baseUrl = normalizeOptionalString(config.baseUrl);
 
-  if (!model) {
-    throw new Error('AI model cannot be empty.');
+  if (provider !== 'openrouter') {
+    throw new Error('Only provider=openrouter is currently supported.');
   }
-
-  if (provider === 'openrouter' && !apiKey) {
+  if (!apiKey) {
     throw new Error('OpenRouter API key cannot be empty.');
+  }
+  if (!model) {
+    throw new Error('OpenRouter model cannot be empty.');
   }
 
   const next: AgentReadinessUserConfig = {
-    provider,
+    provider: 'openrouter',
     apiKey,
     model,
-    baseUrl,
-    createdAt: existing?.createdAt ?? now,
+    createdAt: options?.createdAt ?? existing?.createdAt ?? now,
     updatedAt: now,
   };
 

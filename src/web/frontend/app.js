@@ -5,6 +5,7 @@
     actionPlanExpanded: {},
     loading: false,
     staticExport: Boolean(window.__AGENTABLE_STATIC_EXPORT),
+    remediationFeedbackTimeoutId: null,
   };
 
   function escapeHtml(input) {
@@ -480,6 +481,59 @@
     });
   }
 
+  function setRemediationFeedback(message, isError) {
+    var feedback = document.getElementById('modal-remediation-feedback');
+    if (!(feedback instanceof HTMLElement)) {
+      return;
+    }
+
+    feedback.textContent = message || '';
+    feedback.classList.toggle('error', Boolean(isError));
+
+    if (state.remediationFeedbackTimeoutId) {
+      clearTimeout(state.remediationFeedbackTimeoutId);
+      state.remediationFeedbackTimeoutId = null;
+    }
+
+    if (!message) {
+      return;
+    }
+
+    state.remediationFeedbackTimeoutId = setTimeout(function () {
+      feedback.textContent = '';
+      feedback.classList.remove('error');
+      state.remediationFeedbackTimeoutId = null;
+    }, 2200);
+  }
+
+  async function copyTextToClipboard(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    var scratch = document.createElement('textarea');
+    scratch.value = text;
+    scratch.setAttribute('readonly', '');
+    scratch.style.position = 'fixed';
+    scratch.style.top = '-1000px';
+    scratch.style.opacity = '0';
+    document.body.appendChild(scratch);
+    scratch.focus();
+    scratch.select();
+
+    var copied = false;
+    try {
+      copied = document.execCommand('copy');
+    } finally {
+      document.body.removeChild(scratch);
+    }
+
+    if (!copied) {
+      throw new Error('Clipboard copy failed');
+    }
+  }
+
   function renderModal() {
     return (
       '<div id="card-modal" class="modal-backdrop" aria-hidden="true">' +
@@ -499,6 +553,20 @@
       '<section class="modal-section"><div class="modal-section-title">Current evidence</div><div id="modal-evidence"></div></section>' +
       '<section class="modal-section"><div class="modal-section-title">Implementation next steps</div><div id="modal-next-steps"></div></section>' +
       '<section class="modal-section"><div class="modal-section-title">Success signal</div><div id="modal-success"></div></section>' +
+      '<details id="modal-remediation-section" class="modal-section remediation-section is-hidden">' +
+      '<summary class="modal-section-title remediation-summary">' +
+      '<span>Remediation prompt for LLM</span>' +
+      '<span class="remediation-accordion-indicator" aria-hidden="true"></span>' +
+      '</summary>' +
+      '<div class="remediation-content">' +
+      '<div class="remediation-hint">Review before copying. You can edit this text before sending it to your coding LLM.</div>' +
+      '<textarea id="modal-remediation-text" class="remediation-text" spellcheck="false"></textarea>' +
+      '<div class="remediation-actions">' +
+      '<button class="remediation-copy-btn" data-copy-remediation="1">Copy remediation prompt</button>' +
+      '<span id="modal-remediation-feedback" class="remediation-feedback" aria-live="polite"></span>' +
+      '</div>' +
+      '</div>' +
+      '</details>' +
       '</div>' +
       '</div>' +
       '</div>'
@@ -518,6 +586,9 @@
     var evidence = document.getElementById('modal-evidence');
     var nextSteps = document.getElementById('modal-next-steps');
     var success = document.getElementById('modal-success');
+    var remediationSection = document.getElementById('modal-remediation-section');
+    var remediationText = document.getElementById('modal-remediation-text');
+    var remediationFeedback = document.getElementById('modal-remediation-feedback');
 
     if (
       !badge ||
@@ -528,7 +599,10 @@
       !why ||
       !evidence ||
       !nextSteps ||
-      !success
+      !success ||
+      !remediationSection ||
+      !remediationText ||
+      !remediationFeedback
     )
       return;
 
@@ -596,6 +670,17 @@
         ? guidance.expectedOutcome
         : 'This criterion becomes explicit, automatable, and stable over time.';
 
+    if (typeof card.remediationPrompt === 'string' && card.remediationPrompt.trim().length > 0) {
+      remediationSection.classList.remove('is-hidden');
+      remediationText.value = card.remediationPrompt;
+      remediationSection.open = false;
+    } else {
+      remediationSection.classList.add('is-hidden');
+      remediationText.value = '';
+      remediationSection.open = false;
+    }
+    setRemediationFeedback('', false);
+
     modal.setAttribute('data-criterion-id', String(card.id || ''));
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
@@ -604,6 +689,7 @@
   function closeModal() {
     var modal = document.getElementById('card-modal');
     if (!modal) return;
+    setRemediationFeedback('', false);
     modal.classList.remove('open');
     modal.setAttribute('aria-hidden', 'true');
   }
@@ -782,6 +868,29 @@
 
     if (target.closest('[data-close-modal]') || target.id === 'card-modal') {
       closeModal();
+      return;
+    }
+
+    if (target.closest('[data-copy-remediation]')) {
+      var remediationText = document.getElementById('modal-remediation-text');
+      if (!(remediationText instanceof HTMLTextAreaElement)) {
+        setRemediationFeedback('Remediation prompt not available.', true);
+        return;
+      }
+
+      var copyValue = remediationText.value || '';
+      if (copyValue.trim().length === 0) {
+        setRemediationFeedback('Nothing to copy.', true);
+        return;
+      }
+
+      copyTextToClipboard(copyValue)
+        .then(function () {
+          setRemediationFeedback('Copied to clipboard.', false);
+        })
+        .catch(function () {
+          setRemediationFeedback('Copy failed. Copy manually from the text box.', true);
+        });
       return;
     }
 
