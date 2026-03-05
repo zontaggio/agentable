@@ -1,8 +1,4 @@
-import {
-  AiAssessment,
-  CriterionDefinition,
-  CriterionResult,
-} from '../../types';
+import { AiAssessment, CriterionDefinition, CriterionResult } from '../../types';
 import { evidenceDetail } from './result';
 
 export function applyAiIfPresent(

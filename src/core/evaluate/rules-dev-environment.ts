@@ -4,9 +4,7 @@ import { hasAnyFilePattern, includesAny } from './helpers';
 import { makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateDevEnvironment(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateDevEnvironment(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local } = ctx;
 
@@ -45,8 +43,16 @@ export async function evaluateDevEnvironment(
           buildContext.length > 0 ||
           buildDockerfile.length > 0;
         return hasRuntime
-          ? makeResult(criterion, 'pass', 'Devcontainer has runtime definition and appears runnable.')
-          : makeResult(criterion, 'fail', 'Devcontainer exists but missing image/dockerFile/build settings.');
+          ? makeResult(
+              criterion,
+              'pass',
+              'Devcontainer has runtime definition and appears runnable.',
+            )
+          : makeResult(
+              criterion,
+              'fail',
+              'Devcontainer exists but missing image/dockerFile/build settings.',
+            );
       } catch {
         return makeResult(criterion, 'fail', 'Unable to parse devcontainer.json.');
       }
@@ -58,7 +64,11 @@ export async function evaluateDevEnvironment(
         : makeResult(criterion, 'fail', 'No environment template file found.');
 
     case 'local_services_setup':
-      return includesAny(signals.readmeText, ['docker compose up', 'local services', 'start dependencies'])
+      return includesAny(signals.readmeText, [
+        'docker compose up',
+        'local services',
+        'start dependencies',
+      ])
         ? makeResult(criterion, 'pass', 'Local services setup instructions found.')
         : makeResult(criterion, 'fail', 'No local services setup instructions detected.');
 

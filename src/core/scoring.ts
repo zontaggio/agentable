@@ -58,11 +58,20 @@ export function summarizeResults(results: CriterionResult[]): ScoreSummary {
 
   const coverage = counts.total > 0 ? round2((counts.evaluated / counts.total) * 100) : 0;
   const score = computeScore(counts.pass, counts.fail);
-  const evaluatedResults = results.filter((result) => result.status === 'pass' || result.status === 'fail');
-  const totalConfidenceWeight = evaluatedResults.reduce((acc, result) => acc + confidenceWeight(result.confidence), 0);
-  const highConfidenceCount = evaluatedResults.filter((result) => result.confidence === 'high').length;
+  const evaluatedResults = results.filter(
+    (result) => result.status === 'pass' || result.status === 'fail',
+  );
+  const totalConfidenceWeight = evaluatedResults.reduce(
+    (acc, result) => acc + confidenceWeight(result.confidence),
+    0,
+  );
+  const highConfidenceCount = evaluatedResults.filter(
+    (result) => result.confidence === 'high',
+  ).length;
   const confidenceScore =
-    evaluatedResults.length > 0 ? round2((totalConfidenceWeight / evaluatedResults.length) * 100) : 0;
+    evaluatedResults.length > 0
+      ? round2((totalConfidenceWeight / evaluatedResults.length) * 100)
+      : 0;
   const highConfidenceCoverage =
     evaluatedResults.length > 0 ? round2((highConfidenceCount / evaluatedResults.length) * 100) : 0;
 
@@ -119,12 +128,16 @@ export function summarizeResults(results: CriterionResult[]): ScoreSummary {
       unverified,
       applicable,
       score: computeScore(pass, fail),
-      confidenceScore: evaluatedCount > 0 ? round2((confidenceWeightSum / evaluatedCount) * 100) : 0,
-      highConfidenceCoverage: evaluatedCount > 0 ? round2((highConfidence / evaluatedCount) * 100) : 0,
+      confidenceScore:
+        evaluatedCount > 0 ? round2((confidenceWeightSum / evaluatedCount) * 100) : 0,
+      highConfidenceCoverage:
+        evaluatedCount > 0 ? round2((highConfidence / evaluatedCount) * 100) : 0,
     });
   }
 
-  categoryScores.sort((a, b) => CATEGORY_LABELS[a.category].localeCompare(CATEGORY_LABELS[b.category]));
+  categoryScores.sort((a, b) =>
+    CATEGORY_LABELS[a.category].localeCompare(CATEGORY_LABELS[b.category]),
+  );
 
   return {
     score,

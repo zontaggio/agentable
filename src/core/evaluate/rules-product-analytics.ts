@@ -2,9 +2,7 @@ import { countKeywordMatches, hasAnyDependency } from './helpers';
 import { evidenceDetail, makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateProductAnalytics(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateProductAnalytics(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local } = ctx;
 
@@ -45,27 +43,13 @@ export async function evaluateProductAnalytics(
           'unverified',
           'Only weak textual references to error-to-insight flows were found.',
           [],
-          [
-            evidenceDetail(
-              'text',
-              'weak',
-              'Error-to-insight keywords present in text index.',
-            ),
-          ],
+          [evidenceDetail('text', 'weak', 'Error-to-insight keywords present in text index.')],
         );
       }
       return makeResult(criterion, 'fail', 'No error-to-insight pipeline detected.');
 
     case 'product_analytics_instrumentation':
-      if (
-        hasAnyDependency(local, [
-          'mixpanel',
-          'amplitude',
-          'posthog',
-          'segment',
-          'plausible',
-        ])
-      ) {
+      if (hasAnyDependency(local, ['mixpanel', 'amplitude', 'posthog', 'segment', 'plausible'])) {
         return makeResult(
           criterion,
           'pass',
@@ -94,13 +78,7 @@ export async function evaluateProductAnalytics(
           'pass',
           'Product analytics signals detected in workflows.',
           [],
-          [
-            evidenceDetail(
-              'workflow',
-              'medium',
-              'Workflow references product analytics tooling.',
-            ),
-          ],
+          [evidenceDetail('workflow', 'medium', 'Workflow references product analytics tooling.')],
         );
       }
       if (

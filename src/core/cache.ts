@@ -34,7 +34,9 @@ export async function saveAiBaseline(baseline: AiBaseline): Promise<void> {
   await fs.writeFile(filePath, JSON.stringify(baseline, null, 2), 'utf8');
 }
 
-export async function loadAiRecommendationBaseline(key: string): Promise<AiRecommendationBaseline | null> {
+export async function loadAiRecommendationBaseline(
+  key: string,
+): Promise<AiRecommendationBaseline | null> {
   const filePath = recommendationPath(key);
   try {
     const content = await fs.readFile(filePath, 'utf8');
@@ -45,7 +47,9 @@ export async function loadAiRecommendationBaseline(key: string): Promise<AiRecom
   }
 }
 
-export async function saveAiRecommendationBaseline(baseline: AiRecommendationBaseline): Promise<void> {
+export async function saveAiRecommendationBaseline(
+  baseline: AiRecommendationBaseline,
+): Promise<void> {
   await ensureCacheDir();
   const filePath = recommendationPath(baseline.key);
   await fs.writeFile(filePath, JSON.stringify(baseline, null, 2), 'utf8');

@@ -3,7 +3,12 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { appendHistory, computeRepoKey, loadHistory, MAX_HISTORY_SNAPSHOTS } = require('../dist/web/history');
+const {
+  appendHistory,
+  computeRepoKey,
+  loadHistory,
+  MAX_HISTORY_SNAPSHOTS,
+} = require('../dist/web/history');
 
 async function makeDir() {
   return fs.mkdtemp(path.join(os.tmpdir(), 'agentable-history-'));

@@ -12,6 +12,10 @@
     "build": "tsc -p tsconfig.json",
     "check:max-lines": "node scripts/check-max-lines.mjs",
     "clean": "rm -rf dist",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
     "quality:gates": "node scripts/check-functional-gates.mjs fixtures/quality-gates/functional-benchmark.json",
     "test": "npm run build && npm run check:max-lines && node --test test/**/*.test.js"
   },
@@ -40,8 +44,13 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.13.10",
-    "typescript": "^5.8.2"
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.56.1"
   },
   "dependencies": {
     "cli-ascii-logo": "^2.0.1"

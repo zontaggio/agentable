@@ -2,9 +2,7 @@ import { countKeywordMatches, hasAnyDependency, hasAnyFilePattern } from './help
 import { evidenceDetail, makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateDebuggingObservabilityRuntime(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateDebuggingObservabilityRuntime(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local } = ctx;
 
@@ -31,26 +29,14 @@ export async function evaluateDebuggingObservabilityRuntime(
           'unverified',
           'Only weak textual mentions of health checks were found.',
           [],
-          [
-            evidenceDetail(
-              'text',
-              'weak',
-              'Healthcheck keywords found in text index.',
-            ),
-          ],
+          [evidenceDetail('text', 'weak', 'Healthcheck keywords found in text index.')],
         );
       }
       return makeResult(criterion, 'fail', 'No health checks detected.');
 
     case 'metrics_collection':
       if (
-        hasAnyDependency(local, [
-          'prom-client',
-          'prometheus',
-          'datadog',
-          'statsd',
-          'opentelemetry',
-        ])
+        hasAnyDependency(local, ['prom-client', 'prometheus', 'datadog', 'statsd', 'opentelemetry'])
       ) {
         return makeResult(
           criterion,
@@ -73,13 +59,7 @@ export async function evaluateDebuggingObservabilityRuntime(
           'pass',
           'Metrics/telemetry signals detected in workflows.',
           [],
-          [
-            evidenceDetail(
-              'workflow',
-              'medium',
-              'Workflow references metrics/telemetry systems.',
-            ),
-          ],
+          [evidenceDetail('workflow', 'medium', 'Workflow references metrics/telemetry systems.')],
         );
       }
       if (countKeywordMatches(signals.allTextIndex, ['metrics', 'telemetry']) > 0) {
@@ -115,13 +95,7 @@ export async function evaluateDebuggingObservabilityRuntime(
           'unverified',
           'Only weak textual references to profiling were found.',
           [],
-          [
-            evidenceDetail(
-              'text',
-              'weak',
-              'Profiling-related keywords present in text index.',
-            ),
-          ],
+          [evidenceDetail('text', 'weak', 'Profiling-related keywords present in text index.')],
         );
       }
       return makeResult(criterion, 'fail', 'No profiling instrumentation detected.');

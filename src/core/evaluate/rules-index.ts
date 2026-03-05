@@ -101,8 +101,6 @@ const RULES: Record<string, CriterionEvaluator> = {
   product_analytics_instrumentation: evaluateProductAnalytics,
 };
 
-export function getCriterionEvaluator(
-  criterionId: string,
-): CriterionEvaluator | undefined {
+export function getCriterionEvaluator(criterionId: string): CriterionEvaluator | undefined {
   return RULES[criterionId];
 }

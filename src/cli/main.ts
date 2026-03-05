@@ -53,9 +53,7 @@ export async function runCli(): Promise<void> {
       // keep process alive while server is running
     });
   } catch (error) {
-    console.error(
-      `agentable failed: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    console.error(`agentable failed: ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;
   }
 }

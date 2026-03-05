@@ -3,9 +3,7 @@ import { hasAnyDependency, hasAnyFilePattern, hasAnyScript, includesAny } from '
 import { makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateDocumentation(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateDocumentation(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local } = ctx;
 
@@ -16,7 +14,8 @@ export async function evaluateDocumentation(
         : makeResult(criterion, 'fail', 'AGENTS.md not found at repository root.');
 
     case 'agents_md_validation':
-      return local.fileSet.has('AGENTS.md') && includesAny(signals.workflowText, ['agents.md', 'agent readiness'])
+      return local.fileSet.has('AGENTS.md') &&
+        includesAny(signals.workflowText, ['agents.md', 'agent readiness'])
         ? makeResult(criterion, 'pass', 'AGENTS.md validation appears in CI workflows.')
         : makeResult(
             criterion,
@@ -31,7 +30,11 @@ export async function evaluateDocumentation(
           );
 
     case 'api_schema_docs':
-      return hasAnyFilePattern(local, [/openapi\.(ya?ml|json)$/i, /swagger\.(ya?ml|json)$/i, /docs\/api\//i])
+      return hasAnyFilePattern(local, [
+        /openapi\.(ya?ml|json)$/i,
+        /swagger\.(ya?ml|json)$/i,
+        /docs\/api\//i,
+      ])
         ? makeResult(criterion, 'pass', 'API schema documentation files detected.')
         : makeResult(criterion, 'fail', 'No API schema documentation detected.');
 
@@ -60,7 +63,11 @@ export async function evaluateDocumentation(
 
     case 'service_flow_documented': {
       if (hasAnyFilePattern(local, [/architecture/i, /adr\//i, /diagram/i, /service-flow/i])) {
-        return makeResult(criterion, 'pass', 'Architecture/service flow documentation files detected.');
+        return makeResult(
+          criterion,
+          'pass',
+          'Architecture/service flow documentation files detected.',
+        );
       }
 
       if (criterion.aiAssisted) {
@@ -75,7 +82,11 @@ export async function evaluateDocumentation(
     }
 
     case 'skills':
-      return hasAnyFilePattern(local, [/^\.factory\/skills\//, /^\.skills\//, /^\.claude\/skills\//])
+      return hasAnyFilePattern(local, [
+        /^\.factory\/skills\//,
+        /^\.skills\//,
+        /^\.claude\/skills\//,
+      ])
         ? makeResult(criterion, 'pass', 'Skills directory detected.')
         : makeResult(criterion, 'fail', 'No recognized skills directory found.');
 

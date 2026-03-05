@@ -129,7 +129,10 @@ export function scoreToLevel(score: number): number {
   return 5;
 }
 
-export function buildWebPayload(input: WebTransformInput, history: WebHistoryPoint[]): WebReportPayload {
+export function buildWebPayload(
+  input: WebTransformInput,
+  history: WebHistoryPoint[],
+): WebReportPayload {
   const criteriaByCategory = createCategoryBuckets();
   const actionPlan = input.actionPlan ?? emptyActionPlan();
   const guidanceByCriterion = new Map(actionPlan.all.map((item) => [item.criterionId, item]));

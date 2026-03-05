@@ -35,15 +35,28 @@
         }
       ],
       "repeatRuns": [
-        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.2 },
-        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.1 },
-        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.3 },
-        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.2 },
-        { "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"], "score": 42.0 }
+        {
+          "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"],
+          "score": 42.2
+        },
+        {
+          "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"],
+          "score": 42.1
+        },
+        {
+          "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"],
+          "score": 42.3
+        },
+        {
+          "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"],
+          "score": 42.2
+        },
+        {
+          "top5": ["branch_protection", "metrics_collection", "formatter", "lint_config", "readme"],
+          "score": 42.0
+        }
       ],
-      "highRiskPassCriteria": [
-        { "id": "secrets_management", "evidenceStrengths": ["strong"] }
-      ],
+      "highRiskPassCriteria": [{ "id": "secrets_management", "evidenceStrengths": ["strong"] }],
       "aiFailureRecovered": true,
       "firstRunToThreeStepsMinutes": 7
     }

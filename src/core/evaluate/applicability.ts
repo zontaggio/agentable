@@ -70,7 +70,10 @@ export function evaluateApplicabilitySkip(
         ? { skip: true, reason: 'Skipped - runbooks usually apply to deployed services.' }
         : { skip: false };
     case 'secrets_management': {
-      const hasEnvSurface = hasAnyFilePattern(local, [/^\.env($|\.)/i, /^\.env\.(example|template|sample)$/i]);
+      const hasEnvSurface = hasAnyFilePattern(local, [
+        /^\.env($|\.)/i,
+        /^\.env\.(example|template|sample)$/i,
+      ]);
       return !profile.hasExternalServices && !hasEnvSurface
         ? {
             skip: true,

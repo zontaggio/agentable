@@ -1,9 +1,5 @@
 import { GitData } from '../../collectors/git';
-import {
-  CriterionDefinition,
-  CriterionResult,
-  EvaluationContext,
-} from '../../types';
+import { CriterionDefinition, CriterionResult, EvaluationContext } from '../../types';
 
 export interface EvalSignals {
   readmeText: string;

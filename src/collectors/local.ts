@@ -58,7 +58,9 @@ export async function collectLocalProjectContext(rootPath: string): Promise<Loca
 
   const gitignoreContent = await safeReadText(path.join(rootPath, '.gitignore'));
 
-  const workflowFiles = files.filter((f) => f.startsWith('.github/workflows/') && /\.ya?ml$/i.test(f));
+  const workflowFiles = files.filter(
+    (f) => f.startsWith('.github/workflows/') && /\.ya?ml$/i.test(f),
+  );
 
   const locEstimate = await estimateLoc(rootPath, files);
 

@@ -81,7 +81,11 @@ export async function collectGhData(repoPath: string, enabled: boolean): Promise
   const encodedDefaultBranch = encodeURIComponent(defaultBranch);
 
   const [protectionRes, securityRes, labelsRes, issuesRes] = await Promise.all([
-    runCommand('gh', ['api', `repos/${repo}/branches/${encodedDefaultBranch}/protection`], repoPath),
+    runCommand(
+      'gh',
+      ['api', `repos/${repo}/branches/${encodedDefaultBranch}/protection`],
+      repoPath,
+    ),
     runCommand('gh', ['api', `repos/${repo}`], repoPath),
     runCommand('gh', ['api', `repos/${repo}/labels?per_page=100`], repoPath),
     runCommand(
@@ -109,7 +113,9 @@ export async function collectGhData(repoPath: string, enabled: boolean): Promise
     branchProtectionEnabled = true;
   } else {
     const httpStatus = parseGhHttpStatus(protectionRes.stderr);
-    const notProtected = /branch not protected/i.test(protectionRes.stderr) || /not protected/i.test(protectionRes.stdout);
+    const notProtected =
+      /branch not protected/i.test(protectionRes.stderr) ||
+      /not protected/i.test(protectionRes.stdout);
     if (httpStatus === 404 && notProtected) {
       branchProtectionEnabled = false;
     } else {
@@ -157,9 +163,14 @@ export async function collectGhData(repoPath: string, enabled: boolean): Promise
 
   if (issuesRes.ok) {
     const issues =
-      parseJson<Array<{ title?: string; labels?: Array<{ name?: string }>; createdAt?: string; state?: string }>>(
-        issuesRes.stdout,
-      ) ?? [];
+      parseJson<
+        Array<{
+          title?: string;
+          labels?: Array<{ name?: string }>;
+          createdAt?: string;
+          state?: string;
+        }>
+      >(issuesRes.stdout) ?? [];
 
     const now = Date.now();
     let labeled = 0;

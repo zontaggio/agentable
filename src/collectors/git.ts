@@ -26,7 +26,8 @@ export async function collectGitData(repoPath: string): Promise<GitData> {
   const root = gitRoot.stdout;
 
   const remoteRes = await runCommand('git', ['remote', 'get-url', 'origin'], root);
-  const repoIdentifier = remoteRes.ok && remoteRes.stdout ? normalizeRemoteUrl(remoteRes.stdout) : root;
+  const repoIdentifier =
+    remoteRes.ok && remoteRes.stdout ? normalizeRemoteUrl(remoteRes.stdout) : root;
 
   const tagsRes = await runCommand(
     'git',
@@ -54,8 +55,14 @@ export async function collectGitData(repoPath: string): Promise<GitData> {
     }
   }
 
-  const commitsRes = await runCommand('git', ['rev-list', '--count', '--since=30.days', 'HEAD'], root);
-  const commitCountLast30Days = commitsRes.ok ? Number.parseInt(commitsRes.stdout || '0', 10) || 0 : 0;
+  const commitsRes = await runCommand(
+    'git',
+    ['rev-list', '--count', '--since=30.days', 'HEAD'],
+    root,
+  );
+  const commitCountLast30Days = commitsRes.ok
+    ? Number.parseInt(commitsRes.stdout || '0', 10) || 0
+    : 0;
 
   return {
     isGitRepo: true,

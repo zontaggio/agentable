@@ -7,18 +7,11 @@ export function hasAnyDependency(local: LocalProjectContext, keywords: string[])
   };
 
   const keys = Object.keys(deps).map((k) => k.toLowerCase());
-  return keywords.some((keyword) =>
-    keys.some((dep) => dep.includes(keyword.toLowerCase())),
-  );
+  return keywords.some((keyword) => keys.some((dep) => dep.includes(keyword.toLowerCase())));
 }
 
-export function hasAnyFilePattern(
-  local: LocalProjectContext,
-  patterns: RegExp[],
-): boolean {
-  return local.files.some((file) =>
-    patterns.some((pattern) => pattern.test(file)),
-  );
+export function hasAnyFilePattern(local: LocalProjectContext, patterns: RegExp[]): boolean {
+  return local.files.some((file) => patterns.some((pattern) => pattern.test(file)));
 }
 
 export function hasAnyScript(local: LocalProjectContext, patterns: RegExp[]): boolean {

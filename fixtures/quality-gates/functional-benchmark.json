@@ -3,25 +3,15 @@
   "repos": [
     {
       "id": "cockroachdb/cockroach",
-      "criticalTop3": [
-        "privacy_compliance",
-        "distributed_tracing",
-        "rollback_automation"
-      ],
-      "groundTruthCritical": [
-        "privacy_compliance",
-        "distributed_tracing",
-        "rollback_automation"
-      ],
+      "criticalTop3": ["privacy_compliance", "distributed_tracing", "rollback_automation"],
+      "groundTruthCritical": ["privacy_compliance", "distributed_tracing", "rollback_automation"],
       "criticalFalsePositives": [],
       "recommendations": [
         {
           "criterionId": "privacy_compliance",
           "bucket": "critical",
           "whyItMatters": "Privacy Compliance is currently weak. Privacy compliance references are documented when applicable.",
-          "evidence": [
-            "Heuristic signal from criterion privacy_compliance."
-          ],
+          "evidence": ["Heuristic signal from criterion privacy_compliance."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -34,9 +24,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -49,9 +37,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -64,9 +50,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -79,9 +63,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -94,9 +76,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -161,17 +141,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -195,9 +169,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -210,9 +182,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -225,9 +195,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -240,9 +208,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -255,9 +221,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -270,9 +234,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -337,17 +299,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -371,9 +327,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -386,9 +340,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -401,9 +353,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -416,9 +366,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -431,9 +379,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -446,9 +392,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -513,17 +457,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -531,11 +469,7 @@
     },
     {
       "id": "prisma/prisma",
-      "criticalTop3": [
-        "distributed_tracing",
-        "gitignore_comprehensive",
-        "rollback_automation"
-      ],
+      "criticalTop3": ["distributed_tracing", "gitignore_comprehensive", "rollback_automation"],
       "groundTruthCritical": [
         "distributed_tracing",
         "gitignore_comprehensive",
@@ -547,9 +481,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -562,9 +494,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -577,9 +507,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -592,9 +520,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -607,9 +533,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -622,9 +546,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -689,17 +611,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -723,9 +639,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -738,9 +652,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -753,9 +665,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -768,9 +678,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -783,9 +691,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -798,9 +704,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -865,17 +769,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -883,25 +781,15 @@
     },
     {
       "id": "vuejs/core",
-      "criticalTop3": [
-        "privacy_compliance",
-        "distributed_tracing",
-        "rollback_automation"
-      ],
-      "groundTruthCritical": [
-        "privacy_compliance",
-        "distributed_tracing",
-        "rollback_automation"
-      ],
+      "criticalTop3": ["privacy_compliance", "distributed_tracing", "rollback_automation"],
+      "groundTruthCritical": ["privacy_compliance", "distributed_tracing", "rollback_automation"],
       "criticalFalsePositives": [],
       "recommendations": [
         {
           "criterionId": "privacy_compliance",
           "bucket": "critical",
           "whyItMatters": "Privacy Compliance is currently weak. Privacy compliance references are documented when applicable.",
-          "evidence": [
-            "Heuristic signal from criterion privacy_compliance."
-          ],
+          "evidence": ["Heuristic signal from criterion privacy_compliance."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -914,9 +802,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -929,9 +815,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -944,9 +828,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -959,9 +841,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -974,9 +854,7 @@
           "criterionId": "pii_handling",
           "bucket": "critical",
           "whyItMatters": "PII Handling is currently weak. PII handling controls are present when PII is processed.",
-          "evidence": [
-            "Heuristic signal from criterion pii_handling."
-          ],
+          "evidence": ["Heuristic signal from criterion pii_handling."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1041,17 +919,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -1075,9 +947,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1090,9 +960,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1105,9 +973,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1120,9 +986,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1135,9 +999,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1150,9 +1012,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1217,17 +1077,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -1251,9 +1105,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1266,9 +1118,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1281,9 +1131,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1296,9 +1144,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1311,9 +1157,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1326,9 +1170,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1393,17 +1235,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -1411,11 +1247,7 @@
     },
     {
       "id": "expressjs/express",
-      "criticalTop3": [
-        "rollback_automation",
-        "distributed_tracing",
-        "gitignore_comprehensive"
-      ],
+      "criticalTop3": ["rollback_automation", "distributed_tracing", "gitignore_comprehensive"],
       "groundTruthCritical": [
         "rollback_automation",
         "distributed_tracing",
@@ -1427,9 +1259,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1442,9 +1272,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1457,9 +1285,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1472,9 +1298,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1487,9 +1311,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1502,9 +1324,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1569,17 +1389,11 @@
       "highRiskPassCriteria": [
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "agentic_development",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -1603,9 +1417,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1618,9 +1430,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1633,9 +1443,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1648,9 +1456,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1663,9 +1469,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1678,9 +1482,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1745,17 +1547,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "large_file_detection",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -1779,9 +1575,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1794,9 +1588,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1809,9 +1601,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1824,9 +1614,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1839,9 +1627,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1854,9 +1640,7 @@
           "criterionId": "progressive_rollout",
           "bucket": "critical",
           "whyItMatters": "Progressive Rollout is currently weak. Progressive rollout strategy configured.",
-          "evidence": [
-            "Heuristic signal from criterion progressive_rollout."
-          ],
+          "evidence": ["Heuristic signal from criterion progressive_rollout."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1921,17 +1705,11 @@
       "highRiskPassCriteria": [
         {
           "id": "dead_code_detection",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -1955,9 +1733,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1970,9 +1746,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -1985,9 +1759,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2000,9 +1772,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2015,9 +1785,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2030,9 +1798,7 @@
           "criterionId": "codeowners",
           "bucket": "critical",
           "whyItMatters": "Codeowners is currently weak. CODEOWNERS file exists.",
-          "evidence": [
-            "Heuristic signal from criterion codeowners."
-          ],
+          "evidence": ["Heuristic signal from criterion codeowners."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2097,17 +1863,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -2131,9 +1891,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2146,9 +1904,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2161,9 +1917,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2176,9 +1930,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2191,9 +1943,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2206,9 +1956,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2273,17 +2021,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -2307,9 +2049,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2322,9 +2062,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2337,9 +2075,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2352,9 +2088,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2367,9 +2101,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2382,9 +2114,7 @@
           "criterionId": "log_scrubbing",
           "bucket": "critical",
           "whyItMatters": "Log Scrubbing is currently weak. Log scrubbing/redaction mechanisms are configured.",
-          "evidence": [
-            "Heuristic signal from criterion log_scrubbing."
-          ],
+          "evidence": ["Heuristic signal from criterion log_scrubbing."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2449,17 +2179,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -2483,9 +2207,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2498,9 +2220,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2513,9 +2233,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2528,9 +2246,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2543,9 +2259,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2558,9 +2272,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2625,17 +2337,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -2643,25 +2349,15 @@
     },
     {
       "id": "mui/material-ui",
-      "criticalTop3": [
-        "privacy_compliance",
-        "distributed_tracing",
-        "rollback_automation"
-      ],
-      "groundTruthCritical": [
-        "privacy_compliance",
-        "distributed_tracing",
-        "rollback_automation"
-      ],
+      "criticalTop3": ["privacy_compliance", "distributed_tracing", "rollback_automation"],
+      "groundTruthCritical": ["privacy_compliance", "distributed_tracing", "rollback_automation"],
       "criticalFalsePositives": [],
       "recommendations": [
         {
           "criterionId": "privacy_compliance",
           "bucket": "critical",
           "whyItMatters": "Privacy Compliance is currently weak. Privacy compliance references are documented when applicable.",
-          "evidence": [
-            "Heuristic signal from criterion privacy_compliance."
-          ],
+          "evidence": ["Heuristic signal from criterion privacy_compliance."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2674,9 +2370,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2689,9 +2383,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2704,9 +2396,7 @@
           "criterionId": "pii_handling",
           "bucket": "critical",
           "whyItMatters": "PII Handling is currently weak. PII handling controls are present when PII is processed.",
-          "evidence": [
-            "Heuristic signal from criterion pii_handling."
-          ],
+          "evidence": ["Heuristic signal from criterion pii_handling."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2719,9 +2409,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2734,9 +2422,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2801,17 +2487,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -2819,11 +2499,7 @@
     },
     {
       "id": "reduxjs/redux",
-      "criticalTop3": [
-        "distributed_tracing",
-        "rollback_automation",
-        "gitignore_comprehensive"
-      ],
+      "criticalTop3": ["distributed_tracing", "rollback_automation", "gitignore_comprehensive"],
       "groundTruthCritical": [
         "distributed_tracing",
         "rollback_automation",
@@ -2835,9 +2511,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2850,9 +2524,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2865,9 +2537,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2880,9 +2550,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2895,9 +2563,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2910,9 +2576,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -2977,17 +2641,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -3011,9 +2669,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3026,9 +2682,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3041,9 +2695,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3056,9 +2708,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3071,9 +2721,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3086,9 +2734,7 @@
           "criterionId": "log_scrubbing",
           "bucket": "critical",
           "whyItMatters": "Log Scrubbing is currently weak. Log scrubbing/redaction mechanisms are configured.",
-          "evidence": [
-            "Heuristic signal from criterion log_scrubbing."
-          ],
+          "evidence": ["Heuristic signal from criterion log_scrubbing."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3153,17 +2799,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -3187,9 +2827,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3202,9 +2840,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3217,9 +2853,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3232,9 +2866,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3247,9 +2879,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3262,9 +2892,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3329,17 +2957,11 @@
       "highRiskPassCriteria": [
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "pre_commit_hooks",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -3363,9 +2985,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3378,9 +2998,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3393,9 +3011,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3408,9 +3024,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3423,9 +3037,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3438,9 +3050,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3505,17 +3115,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -3539,9 +3143,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3554,9 +3156,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3569,9 +3169,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3584,9 +3182,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3599,9 +3195,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3614,9 +3208,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3681,17 +3273,11 @@
       "highRiskPassCriteria": [
         {
           "id": "dead_code_detection",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -3715,9 +3301,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3730,9 +3314,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3745,9 +3327,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3760,9 +3340,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3775,9 +3353,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3790,9 +3366,7 @@
           "criterionId": "log_scrubbing",
           "bucket": "critical",
           "whyItMatters": "Log Scrubbing is currently weak. Log scrubbing/redaction mechanisms are configured.",
-          "evidence": [
-            "Heuristic signal from criterion log_scrubbing."
-          ],
+          "evidence": ["Heuristic signal from criterion log_scrubbing."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3857,17 +3431,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -3891,9 +3459,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3906,9 +3472,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3921,9 +3485,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3936,9 +3498,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3951,9 +3511,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -3966,9 +3524,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4033,17 +3589,11 @@
       "highRiskPassCriteria": [
         {
           "id": "pre_commit_hooks",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "strict_typing",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -4051,11 +3601,7 @@
     },
     {
       "id": "fastify/fastify",
-      "criticalTop3": [
-        "rollback_automation",
-        "distributed_tracing",
-        "automated_security_review"
-      ],
+      "criticalTop3": ["rollback_automation", "distributed_tracing", "automated_security_review"],
       "groundTruthCritical": [
         "rollback_automation",
         "distributed_tracing",
@@ -4067,9 +3613,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4082,9 +3626,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4097,9 +3639,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4112,9 +3652,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4127,9 +3665,7 @@
           "criterionId": "secrets_management",
           "bucket": "critical",
           "whyItMatters": "Secrets Management is currently weak. Secrets management patterns/integrations exist.",
-          "evidence": [
-            "Heuristic signal from criterion secrets_management."
-          ],
+          "evidence": ["Heuristic signal from criterion secrets_management."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4142,9 +3678,7 @@
           "criterionId": "codeowners",
           "bucket": "critical",
           "whyItMatters": "Codeowners is currently weak. CODEOWNERS file exists.",
-          "evidence": [
-            "Heuristic signal from criterion codeowners."
-          ],
+          "evidence": ["Heuristic signal from criterion codeowners."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4209,17 +3743,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -4243,9 +3771,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4258,9 +3784,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4273,9 +3797,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4288,9 +3810,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4303,9 +3823,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4318,9 +3836,7 @@
           "criterionId": "log_scrubbing",
           "bucket": "critical",
           "whyItMatters": "Log Scrubbing is currently weak. Log scrubbing/redaction mechanisms are configured.",
-          "evidence": [
-            "Heuristic signal from criterion log_scrubbing."
-          ],
+          "evidence": ["Heuristic signal from criterion log_scrubbing."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4385,17 +3901,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -4403,25 +3913,15 @@
     },
     {
       "id": "eslint/eslint",
-      "criticalTop3": [
-        "distributed_tracing",
-        "gitignore_comprehensive",
-        "log_scrubbing"
-      ],
-      "groundTruthCritical": [
-        "distributed_tracing",
-        "gitignore_comprehensive",
-        "log_scrubbing"
-      ],
+      "criticalTop3": ["distributed_tracing", "gitignore_comprehensive", "log_scrubbing"],
+      "groundTruthCritical": ["distributed_tracing", "gitignore_comprehensive", "log_scrubbing"],
       "criticalFalsePositives": [],
       "recommendations": [
         {
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4434,9 +3934,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4449,9 +3947,7 @@
           "criterionId": "log_scrubbing",
           "bucket": "critical",
           "whyItMatters": "Log Scrubbing is currently weak. Log scrubbing/redaction mechanisms are configured.",
-          "evidence": [
-            "Heuristic signal from criterion log_scrubbing."
-          ],
+          "evidence": ["Heuristic signal from criterion log_scrubbing."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4464,9 +3960,7 @@
           "criterionId": "alerting_configured",
           "bucket": "critical",
           "whyItMatters": "Alerting Configured is currently weak. Alerting integrations or rules configured.",
-          "evidence": [
-            "Heuristic signal from criterion alerting_configured."
-          ],
+          "evidence": ["Heuristic signal from criterion alerting_configured."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4479,9 +3973,7 @@
           "criterionId": "deployment_observability",
           "bucket": "critical",
           "whyItMatters": "Deployment Observability is currently weak. Deployment observability dashboard/notification is configured.",
-          "evidence": [
-            "Heuristic signal from criterion deployment_observability."
-          ],
+          "evidence": ["Heuristic signal from criterion deployment_observability."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4494,9 +3986,7 @@
           "criterionId": "metrics_collection",
           "bucket": "critical",
           "whyItMatters": "Metrics Collection is currently weak. Metrics collection/telemetry is configured.",
-          "evidence": [
-            "Heuristic signal from criterion metrics_collection."
-          ],
+          "evidence": ["Heuristic signal from criterion metrics_collection."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4561,17 +4051,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "dead_code_detection",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -4595,9 +4079,7 @@
           "criterionId": "privacy_compliance",
           "bucket": "critical",
           "whyItMatters": "Privacy Compliance is currently weak. Privacy compliance references are documented when applicable.",
-          "evidence": [
-            "Heuristic signal from criterion privacy_compliance."
-          ],
+          "evidence": ["Heuristic signal from criterion privacy_compliance."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4610,9 +4092,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4625,9 +4105,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4640,9 +4118,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4655,9 +4131,7 @@
           "criterionId": "pii_handling",
           "bucket": "critical",
           "whyItMatters": "PII Handling is currently weak. PII handling controls are present when PII is processed.",
-          "evidence": [
-            "Heuristic signal from criterion pii_handling."
-          ],
+          "evidence": ["Heuristic signal from criterion pii_handling."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4670,9 +4144,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4737,17 +4209,11 @@
       "highRiskPassCriteria": [
         {
           "id": "dead_code_detection",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -4771,9 +4237,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4786,9 +4250,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4801,9 +4263,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4816,9 +4276,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4831,9 +4289,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4846,9 +4302,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4913,17 +4367,11 @@
       "highRiskPassCriteria": [
         {
           "id": "cyclomatic_complexity",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "large_file_detection",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -4947,9 +4395,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4962,9 +4408,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4977,9 +4421,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -4992,9 +4434,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5007,9 +4447,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5022,9 +4460,7 @@
           "criterionId": "log_scrubbing",
           "bucket": "critical",
           "whyItMatters": "Log Scrubbing is currently weak. Log scrubbing/redaction mechanisms are configured.",
-          "evidence": [
-            "Heuristic signal from criterion log_scrubbing."
-          ],
+          "evidence": ["Heuristic signal from criterion log_scrubbing."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5089,17 +4525,11 @@
       "highRiskPassCriteria": [
         {
           "id": "dead_code_detection",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -5107,11 +4537,7 @@
     },
     {
       "id": "socketio/socket.io",
-      "criticalTop3": [
-        "distributed_tracing",
-        "rollback_automation",
-        "gitignore_comprehensive"
-      ],
+      "criticalTop3": ["distributed_tracing", "rollback_automation", "gitignore_comprehensive"],
       "groundTruthCritical": [
         "distributed_tracing",
         "rollback_automation",
@@ -5123,9 +4549,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5138,9 +4562,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5153,9 +4575,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5168,9 +4588,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5183,9 +4601,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5198,9 +4614,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5265,17 +4679,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -5283,25 +4691,15 @@
     },
     {
       "id": "honojs/hono",
-      "criticalTop3": [
-        "distributed_tracing",
-        "rollback_automation",
-        "circuit_breakers"
-      ],
-      "groundTruthCritical": [
-        "distributed_tracing",
-        "rollback_automation",
-        "circuit_breakers"
-      ],
+      "criticalTop3": ["distributed_tracing", "rollback_automation", "circuit_breakers"],
+      "groundTruthCritical": ["distributed_tracing", "rollback_automation", "circuit_breakers"],
       "criticalFalsePositives": [],
       "recommendations": [
         {
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5314,9 +4712,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5329,9 +4725,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5344,9 +4738,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5359,9 +4751,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5374,9 +4764,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5441,17 +4829,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -5459,25 +4841,15 @@
     },
     {
       "id": "t3-oss/create-t3-app",
-      "criticalTop3": [
-        "distributed_tracing",
-        "rollback_automation",
-        "circuit_breakers"
-      ],
-      "groundTruthCritical": [
-        "distributed_tracing",
-        "rollback_automation",
-        "circuit_breakers"
-      ],
+      "criticalTop3": ["distributed_tracing", "rollback_automation", "circuit_breakers"],
+      "groundTruthCritical": ["distributed_tracing", "rollback_automation", "circuit_breakers"],
       "criticalFalsePositives": [],
       "recommendations": [
         {
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5490,9 +4862,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5505,9 +4875,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5520,9 +4888,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5535,9 +4901,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5550,9 +4914,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5617,17 +4979,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -5651,9 +5007,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5666,9 +5020,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5681,9 +5033,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5696,9 +5046,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5711,9 +5059,7 @@
           "criterionId": "log_scrubbing",
           "bucket": "critical",
           "whyItMatters": "Log Scrubbing is currently weak. Log scrubbing/redaction mechanisms are configured.",
-          "evidence": [
-            "Heuristic signal from criterion log_scrubbing."
-          ],
+          "evidence": ["Heuristic signal from criterion log_scrubbing."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5726,9 +5072,7 @@
           "criterionId": "codeowners",
           "bucket": "critical",
           "whyItMatters": "Codeowners is currently weak. CODEOWNERS file exists.",
-          "evidence": [
-            "Heuristic signal from criterion codeowners."
-          ],
+          "evidence": ["Heuristic signal from criterion codeowners."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5793,17 +5137,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -5827,9 +5165,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5842,9 +5178,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5857,9 +5191,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5872,9 +5204,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5887,9 +5217,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5902,9 +5230,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -5969,17 +5295,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -6003,9 +5323,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6018,9 +5336,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6033,9 +5349,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6048,9 +5362,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6063,9 +5375,7 @@
           "criterionId": "circuit_breakers",
           "bucket": "critical",
           "whyItMatters": "Circuit Breakers is currently weak. Circuit breaker patterns/libraries configured.",
-          "evidence": [
-            "Heuristic signal from criterion circuit_breakers."
-          ],
+          "evidence": ["Heuristic signal from criterion circuit_breakers."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6078,9 +5388,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6145,17 +5453,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -6179,9 +5481,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6194,9 +5494,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6209,9 +5507,7 @@
           "criterionId": "rollback_automation",
           "bucket": "critical",
           "whyItMatters": "Rollback Automation is currently weak. Rollback automation exists for deployments.",
-          "evidence": [
-            "Heuristic signal from criterion rollback_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion rollback_automation."],
           "expectedOutcome": "A safer and faster delivery pipeline with predictable release behavior.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6224,9 +5520,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6239,9 +5533,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6254,9 +5546,7 @@
           "criterionId": "dast_scanning",
           "bucket": "critical",
           "whyItMatters": "Dast Scanning is currently weak. DAST scanning is configured for service apps.",
-          "evidence": [
-            "Heuristic signal from criterion dast_scanning."
-          ],
+          "evidence": ["Heuristic signal from criterion dast_scanning."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6321,17 +5611,11 @@
       "highRiskPassCriteria": [
         {
           "id": "formatter",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "lint_config",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,
@@ -6355,9 +5639,7 @@
           "criterionId": "distributed_tracing",
           "bucket": "critical",
           "whyItMatters": "Distributed Tracing is currently weak. Distributed tracing instrumentation is configured.",
-          "evidence": [
-            "Heuristic signal from criterion distributed_tracing."
-          ],
+          "evidence": ["Heuristic signal from criterion distributed_tracing."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6370,9 +5652,7 @@
           "criterionId": "error_tracking_contextualized",
           "bucket": "critical",
           "whyItMatters": "Error Tracking Contextualized is currently weak. Error tracking with contextual metadata is configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_tracking_contextualized."
-          ],
+          "evidence": ["Heuristic signal from criterion error_tracking_contextualized."],
           "expectedOutcome": "Shorter incident detection and diagnosis cycles.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6385,9 +5665,7 @@
           "criterionId": "gitignore_comprehensive",
           "bucket": "critical",
           "whyItMatters": "Gitignore Comprehensive is currently weak. .gitignore includes common sensitive/local artifacts.",
-          "evidence": [
-            "Heuristic signal from criterion gitignore_comprehensive."
-          ],
+          "evidence": ["Heuristic signal from criterion gitignore_comprehensive."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6400,9 +5678,7 @@
           "criterionId": "error_to_insight_pipeline",
           "bucket": "critical",
           "whyItMatters": "Error To Insight Pipeline is currently weak. Error-to-issue insight pipeline configured.",
-          "evidence": [
-            "Heuristic signal from criterion error_to_insight_pipeline."
-          ],
+          "evidence": ["Heuristic signal from criterion error_to_insight_pipeline."],
           "expectedOutcome": "Clearer product feedback loops and evidence-based prioritization.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6415,9 +5691,7 @@
           "criterionId": "automated_security_review",
           "bucket": "critical",
           "whyItMatters": "Automated Security Review is currently weak. Automated security scan (SAST) configured in CI.",
-          "evidence": [
-            "Heuristic signal from criterion automated_security_review."
-          ],
+          "evidence": ["Heuristic signal from criterion automated_security_review."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6430,9 +5704,7 @@
           "criterionId": "dependency_update_automation",
           "bucket": "critical",
           "whyItMatters": "Dependency Update Automation is currently weak. Dependency update automation configured (Dependabot/Renovate).",
-          "evidence": [
-            "Heuristic signal from criterion dependency_update_automation."
-          ],
+          "evidence": ["Heuristic signal from criterion dependency_update_automation."],
           "expectedOutcome": "Reduced exposure to preventable security and compliance risks.",
           "actionabilityRubric": {
             "clarity": 2,
@@ -6497,17 +5769,11 @@
       "highRiskPassCriteria": [
         {
           "id": "single_command_setup",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         },
         {
           "id": "vcs_cli_tools",
-          "evidenceStrengths": [
-            "medium",
-            "weak"
-          ]
+          "evidenceStrengths": ["medium", "weak"]
         }
       ],
       "aiFailureRecovered": true,

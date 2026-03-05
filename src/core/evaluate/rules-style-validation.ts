@@ -1,12 +1,16 @@
 import path from 'node:path';
 import { safeReadText } from '../../utils/files';
-import { hasAnyDependency, hasAnyFilePattern, hasAnyScript, includesAny, inferTopLevelSourceFolders } from './helpers';
+import {
+  hasAnyDependency,
+  hasAnyFilePattern,
+  hasAnyScript,
+  includesAny,
+  inferTopLevelSourceFolders,
+} from './helpers';
 import { makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateStyleValidation(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateStyleValidation(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local } = ctx;
 
@@ -67,8 +71,11 @@ export async function evaluateStyleValidation(
         : makeResult(criterion, 'fail', 'No duplicate code detection tooling found.');
 
     case 'formatter':
-      return hasAnyFilePattern(local, [/\.prettierrc/, /prettier\.config\./, /^pyproject\.toml$/]) ||
-        hasAnyDependency(local, ['prettier', 'black', 'ruff'])
+      return hasAnyFilePattern(local, [
+        /\.prettierrc/,
+        /prettier\.config\./,
+        /^pyproject\.toml$/,
+      ]) || hasAnyDependency(local, ['prettier', 'black', 'ruff'])
         ? makeResult(criterion, 'pass', 'Formatter configuration detected.')
         : makeResult(criterion, 'fail', 'No formatter configuration files found.');
 
@@ -79,8 +86,12 @@ export async function evaluateStyleValidation(
         : makeResult(criterion, 'fail', 'No large file detection checks found.');
 
     case 'lint_config':
-      return hasAnyFilePattern(local, [/\.eslintrc/, /^eslint\.config\./, /\.ruff\.toml$/, /^pyproject\.toml$/]) ||
-        hasAnyDependency(local, ['eslint', 'ruff', 'pylint'])
+      return hasAnyFilePattern(local, [
+        /\.eslintrc/,
+        /^eslint\.config\./,
+        /\.ruff\.toml$/,
+        /^pyproject\.toml$/,
+      ]) || hasAnyDependency(local, ['eslint', 'ruff', 'pylint'])
         ? makeResult(criterion, 'pass', 'Lint configuration detected.')
         : makeResult(criterion, 'fail', 'No lint configuration found.');
 
@@ -97,8 +108,7 @@ export async function evaluateStyleValidation(
                 {
                   kind: 'dependency',
                   strength: 'strong',
-                  detail:
-                    'Found dependency commonly used for N+1 query detection.',
+                  detail: 'Found dependency commonly used for N+1 query detection.',
                 },
               ],
             )
@@ -133,7 +143,10 @@ export async function evaluateStyleValidation(
       const tsconfig = await safeReadText(path.join(local.rootPath, 'tsconfig.json'));
       const pyproject = await safeReadText(path.join(local.rootPath, 'pyproject.toml'));
 
-      if (includesAny(tsconfig, ['"strict": true', '"strict":true']) || includesAny(pyproject, ['strict = true'])) {
+      if (
+        includesAny(tsconfig, ['"strict": true', '"strict":true']) ||
+        includesAny(pyproject, ['strict = true'])
+      ) {
         return makeResult(criterion, 'pass', 'Strict typing mode configured.');
       }
 
@@ -148,8 +161,9 @@ export async function evaluateStyleValidation(
         : makeResult(criterion, 'fail', 'No tech debt tracking automation found.');
 
     case 'type_check':
-      return hasAnyScript(local, [/tsc\s+--noemit|npm\s+run\s+typecheck|mypy|pyright|typecheck/i]) ||
-        hasAnyDependency(local, ['typescript', 'mypy', 'pyright'])
+      return hasAnyScript(local, [
+        /tsc\s+--noemit|npm\s+run\s+typecheck|mypy|pyright|typecheck/i,
+      ]) || hasAnyDependency(local, ['typescript', 'mypy', 'pyright'])
         ? makeResult(criterion, 'pass', 'Type checking command/tooling detected.')
         : makeResult(criterion, 'fail', 'No type-checking setup found.');
 

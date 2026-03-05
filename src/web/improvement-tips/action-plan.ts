@@ -14,7 +14,8 @@ import {
   RecommendationSeed,
 } from './types';
 
-const VAGUE_TERMS = /(improve|optimi[sz]e|enhance|consider|etc|best practice|as needed|when possible|review regularly)/i;
+const VAGUE_TERMS =
+  /(improve|optimi[sz]e|enhance|consider|etc|best practice|as needed|when possible|review regularly)/i;
 
 function isSpecificText(value: string, minLength: number): boolean {
   const text = value.trim();
@@ -41,11 +42,7 @@ function sanitizeNextSteps(nextSteps: string[] | undefined, fallback: string[]):
   }
 
   const cleaned = Array.from(
-    new Set(
-      nextSteps
-        .map((step) => step.trim())
-        .filter((step) => step.length > 0),
-    ),
+    new Set(nextSteps.map((step) => step.trim()).filter((step) => step.length > 0)),
   ).slice(0, 5);
 
   const concreteCount = cleaned.filter((step) => isSpecificText(step, 18)).length;
@@ -56,7 +53,9 @@ function sanitizeNextSteps(nextSteps: string[] | undefined, fallback: string[]):
   return cleaned;
 }
 
-export function buildDeterministicActionPlan(results: CriterionResult[]): DeterministicActionPlanResult {
+export function buildDeterministicActionPlan(
+  results: CriterionResult[],
+): DeterministicActionPlanResult {
   const weakResults = results.filter(
     (result) => result.applicable && (result.status === 'fail' || result.status === 'unverified'),
   );
@@ -126,7 +125,8 @@ export function buildDeterministicActionPlan(results: CriterionResult[]): Determ
 
   const rankedWithBuckets = ranked.map((entry) => ({
     ...entry,
-    recommendation: recommendationByCriterionId.get(entry.recommendation.criterionId) ?? entry.recommendation,
+    recommendation:
+      recommendationByCriterionId.get(entry.recommendation.criterionId) ?? entry.recommendation,
   }));
 
   const all = rankedWithBuckets.map((entry) => entry.recommendation);
@@ -145,7 +145,9 @@ export function buildDeterministicActionPlan(results: CriterionResult[]): Determ
     rank: recommendation.rank,
     reason: result.reason,
     evidence: result.evidence.slice(0, 4),
-    evidenceDetails: result.evidenceDetails.map((item) => `${item.kind}:${item.strength}:${item.detail}`).slice(0, 5),
+    evidenceDetails: result.evidenceDetails
+      .map((item) => `${item.kind}:${item.strength}:${item.detail}`)
+      .slice(0, 5),
     deterministic: {
       whyItMatters: recommendation.whyItMatters,
       whatGoodLooksLike: recommendation.whatGoodLooksLike,
@@ -181,8 +183,7 @@ export function applyActionPlanEnrichment(
       return item;
     }
 
-    const nextSteps =
-      sanitizeNextSteps(enriched.nextSteps, item.nextSteps);
+    const nextSteps = sanitizeNextSteps(enriched.nextSteps, item.nextSteps);
 
     const whyItMatters = sanitizeText(enriched.whyItMatters, item.whyItMatters, 60);
     const whatGoodLooksLike = sanitizeText(enriched.whatGoodLooksLike, item.whatGoodLooksLike, 40);

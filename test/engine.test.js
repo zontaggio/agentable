@@ -89,8 +89,16 @@ async function createRepoFixture() {
     'utf8',
   );
 
-  await fs.writeFile(path.join(root, 'README.md'), '# Fixture\n\nRun `npm install` and `npm run build`.', 'utf8');
-  await fs.writeFile(path.join(root, '.gitignore'), 'node_modules\n.env\n.DS_Store\n.idea\n.vscode\n', 'utf8');
+  await fs.writeFile(
+    path.join(root, 'README.md'),
+    '# Fixture\n\nRun `npm install` and `npm run build`.',
+    'utf8',
+  );
+  await fs.writeFile(
+    path.join(root, '.gitignore'),
+    'node_modules\n.env\n.DS_Store\n.idea\n.vscode\n',
+    'utf8',
+  );
   await fs.writeFile(path.join(root, 'src/index.ts'), 'export const ok = true;\n', 'utf8');
   await fs.writeFile(path.join(root, 'test/basic.test.ts'), 'export {};\n', 'utf8');
 
@@ -118,7 +126,9 @@ test('engine runs in local-only mode and produces summary/report', async () => {
     const gitignoreCriterion = result.results.find((item) => item.id === 'gitignore_comprehensive');
     assert.ok(gitignoreCriterion);
     assert.equal(gitignoreCriterion.status, 'pass');
-    const secretsManagementCriterion = result.results.find((item) => item.id === 'secrets_management');
+    const secretsManagementCriterion = result.results.find(
+      (item) => item.id === 'secrets_management',
+    );
     assert.ok(secretsManagementCriterion);
     assert.equal(secretsManagementCriterion.status, 'skip');
 

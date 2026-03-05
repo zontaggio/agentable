@@ -66,6 +66,8 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`check-max-lines failed: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(
+    `check-max-lines failed: ${error instanceof Error ? error.message : String(error)}`,
+  );
   process.exitCode = 1;
 });

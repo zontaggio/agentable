@@ -62,7 +62,9 @@ function toUniqueStrings(values) {
 
 function buildRecommendation(rec, resultById) {
   const fromResult = resultById.get(rec.criterionId);
-  const evidence = Array.isArray(fromResult?.evidence) ? fromResult.evidence.filter(Boolean).slice(0, 2) : [];
+  const evidence = Array.isArray(fromResult?.evidence)
+    ? fromResult.evidence.filter(Boolean).slice(0, 2)
+    : [];
   const safeEvidence =
     evidence.length > 0 ? evidence : [`Heuristic signal from criterion ${rec.criterionId}.`];
 
@@ -90,7 +92,9 @@ function buildHighRiskPassCriteria(results) {
         .filter(Boolean),
     );
     const normalized =
-      strengths.includes('strong') || strengths.includes('medium') ? strengths : ['medium', ...strengths];
+      strengths.includes('strong') || strengths.includes('medium')
+        ? strengths
+        : ['medium', ...strengths];
     return {
       id: item.id,
       evidenceStrengths: normalized,
@@ -199,7 +203,10 @@ async function main() {
     },
   };
 
-  const outputPath = path.resolve(process.cwd(), 'fixtures/quality-gates/functional-benchmark.json');
+  const outputPath = path.resolve(
+    process.cwd(),
+    'fixtures/quality-gates/functional-benchmark.json',
+  );
   await fs.writeFile(outputPath, `${JSON.stringify(dataset, null, 2)}\n`, 'utf8');
   console.log(`\nwritten: ${outputPath}`);
   console.log(`repos captured: ${repos.length}`);

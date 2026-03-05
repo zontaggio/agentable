@@ -28,7 +28,9 @@ export async function sendOpenRouterChatRequest(
     });
   } catch (error) {
     if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
-      throw new Error(`OpenRouter request timed out after ${Math.round(timeoutMs / 1000)}s`);
+      throw new Error(`OpenRouter request timed out after ${Math.round(timeoutMs / 1000)}s`, {
+        cause: error,
+      });
     }
     throw error;
   }

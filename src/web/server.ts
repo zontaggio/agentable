@@ -69,7 +69,11 @@ async function readBody(req: IncomingMessage, maxBytes = 1_000_000): Promise<str
   return Buffer.concat(chunks).toString('utf8');
 }
 
-function parseFeedbackPayload(body: string): { criterionId: string; useful: boolean; reason: string } {
+function parseFeedbackPayload(body: string): {
+  criterionId: string;
+  useful: boolean;
+  reason: string;
+} {
   let parsed: unknown;
   try {
     parsed = JSON.parse(body);

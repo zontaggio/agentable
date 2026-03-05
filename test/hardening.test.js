@@ -105,7 +105,11 @@ test('devcontainer_runnable passes with image and with valid build object', asyn
   await fs.mkdir(path.join(imageRoot, '.devcontainer'), { recursive: true });
   await fs.writeFile(
     path.join(imageRoot, '.devcontainer/devcontainer.json'),
-    JSON.stringify({ image: 'mcr.microsoft.com/devcontainers/javascript-node:1-20-bookworm' }, null, 2),
+    JSON.stringify(
+      { image: 'mcr.microsoft.com/devcontainers/javascript-node:1-20-bookworm' },
+      null,
+      2,
+    ),
     'utf8',
   );
 

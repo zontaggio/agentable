@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+
 - Added configurable AI failure behavior (`fallback` default, `strict` optional) and deterministic fallback flow for AI outages.
 - Added `actionabilityScore` to prioritized recommendations and stricter filtering of vague AI-enriched guidance.
 - Added web payload metadata for launch governance (`knownLimitations`, `qualityGateVersion`).
@@ -29,16 +30,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub permission-limited paths are normalized to `unverified` instead of false-negative `fail` states.
 
 ### Removed
+
 - Removed `--no-ai` CLI option.
 - Removed `--terminal` CLI option and terminal-report user flow.
 
 ### Breaking
+
 - Running without valid OpenRouter config now fails instead of producing partial `UNVERIFIED` AI criteria.
 - CLI runtime is web-only; terminal report mode is no longer available as a user-facing path.
 
 ## [0.1.0] - 2026-03-02
 
 ### Added
+
 - Initial release of Agentable CLI
 - Comprehensive criteria catalog (v1.0.0) with 9 categories
 - Local project context collection
@@ -57,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript type definitions throughout
 
 ### Features
+
 - **CLI**: Command-line interface with multiple flags
 - **Scoring**: Deterministic scoring algorithm
 - **Web Mode**: Interactive localhost dashboard

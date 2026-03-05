@@ -163,7 +163,12 @@ export async function collectAiAssessments(input: AiCollectionInput): Promise<Ai
       providerConfig,
     );
   } catch (error) {
-    throw new Error(`AI provider request failed: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `AI provider request failed: ${error instanceof Error ? error.message : String(error)}`,
+      {
+        cause: error,
+      },
+    );
   }
 
   const baseline: AiBaseline = {

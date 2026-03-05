@@ -124,7 +124,9 @@ test('enrichActionPlanRecommendations batches and caches guidance', async () => 
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-ai-enrich-cache-'));
   const local = makeLocalContext(root);
   const profile = makeProfile();
-  const recommendations = Array.from({ length: 13 }, (_, index) => makeRecommendationSeed(index + 1));
+  const recommendations = Array.from({ length: 13 }, (_, index) =>
+    makeRecommendationSeed(index + 1),
+  );
   const fingerprint = `fp-${Date.now()}-enrich-cache`;
 
   const realFetch = global.fetch;
@@ -160,7 +162,8 @@ test('enrichActionPlanRecommendations batches and caches guidance', async () => 
     recommendationCalls += 1;
     const marker = 'Recommendations JSON:\n\n';
     const markerIndex = userContent.indexOf(marker);
-    const batchJson = markerIndex === -1 ? '[]' : userContent.slice(markerIndex + marker.length).trim();
+    const batchJson =
+      markerIndex === -1 ? '[]' : userContent.slice(markerIndex + marker.length).trim();
     const batch = JSON.parse(batchJson);
 
     return {

@@ -37,18 +37,27 @@ function findAiCriteriaIds(): string[] {
   return CRITERIA.filter((criterion) => criterion.aiAssisted).map((criterion) => criterion.id);
 }
 
-function buildFallbackAiAssessments(criteriaIds: string[], reason: string): Record<string, {
-  id: string;
-  status: 'unverified';
-  reason: string;
-  evidence: string[];
-}> {
-  const output: Record<string, {
+function buildFallbackAiAssessments(
+  criteriaIds: string[],
+  reason: string,
+): Record<
+  string,
+  {
     id: string;
     status: 'unverified';
     reason: string;
     evidence: string[];
-  }> = {};
+  }
+> {
+  const output: Record<
+    string,
+    {
+      id: string;
+      status: 'unverified';
+      reason: string;
+      evidence: string[];
+    }
+  > = {};
 
   for (const criterionId of criteriaIds) {
     output[criterionId] = {
@@ -147,9 +156,14 @@ export async function runAgentReadiness(
     });
 
     if (recommendationEnrichment.error) {
-      warnings.push(`Action plan AI enrichment unavailable; using deterministic guidance. ${recommendationEnrichment.error}`);
+      warnings.push(
+        `Action plan AI enrichment unavailable; using deterministic guidance. ${recommendationEnrichment.error}`,
+      );
     } else if (recommendationEnrichment.usedAi) {
-      actionPlan = applyActionPlanEnrichment(actionPlan, recommendationEnrichment.guidanceByCriterion);
+      actionPlan = applyActionPlanEnrichment(
+        actionPlan,
+        recommendationEnrichment.guidanceByCriterion,
+      );
     }
   } else {
     warnings.push('Action plan AI enrichment skipped because AI assessments were unavailable.');

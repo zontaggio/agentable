@@ -57,7 +57,9 @@ export function defaultExpectedOutcome(result: CriterionResult): string {
 
 function genericTips(result: CriterionResult): string[] {
   if (result.status === 'pass') {
-    return ['This criterion is already validated. Keep it enforced in automation to avoid regressions.'];
+    return [
+      'This criterion is already validated. Keep it enforced in automation to avoid regressions.',
+    ];
   }
 
   if (result.status === 'skip') {
@@ -71,10 +73,16 @@ function genericTips(result: CriterionResult): string[] {
     ];
   }
 
-  return ['Define and implement an explicit standard for this criterion.', 'Automate validation to prevent regressions.'];
+  return [
+    'Define and implement an explicit standard for this criterion.',
+    'Automate validation to prevent regressions.',
+  ];
 }
 
-export function getImprovementTips(result: CriterionResult, guidance?: RecommendationItem): string[] {
+export function getImprovementTips(
+  result: CriterionResult,
+  guidance?: RecommendationItem,
+): string[] {
   if (guidance?.nextSteps && guidance.nextSteps.length > 0) {
     return guidance.nextSteps.slice(0, 5);
   }

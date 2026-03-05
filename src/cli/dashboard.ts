@@ -16,9 +16,13 @@ export function printDashboardReady(url: string): void {
   ];
   const contentWidth = rows.reduce((max, row) => Math.max(max, visibleLength(row)), 0);
 
-  console.log(`${paint('┌', 'cyan')}${paint('─'.repeat(contentWidth + 2), 'cyan')}${paint('┐', 'cyan')}`);
+  console.log(
+    `${paint('┌', 'cyan')}${paint('─'.repeat(contentWidth + 2), 'cyan')}${paint('┐', 'cyan')}`,
+  );
   for (const row of rows) {
     console.log(`${paint('│', 'cyan')} ${padRightAnsi(row, contentWidth)} ${paint('│', 'cyan')}`);
   }
-  console.log(`${paint('└', 'cyan')}${paint('─'.repeat(contentWidth + 2), 'cyan')}${paint('┘', 'cyan')}`);
+  console.log(
+    `${paint('└', 'cyan')}${paint('─'.repeat(contentWidth + 2), 'cyan')}${paint('┘', 'cyan')}`,
+  );
 }

@@ -162,7 +162,9 @@ test('buildWebPayload creates category buckets and card metadata', () => {
   assert.equal(typeof payload.qualityGateVersion, 'string');
   assert.ok(Array.isArray(payload.knownLimitations));
 
-  const formatterCard = payload.criteriaByCategory.style_validation.find((item) => item.id === 'formatter');
+  const formatterCard = payload.criteriaByCategory.style_validation.find(
+    (item) => item.id === 'formatter',
+  );
   assert.ok(formatterCard);
   assert.equal(formatterCard.badge, 'BASIC');
   assert.equal(formatterCard.scoreLabel, '1/1');

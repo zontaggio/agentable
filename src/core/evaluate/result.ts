@@ -104,10 +104,8 @@ export function enforceConservativeDecision(result: CriterionResult): CriterionR
     return result;
   }
 
-  const strongEvidence =
-    result.evidenceDetails.filter((item) => item.strength === 'strong').length;
-  const mediumEvidence =
-    result.evidenceDetails.filter((item) => item.strength === 'medium').length;
+  const strongEvidence = result.evidenceDetails.filter((item) => item.strength === 'strong').length;
+  const mediumEvidence = result.evidenceDetails.filter((item) => item.strength === 'medium').length;
   if (strongEvidence > 0 || mediumEvidence >= 2) {
     return result;
   }

@@ -1,6 +1,11 @@
 import { CriterionConfidence, CriterionResult } from '../../types';
 import { getCardMeta } from '../card-meta';
-import { CATEGORY_PRIORITY, CONFIDENCE_PRIORITY, DEPENDENCY_GRAPH, STATUS_PRIORITY } from './constants';
+import {
+  CATEGORY_PRIORITY,
+  CONFIDENCE_PRIORITY,
+  DEPENDENCY_GRAPH,
+  STATUS_PRIORITY,
+} from './constants';
 
 function statusWeight(status: Exclude<CriterionResult['status'], 'pass' | 'skip'>): number {
   return STATUS_PRIORITY[status];
@@ -41,7 +46,8 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function countConcreteSteps(nextSteps: string[]): number {
-  const vagueTerms = /(improve|optimi[sz]e|enhance|consider|etc|best practice|as needed|when possible)/i;
+  const vagueTerms =
+    /(improve|optimi[sz]e|enhance|consider|etc|best practice|as needed|when possible)/i;
   return nextSteps.filter((step) => {
     const text = step.trim();
     if (text.length < 18) {

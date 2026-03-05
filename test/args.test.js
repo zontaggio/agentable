@@ -16,5 +16,8 @@ test('parseArgs accepts strict ai failure mode', () => {
 });
 
 test('parseArgs rejects invalid ai failure mode', () => {
-  assert.throws(() => parseArgs(['.', '--ai-failure-mode', 'invalid']), /Invalid --ai-failure-mode value/);
+  assert.throws(
+    () => parseArgs(['.', '--ai-failure-mode', 'invalid']),
+    /Invalid --ai-failure-mode value/,
+  );
 });

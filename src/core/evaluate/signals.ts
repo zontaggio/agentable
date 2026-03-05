@@ -32,7 +32,9 @@ export async function buildSignals(local: LocalProjectContext): Promise<EvalSign
   const integrationTestFiles = local.files.filter((file) =>
     /(integration|acceptance|e2e|it\.|test\/integration|test\/acceptance)/i.test(file),
   );
-  const unitTestFiles = local.files.filter((file) => /((^|\/)test\/.+|\.test\.|\.spec\.)/i.test(file));
+  const unitTestFiles = local.files.filter((file) =>
+    /((^|\/)test\/.+|\.test\.|\.spec\.)/i.test(file),
+  );
 
   return {
     readmeText: readmeText.toLowerCase(),

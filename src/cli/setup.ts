@@ -8,7 +8,9 @@ import { BRAND_NAME } from './constants';
 import { CliOptions } from './types';
 
 function printSetupHeader(isReconfigure: boolean): void {
-  const title = isReconfigure ? `${BRAND_NAME} Setup (Reconfigure)` : `${BRAND_NAME} First-Time Setup`;
+  const title = isReconfigure
+    ? `${BRAND_NAME} Setup (Reconfigure)`
+    : `${BRAND_NAME} First-Time Setup`;
   const lines = [
     '┌─────────────────────────────────────────────────────────────────────┐',
     `│ ${title.padEnd(67)}│`,
@@ -23,7 +25,10 @@ function printSetupHeader(isReconfigure: boolean): void {
   console.log('');
 }
 
-async function promptAndSaveUserConfig(currentModel?: string, hasExistingKey = false): Promise<{
+async function promptAndSaveUserConfig(
+  currentModel?: string,
+  hasExistingKey = false,
+): Promise<{
   openRouterApiKey: string;
   openRouterModel: string;
 }> {
@@ -44,7 +49,9 @@ async function promptAndSaveUserConfig(currentModel?: string, hasExistingKey = f
     const apiInput = (await rl.question(apiPrompt)).trim();
 
     const modelDefault = (currentModel || DEFAULT_OPENROUTER_MODEL).trim();
-    const modelInput = (await rl.question(`${paint('OpenRouter model', 'cyan', true)} [${modelDefault}]: `)).trim();
+    const modelInput = (
+      await rl.question(`${paint('OpenRouter model', 'cyan', true)} [${modelDefault}]: `)
+    ).trim();
     const openRouterModel = modelInput || modelDefault;
 
     const existing = await loadUserConfig();

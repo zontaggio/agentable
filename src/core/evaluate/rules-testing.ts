@@ -2,9 +2,7 @@ import { hasAnyScript, includesAny } from './helpers';
 import { makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateTesting(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateTesting(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local } = ctx;
 
@@ -53,7 +51,11 @@ export async function evaluateTesting(
 
     case 'unit_tests_exist':
       return signals.unitTestFiles.length > 0
-        ? makeResult(criterion, 'pass', `Unit test files detected (${signals.unitTestFiles.length}).`)
+        ? makeResult(
+            criterion,
+            'pass',
+            `Unit test files detected (${signals.unitTestFiles.length}).`,
+          )
         : makeResult(criterion, 'fail', 'No unit test files detected.');
 
     case 'unit_tests_runnable':

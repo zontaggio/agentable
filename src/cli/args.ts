@@ -38,7 +38,9 @@ export function parseArgs(argv: string[]): CliOptions | null {
     }
 
     if (arg === '--terminal') {
-      throw new Error('Option --terminal was removed. Agentable now runs in web dashboard mode only.');
+      throw new Error(
+        'Option --terminal was removed. Agentable now runs in web dashboard mode only.',
+      );
     }
 
     if (arg === '--web') {
@@ -46,7 +48,9 @@ export function parseArgs(argv: string[]): CliOptions | null {
     }
 
     if (arg === '--report') {
-      throw new Error('Option --report is not supported. Agentable now runs in web dashboard mode only.');
+      throw new Error(
+        'Option --report is not supported. Agentable now runs in web dashboard mode only.',
+      );
     }
 
     if (arg === '--setup') {

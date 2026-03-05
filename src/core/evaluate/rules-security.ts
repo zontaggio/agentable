@@ -1,10 +1,14 @@
-import { countKeywordMatches, gitignoreEntryMatches, hasAnyDependency, hasAnyFilePattern, includesAny, parseGitignoreEntries } from './helpers';
+import {
+  countKeywordMatches,
+  gitignoreEntryMatches,
+  hasAnyDependency,
+  includesAny,
+  parseGitignoreEntries,
+} from './helpers';
 import { evidenceDetail, makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateSecurity(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateSecurity(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local, ghData } = ctx;
 
@@ -43,11 +47,7 @@ export async function evaluateSecurity(
       }
       return ghData.branchProtectionEnabled
         ? makeResult(criterion, 'pass', 'Branch protection is enabled.')
-        : makeResult(
-            criterion,
-            'fail',
-            'Branch protection not detected on default branch.',
-          );
+        : makeResult(criterion, 'fail', 'Branch protection not detected on default branch.');
 
     case 'codeowners':
       return local.fileSet.has('CODEOWNERS') || local.fileSet.has('.github/CODEOWNERS')
@@ -69,13 +69,7 @@ export async function evaluateSecurity(
             'pass',
             'Dependency update automation configuration detected.',
             [],
-            [
-              evidenceDetail(
-                'file',
-                'strong',
-                'Dependabot/Renovate configuration file detected.',
-              ),
-            ],
+            [evidenceDetail('file', 'strong', 'Dependabot/Renovate configuration file detected.')],
           )
         : makeResult(criterion, 'fail', 'No Dependabot/Renovate configuration found.');
 
@@ -176,7 +170,10 @@ export async function evaluateSecurity(
       return makeResult(criterion, 'fail', 'No log scrubbing mechanism detected.');
 
     case 'pii_handling':
-      if (countKeywordMatches(signals.workflowText, ['pii', 'data classification', 'personal data']) > 0) {
+      if (
+        countKeywordMatches(signals.workflowText, ['pii', 'data classification', 'personal data']) >
+        0
+      ) {
         return makeResult(
           criterion,
           'pass',
@@ -191,19 +188,16 @@ export async function evaluateSecurity(
           ],
         );
       }
-      if (countKeywordMatches(signals.allTextIndex, ['pii', 'data classification', 'personal data']) > 0) {
+      if (
+        countKeywordMatches(signals.allTextIndex, ['pii', 'data classification', 'personal data']) >
+        0
+      ) {
         return makeResult(
           criterion,
           'unverified',
           'Only textual references to PII handling were found.',
           [],
-          [
-            evidenceDetail(
-              'text',
-              'weak',
-              'PII-related keywords present in text index.',
-            ),
-          ],
+          [evidenceDetail('text', 'weak', 'PII-related keywords present in text index.')],
         );
       }
       return makeResult(criterion, 'fail', 'No explicit PII handling controls detected.');

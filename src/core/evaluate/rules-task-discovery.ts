@@ -2,9 +2,7 @@ import { hasAnyFilePattern } from './helpers';
 import { makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateTaskDiscovery(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateTaskDiscovery(input: CriterionEvaluatorInput) {
   const { criterion, ctx } = input;
   const { local, ghData } = ctx;
 
@@ -63,15 +61,25 @@ export async function evaluateTaskDiscovery(
         ? makeResult(criterion, 'pass', 'Labeling automation/configuration detected in repository.')
         : ghData.available && ghData.authenticated
           ? makeResult(criterion, 'fail', 'No strong issue labeling system signals detected.')
-          : makeResult(criterion, 'unverified', 'Unable to verify issue labels without authenticated gh CLI.');
+          : makeResult(
+              criterion,
+              'unverified',
+              'Unable to verify issue labels without authenticated gh CLI.',
+            );
 
     case 'issue_templates':
-      return hasAnyFilePattern(local, [/^\.github\/ISSUE_TEMPLATE\//, /^\.github\/issue_template\.md$/i])
+      return hasAnyFilePattern(local, [
+        /^\.github\/ISSUE_TEMPLATE\//,
+        /^\.github\/issue_template\.md$/i,
+      ])
         ? makeResult(criterion, 'pass', 'Issue template(s) detected.')
         : makeResult(criterion, 'fail', 'No issue templates found.');
 
     case 'pr_templates':
-      return hasAnyFilePattern(local, [/^\.github\/pull_request_template\.md$/i, /^pull_request_template\.md$/i])
+      return hasAnyFilePattern(local, [
+        /^\.github\/pull_request_template\.md$/i,
+        /^pull_request_template\.md$/i,
+      ])
         ? makeResult(criterion, 'pass', 'Pull request template detected.')
         : makeResult(criterion, 'fail', 'No pull request template found.');
 

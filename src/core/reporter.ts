@@ -20,7 +20,11 @@ function shouldUseColor(): boolean {
   if (process.env.FORCE_COLOR === '0') {
     return false;
   }
-  if (process.env.FORCE_COLOR === '1' || process.env.FORCE_COLOR === '2' || process.env.FORCE_COLOR === '3') {
+  if (
+    process.env.FORCE_COLOR === '1' ||
+    process.env.FORCE_COLOR === '2' ||
+    process.env.FORCE_COLOR === '3'
+  ) {
     return true;
   }
   return Boolean(process.stdout.isTTY);
@@ -35,11 +39,15 @@ function colorize(text: string, color: keyof typeof ANSI, enabled: boolean, bold
 }
 
 function padRight(value: string, width: number): string {
-  return value.length >= width ? value.slice(0, width) : `${value}${' '.repeat(width - value.length)}`;
+  return value.length >= width
+    ? value.slice(0, width)
+    : `${value}${' '.repeat(width - value.length)}`;
 }
 
 function padLeft(value: string, width: number): string {
-  return value.length >= width ? value.slice(0, width) : `${' '.repeat(width - value.length)}${value}`;
+  return value.length >= width
+    ? value.slice(0, width)
+    : `${' '.repeat(width - value.length)}${value}`;
 }
 
 function percent(value: number): string {
@@ -156,7 +164,12 @@ function buildCategorySummaryTable(summary: ScoreSummary, colorEnabled: boolean)
     const unv = String(item?.unverified ?? 0);
     const scoreText = `${(item?.score ?? 0).toFixed(0)}%`;
 
-    const scoreDisplay = colorize(padLeft(scoreText, scoreWidth), scoreColor(item?.score ?? 0), colorEnabled, true);
+    const scoreDisplay = colorize(
+      padLeft(scoreText, scoreWidth),
+      scoreColor(item?.score ?? 0),
+      colorEnabled,
+      true,
+    );
 
     rows.push(
       `${padRight(label, categoryWidth)} ${padLeft(pass, passWidth)} ${padLeft(fail, failWidth)} ${padLeft(skip, skipWidth)} ${padLeft(unv, unvWidth)} ${scoreDisplay}`,

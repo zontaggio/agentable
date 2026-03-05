@@ -14,9 +14,7 @@ function hasAgentCommitSignals(text: string): boolean {
   return AGENT_COMMIT_SIGNAL_PATTERNS.some((pattern) => pattern.test(text));
 }
 
-export async function evaluateBuildSystem(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateBuildSystem(input: CriterionEvaluatorInput) {
   const { criterion, ctx, gitData, signals } = input;
   const { local, ghData } = ctx;
 
@@ -31,9 +29,17 @@ export async function evaluateBuildSystem(
       }
 
       if (gitData.isGitRepo) {
-        const logCheck = await runCommand('git', ['log', '--format=%B', '-n', '25'], local.rootPath);
+        const logCheck = await runCommand(
+          'git',
+          ['log', '--format=%B', '-n', '25'],
+          local.rootPath,
+        );
         if (logCheck.ok && hasAgentCommitSignals(logCheck.stdout)) {
-          return makeResult(criterion, 'pass', 'Recent git history indicates agent-assisted contributions.');
+          return makeResult(
+            criterion,
+            'pass',
+            'Recent git history indicates agent-assisted contributions.',
+          );
         }
       }
 
@@ -161,8 +167,7 @@ export async function evaluateBuildSystem(
               {
                 kind: 'text',
                 strength: 'weak',
-                detail:
-                  'Canary/progressive rollout keywords found in repository text index.',
+                detail: 'Canary/progressive rollout keywords found in repository text index.',
               },
             ],
           )

@@ -48,7 +48,10 @@ function normalizedRubricScore(rubric) {
 }
 
 function isExecutableNow(recommendation) {
-  const rubric = recommendation && typeof recommendation === 'object' ? recommendation.actionabilityRubric : null;
+  const rubric =
+    recommendation && typeof recommendation === 'object'
+      ? recommendation.actionabilityRubric
+      : null;
   if (!rubric || typeof rubric !== 'object') {
     return false;
   }
@@ -89,7 +92,9 @@ function buildGateResults(data) {
   const repoCount = repos.length;
 
   const precisionAt3Values = repos.map((repo) => {
-    const top3 = toArray(repo.criticalTop3).slice(0, 3).map((item) => String(item));
+    const top3 = toArray(repo.criticalTop3)
+      .slice(0, 3)
+      .map((item) => String(item));
     const truth = new Set(toArray(repo.groundTruthCritical).map((item) => String(item)));
     if (top3.length === 0) return 0;
     const hits = top3.filter((item) => truth.has(item)).length;
@@ -97,7 +102,9 @@ function buildGateResults(data) {
   });
 
   const falsePositiveRates = repos.map((repo) => {
-    const top3 = toArray(repo.criticalTop3).slice(0, 3).map((item) => String(item));
+    const top3 = toArray(repo.criticalTop3)
+      .slice(0, 3)
+      .map((item) => String(item));
     if (top3.length === 0) return 1;
 
     const explicitFps = toArray(repo.criticalFalsePositives).map((item) => String(item));
@@ -115,13 +122,19 @@ function buildGateResults(data) {
   );
 
   const reposWithTwoExecutableNow = repos.filter((repo) => {
-    const executableNowCount = toArray(repo.recommendations).filter((item) => isExecutableNow(item)).length;
+    const executableNowCount = toArray(repo.recommendations).filter((item) =>
+      isExecutableNow(item),
+    ).length;
     return executableNowCount >= 2;
   }).length;
 
   const determinismPasses = repos.filter((repo) => {
     const repeatRuns = toArray(repo.repeatRuns);
-    return repeatRuns.length >= 5 && stableTop5(repeatRuns) && scoreVariation(repeatRuns) <= THRESHOLDS.maxScoreVariation;
+    return (
+      repeatRuns.length >= 5 &&
+      stableTop5(repeatRuns) &&
+      scoreVariation(repeatRuns) <= THRESHOLDS.maxScoreVariation
+    );
   }).length;
 
   const aiRecoveryPasses = repos.filter((repo) => Boolean(repo.aiFailureRecovered)).length;
@@ -132,7 +145,8 @@ function buildGateResults(data) {
       .map((item) => {
         const why = typeof item?.whyItMatters === 'string' && item.whyItMatters.trim().length > 0;
         const evidence = toArray(item?.evidence).length > 0;
-        const outcome = typeof item?.expectedOutcome === 'string' && item.expectedOutcome.trim().length > 0;
+        const outcome =
+          typeof item?.expectedOutcome === 'string' && item.expectedOutcome.trim().length > 0;
         return why && evidence && outcome;
       }),
   );
@@ -141,7 +155,9 @@ function buildGateResults(data) {
     toArray(repo.highRiskPassCriteria).map((item) => hasStrongOrMediumEvidence(item)),
   );
 
-  const firstRunUx = repos.map((repo) => toNumber(repo.firstRunToThreeStepsMinutes, Number.POSITIVE_INFINITY));
+  const firstRunUx = repos.map((repo) =>
+    toNumber(repo.firstRunToThreeStepsMinutes, Number.POSITIVE_INFINITY),
+  );
   const uxStudy = data.uxStudy && typeof data.uxStudy === 'object' ? data.uxStudy : {};
   const participants = toNumber(uxStudy.participants, 0);
   const successes = toNumber(uxStudy.successes, 0);
@@ -155,12 +171,14 @@ function buildGateResults(data) {
     reposWithTwoExecutableNowRate: repoCount > 0 ? reposWithTwoExecutableNow / repoCount : 0,
     determinismRate: repoCount > 0 ? determinismPasses / repoCount : 0,
     aiFailureRecoveryRate: repoCount > 0 ? aiRecoveryPasses / repoCount : 0,
-    transparencyCoverage: transparencyChecks.length > 0 ? average(transparencyChecks.map((item) => (item ? 1 : 0))) : 0,
+    transparencyCoverage:
+      transparencyChecks.length > 0 ? average(transparencyChecks.map((item) => (item ? 1 : 0))) : 0,
     highRiskPassEvidenceCoverage:
       highRiskPassEvidenceChecks.length > 0
         ? average(highRiskPassEvidenceChecks.map((item) => (item ? 1 : 0)))
         : 0,
-    maxFirstRunMinutesObserved: firstRunUx.length > 0 ? Math.max(...firstRunUx) : Number.POSITIVE_INFINITY,
+    maxFirstRunMinutesObserved:
+      firstRunUx.length > 0 ? Math.max(...firstRunUx) : Number.POSITIVE_INFINITY,
     uxSuccessRate,
   };
 
@@ -256,18 +274,24 @@ async function main() {
   console.log(`- precision@3: ${fmt(result.metrics.precisionAt3)}`);
   console.log(`- critical false-positive rate: ${fmt(result.metrics.criticalFalsePositiveRate)}`);
   console.log(`- actionability avg: ${fmt(result.metrics.actionabilityAverage)}`);
-  console.log(`- repos with >=2 executable-now recommendations: ${fmt(result.metrics.reposWithTwoExecutableNowRate)}`);
+  console.log(
+    `- repos with >=2 executable-now recommendations: ${fmt(result.metrics.reposWithTwoExecutableNowRate)}`,
+  );
   console.log(`- determinism rate: ${fmt(result.metrics.determinismRate)}`);
   console.log(`- ai failure recovery rate: ${fmt(result.metrics.aiFailureRecoveryRate)}`);
   console.log(`- transparency coverage: ${fmt(result.metrics.transparencyCoverage)}`);
-  console.log(`- high-risk pass evidence coverage: ${fmt(result.metrics.highRiskPassEvidenceCoverage)}`);
+  console.log(
+    `- high-risk pass evidence coverage: ${fmt(result.metrics.highRiskPassEvidenceCoverage)}`,
+  );
   console.log(`- max first-run minutes: ${fmt(result.metrics.maxFirstRunMinutesObserved)}`);
   console.log(`- ux success rate: ${fmt(result.metrics.uxSuccessRate)}`);
   console.log('');
 
   console.log('checks');
   for (const check of result.checks) {
-    console.log(`- [${check.ok ? 'PASS' : 'FAIL'}] ${check.id}: actual=${fmt(check.actual)} expected ${check.expected}`);
+    console.log(
+      `- [${check.ok ? 'PASS' : 'FAIL'}] ${check.id}: actual=${fmt(check.actual)} expected ${check.expected}`,
+    );
   }
 
   const failed = result.checks.filter((check) => !check.ok);
@@ -277,6 +301,8 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`quality gate check failed: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(
+    `quality gate check failed: ${error instanceof Error ? error.message : String(error)}`,
+  );
   process.exitCode = 1;
 });

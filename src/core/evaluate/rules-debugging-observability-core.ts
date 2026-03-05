@@ -2,9 +2,7 @@ import { countKeywordMatches, hasAnyDependency } from './helpers';
 import { evidenceDetail, makeResult } from './result';
 import { CriterionEvaluatorInput } from './types';
 
-export async function evaluateDebuggingObservabilityCore(
-  input: CriterionEvaluatorInput,
-) {
+export async function evaluateDebuggingObservabilityCore(input: CriterionEvaluatorInput) {
   const { criterion, ctx, signals } = input;
   const { local } = ctx;
 
@@ -71,13 +69,7 @@ export async function evaluateDebuggingObservabilityCore(
           'pass',
           'Circuit breaker dependency detected.',
           [],
-          [
-            evidenceDetail(
-              'dependency',
-              'strong',
-              'Found circuit breaker library dependency.',
-            ),
-          ],
+          [evidenceDetail('dependency', 'strong', 'Found circuit breaker library dependency.')],
         );
       }
       if (countKeywordMatches(signals.allTextIndex, ['circuit breaker']) > 0) {
@@ -86,13 +78,7 @@ export async function evaluateDebuggingObservabilityCore(
           'unverified',
           'Only textual references to circuit breaker patterns were found.',
           [],
-          [
-            evidenceDetail(
-              'text',
-              'weak',
-              'Repository text includes "circuit breaker" mention.',
-            ),
-          ],
+          [evidenceDetail('text', 'weak', 'Repository text includes "circuit breaker" mention.')],
         );
       }
       return makeResult(criterion, 'fail', 'No circuit breaker configuration detected.');
@@ -113,7 +99,9 @@ export async function evaluateDebuggingObservabilityCore(
           ],
         );
       }
-      if (countKeywordMatches(signals.workflowText, ['codeql', 'coveralls', 'codecov', 'sonar']) > 0) {
+      if (
+        countKeywordMatches(signals.workflowText, ['codeql', 'coveralls', 'codecov', 'sonar']) > 0
+      ) {
         return makeResult(
           criterion,
           'pass',
@@ -176,13 +164,7 @@ export async function evaluateDebuggingObservabilityCore(
           'pass',
           'Distributed tracing dependency detected.',
           [],
-          [
-            evidenceDetail(
-              'dependency',
-              'strong',
-              'Found OpenTelemetry/Jaeger/Zipkin dependency.',
-            ),
-          ],
+          [evidenceDetail('dependency', 'strong', 'Found OpenTelemetry/Jaeger/Zipkin dependency.')],
         );
       }
       if (countKeywordMatches(signals.allTextIndex, ['traceid', 'request-id propagation']) > 0) {
@@ -191,13 +173,7 @@ export async function evaluateDebuggingObservabilityCore(
           'unverified',
           'Only weak textual references to trace propagation were found.',
           [],
-          [
-            evidenceDetail(
-              'text',
-              'weak',
-              'Trace propagation keywords detected in text index.',
-            ),
-          ],
+          [evidenceDetail('text', 'weak', 'Trace propagation keywords detected in text index.')],
         );
       }
       return makeResult(criterion, 'fail', 'No distributed tracing instrumentation detected.');
@@ -209,13 +185,7 @@ export async function evaluateDebuggingObservabilityCore(
           'pass',
           'Error tracking dependency detected.',
           [],
-          [
-            evidenceDetail(
-              'dependency',
-              'strong',
-              'Found Sentry/Bugsnag/Rollbar dependency.',
-            ),
-          ],
+          [evidenceDetail('dependency', 'strong', 'Found Sentry/Bugsnag/Rollbar dependency.')],
         );
       }
       if (countKeywordMatches(signals.allTextIndex, ['sentry', 'bugsnag', 'rollbar']) > 0) {
