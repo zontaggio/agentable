@@ -158,4 +158,5 @@ Dataset template is available at `fixtures/quality-gates/functional-benchmark.te
 - `src/core/evaluate.ts`: conservative criterion decisions + evidence
 - `src/core/scoring.ts`: score + confidence aggregation
 - `src/web/improvement-tips.ts`: deterministic ranking and fallback guidance
-- `src/web/*`: dashboard server, transforms, templates
+- `src/web/frontend/*`: dashboard frontend source files (`index.html`, `app.css`, `app.js`)
+- `src/web/*`: dashboard server, transforms, template bundling bridge

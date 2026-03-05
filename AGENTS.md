@@ -35,9 +35,10 @@ Execution flow:
 - `src/catalog/v1`: criterion definitions grouped by category
 - `src/collectors`: repository and provider context collection
 - `src/core`: profile building, evaluation engine, scoring, reporting, user config
-- `src/web`: server, transforms, templates, card metadata, improvement tips
+- `src/web`: server, transforms, template bridge, card metadata, improvement tips
+- `src/web/frontend`: editable dashboard frontend sources (`index.html`, `app.css`, `app.js`)
 - `test`: Node test runner suites
-- `scripts`: utility scripts (line budget checks, quality-gates, benchmark generation)
+- `scripts`: utility scripts (line budget checks, frontend bundle, quality-gates, benchmark generation)
 - `fixtures`: benchmark and quality-gate fixtures
 - `dist`: TypeScript build output
 

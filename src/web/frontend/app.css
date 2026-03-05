@@ -1,0 +1,795 @@
+@import url('https://fonts.cdnfonts.com/css/tiktok-sans');
+
+:root {
+  --bg: #070e11;
+  --bg-2: #0d161a;
+  --panel: #111b20;
+  --panel-2: #18242a;
+  --line: #294049;
+  --text: #edf4f5;
+  --muted: #9db2b9;
+  --pass: #66d6a5;
+  --fail: #e38364;
+  --skip: #7c9198;
+  --unverified: #8fa0c4;
+  --advanced: #f06a74;
+  --intermediate: #62b7ff;
+  --basic: #b8e06e;
+  --shadow: rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at 88% 8%, #16272d, #060c0f 55%);
+  color: var(--text);
+  min-height: 100%;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+}
+
+body::before {
+  content: '';
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(98, 183, 255, 0.09), transparent 25%),
+    radial-gradient(circle at 82% 12%, rgba(184, 224, 110, 0.08), transparent 22%),
+    radial-gradient(circle at 30% 90%, rgba(255, 255, 255, 0.03), transparent 18%);
+  mix-blend-mode: screen;
+}
+
+#app {
+  position: relative;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 26px 24px 64px;
+}
+
+.page-title {
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  color: #f3fbfc;
+}
+
+.panel {
+  background: linear-gradient(160deg, rgba(16, 27, 32, 0.94), rgba(11, 19, 23, 0.94));
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 30px var(--shadow);
+}
+
+.hero {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.repo-chip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.level-badge {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(145deg, #9fe17f, #63b879);
+  color: #112015;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  clip-path: polygon(50% 0%, 94% 25%, 94% 75%, 50% 100%, 6% 75%, 6% 25%);
+}
+
+.repo-name {
+  font-size: 24px;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.repo-path {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.icon-btn:hover {
+  border-color: #4e8493;
+  background: rgba(98, 183, 255, 0.12);
+}
+
+.last-updated {
+  color: var(--muted);
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: flex-end;
+  margin: 14px 0 8px;
+  color: var(--muted);
+  font-size: 14px;
+  gap: 10px;
+}
+
+.summary-strong {
+  color: #f2ece7;
+  font-weight: 600;
+}
+
+.segment-wrapper {
+  margin-top: 4px;
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(100, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.segment {
+  height: 20px;
+  background: #152127;
+}
+
+.segment.fill-1 {
+  background: linear-gradient(180deg, #e76f51, #c85a42);
+}
+
+.segment.fill-2 {
+  background: linear-gradient(180deg, #f4a261, #d98d4f);
+}
+
+.segment.fill-3 {
+  background: linear-gradient(180deg, #e9c46a, #c3a24f);
+}
+
+.segment.fill-4 {
+  background: linear-gradient(180deg, #58bac1, #4199a3);
+}
+
+.segment.fill-5 {
+  background: linear-gradient(180deg, #7ce5c7, #4cbd9d);
+}
+
+.level-scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin-top: 8px;
+  color: #9f8f85;
+  font-size: 13px;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.9fr;
+  gap: 16px;
+  margin-bottom: 18px;
+  align-items: start;
+}
+
+.action-plan {
+  margin-bottom: 18px;
+  padding: 18px;
+}
+
+.action-title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.action-subtitle {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.action-bucket {
+  border: 1px solid #34505a;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+}
+
+.action-bucket h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #cde2e9;
+}
+
+.action-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 3px;
+}
+
+.action-list.expanded {
+  max-height: 340px;
+}
+
+.action-item {
+  border: 1px solid #3b5964;
+  background: rgba(13, 25, 30, 0.6);
+  padding: 8px 9px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+}
+
+.action-item:hover {
+  border-color: #69b2c5;
+}
+
+.action-toggle {
+  margin-top: 10px;
+  width: 100%;
+  border: 1px solid #436572;
+  background: rgba(17, 31, 37, 0.86);
+  color: #cde2e8;
+  padding: 7px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.action-toggle:hover {
+  border-color: #6bbad0;
+}
+
+.action-item-title {
+  font-size: 13px;
+  color: #f4fbfc;
+}
+
+.action-item-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #a8c0c7;
+}
+
+.analytics-card {
+  padding: 18px;
+}
+
+.analytics-title {
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.chart-wrap {
+  width: 100%;
+  min-height: 330px;
+  margin-top: 12px;
+}
+
+.radar-wrap {
+  position: relative;
+}
+
+.radar-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -120%);
+  pointer-events: none;
+  background: rgba(8, 14, 17, 0.92);
+  border: 1px solid #5f7d89;
+  color: #ecf4f7;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  z-index: 4;
+}
+
+.radar-tooltip.show {
+  opacity: 1;
+}
+
+.radar-hover-target {
+  cursor: pointer;
+}
+
+.radar-axis-label {
+  fill: #95aeb6;
+  font-size: 11px;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+}
+
+.radar-axis-label:hover {
+  fill: #edf4f5;
+}
+
+.accordion-indicator {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #87a6b4;
+  border-bottom: 2px solid #87a6b4;
+  transform: rotate(45deg);
+  transition: transform 140ms ease;
+  margin-right: 4px;
+}
+
+details[open] > summary .accordion-indicator {
+  transform: rotate(225deg);
+}
+
+.category-section {
+  margin-top: 18px;
+}
+
+.category-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.category-summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.category-summary::-webkit-details-marker {
+  display: none;
+}
+
+.category-content {
+  overflow: hidden;
+}
+
+details[open] > .category-content {
+  padding-top: 12px;
+}
+
+@keyframes accordionCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+details[open] > .category-content .criterion-card {
+  animation: accordionCardIn 280ms ease both;
+}
+
+details[open] > .category-content .criterion-card:nth-child(2n) {
+  animation-delay: 25ms;
+}
+
+details[open] > .category-content .criterion-card:nth-child(3n) {
+  animation-delay: 45ms;
+}
+
+details[open] > .category-content .criterion-card:nth-child(4n) {
+  animation-delay: 65ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-content {
+    transition: none;
+    transform: none;
+  }
+
+  details[open] > .category-content .criterion-card {
+    animation: none;
+  }
+}
+
+.category-name {
+  font-size: 24px;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+}
+
+.category-line {
+  border-bottom: 1px dashed #47616b;
+  transform: translateY(2px);
+}
+
+.category-score {
+  font-size: 24px;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.criterion-card {
+  text-align: left;
+  border: 1px solid #274049;
+  background: linear-gradient(180deg, #1d2a30, #182328);
+  color: var(--text);
+  min-height: 154px;
+  padding: 13px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.criterion-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid transparent;
+  transition: border-color 160ms ease;
+  z-index: 1;
+}
+
+.criterion-card:hover::after {
+  border-color: #7ab5c8;
+}
+
+.criterion-card.status-pass {
+  background: linear-gradient(180deg, #1e2f2b, #1a2724);
+}
+
+.criterion-card.status-fail {
+  background: linear-gradient(180deg, #4f2c26, #432521);
+}
+
+.criterion-card.status-unverified,
+.criterion-card.status-skip {
+  background: linear-gradient(180deg, #263136, #212a2e);
+}
+
+.card-badge {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: #d3c5bc;
+  z-index: 1;
+}
+
+.badge-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+}
+
+.badge-dot.badge-BASIC {
+  background: var(--basic);
+}
+
+.badge-dot.badge-INTERMEDIATE {
+  background: var(--intermediate);
+}
+
+.badge-dot.badge-ADVANCED {
+  background: var(--advanced);
+}
+
+.card-name {
+  margin-top: 30px;
+  font-size: 18px;
+  line-height: 1.24;
+}
+
+.card-hint {
+  margin-top: auto;
+  font-size: 11px;
+  color: #a9c7cf;
+  opacity: 0.9;
+}
+
+.card-score {
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #47646d;
+  background: #1d2a30;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  color: #ecf3f5;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+  z-index: 3;
+}
+
+.card-rank {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  border: 1px solid #4a6470;
+  color: #cde2e8;
+  background: rgba(8, 18, 22, 0.85);
+}
+
+.criterion-card.status-pass .card-score {
+  background: #193229;
+  border-color: #5aa98b;
+}
+
+.criterion-card.status-fail .card-score {
+  background: #3a241f;
+  border-color: #ca816a;
+}
+
+.criterion-card.status-skip .card-score,
+.criterion-card.status-unverified .card-score {
+  background: #233138;
+  border-color: #6d8087;
+}
+
+.warning-panel {
+  margin-top: 22px;
+  padding: 12px 16px;
+  border-left: 4px solid #5baad2;
+  background: rgba(91, 170, 210, 0.14);
+  color: #d4edf8;
+}
+
+.warning-panel h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.warning-panel ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 10, 0.75);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 20;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal {
+  width: min(1100px, 100%);
+  background: linear-gradient(180deg, #18242a, #10191d);
+  border: 1px solid #46616b;
+  box-shadow: 0 28px 48px rgba(0, 0, 0, 0.5);
+  padding: 24px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.modal-title {
+  font-size: 36px;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  margin: 10px 0 0;
+}
+
+.close-btn {
+  border: 1px solid #49606a;
+  background: transparent;
+  color: #f3e8df;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.modal-card {
+  padding: 14px 16px;
+  border: 1px solid #39515a;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.modal-label {
+  color: #bea89c;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.modal-value {
+  font-size: 24px;
+  font-family: 'TikTok Sans', 'TikTokSans', 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.modal-reason {
+  margin-top: 18px;
+  font-size: 19px;
+  line-height: 1.3;
+  color: #efdfd4;
+}
+
+.modal-evidence {
+  margin-top: 16px;
+  color: #cdb9ad;
+  font-size: 15px;
+}
+
+.modal-evidence ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.modal-improve {
+  margin-top: 16px;
+  color: #d9ecef;
+  font-size: 15px;
+}
+
+.modal-improve ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.modal-sections {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.modal-section {
+  border: 1px solid #3a535d;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+}
+
+.modal-section-title {
+  color: #c6e0e8;
+  font-size: 13px;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.modal-section ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 1050px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  #app {
+    padding: 14px 12px 30px;
+  }
+
+  .hero,
+  .analytics-card {
+    padding: 14px;
+  }
+
+  .repo-name {
+    font-size: 22px;
+  }
+
+  .category-name,
+  .category-score {
+    font-size: 20px;
+  }
+
+  .card-name {
+    font-size: 17px;
+  }
+
+  .modal-title {
+    font-size: 28px;
+  }
+
+  .summary-line {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .category-head {
+    grid-template-columns: auto 1fr auto auto;
+  }
+
+  .category-head .accordion-indicator {
+    display: none;
+  }
+}

@@ -9,7 +9,7 @@
   },
   "type": "commonjs",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node scripts/bundle-frontend.mjs && tsc -p tsconfig.json",
     "check:max-lines": "node scripts/check-max-lines.mjs",
     "clean": "rm -rf dist",
     "format": "prettier --check .",

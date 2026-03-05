@@ -1,35 +1,22 @@
 import { WebReportPayload } from '../types';
-import { APP_CSS_COMPONENTS } from './templates/css-components';
-import { APP_CSS_FOUNDATION } from './templates/css-foundation';
-import { APP_CSS_LAYOUT } from './templates/css-layout';
-import { APP_CSS_RESPONSIVE } from './templates/css-responsive';
-import {
-  renderIndexHtml as renderIndexHtmlTemplate,
-  renderStandaloneHtml as renderStandaloneHtmlTemplate,
-} from './templates/html';
-import { APP_JS_CHARTS } from './templates/js-charts';
-import { APP_JS_EVENTS_BOOTSTRAP } from './templates/js-events-bootstrap';
-import { APP_JS_MODAL } from './templates/js-modal';
-import { APP_JS_RUNTIME } from './templates/js-runtime';
-import { APP_JS_SECTIONS } from './templates/js-sections';
+import { APP_CSS, APP_JS, INDEX_HTML } from './templates-generated';
 
-export const APP_CSS = [
-  APP_CSS_FOUNDATION,
-  APP_CSS_LAYOUT,
-  APP_CSS_COMPONENTS,
-  APP_CSS_RESPONSIVE,
-].join('');
+function serializePayload(payload: WebReportPayload): string {
+  return JSON.stringify(payload).replace(/</g, '\\u003c');
+}
 
-export const APP_JS = [
-  APP_JS_RUNTIME,
-  APP_JS_CHARTS,
-  APP_JS_SECTIONS,
-  APP_JS_MODAL,
-  APP_JS_EVENTS_BOOTSTRAP,
-].join('');
+export { APP_CSS, APP_JS };
 
-export const renderIndexHtml = renderIndexHtmlTemplate;
+export function renderIndexHtml(): string {
+  return INDEX_HTML;
+}
 
 export function renderStandaloneHtml(payload: WebReportPayload): string {
-  return renderStandaloneHtmlTemplate(payload, APP_CSS, APP_JS);
+  const serialized = serializePayload(payload);
+  return INDEX_HTML.replace('<title>Agentable</title>', '<title>Agentable Export</title>')
+    .replace('<link rel="stylesheet" href="/assets/app.css" />', `<style>${APP_CSS}</style>`)
+    .replace(
+      '<script src="/assets/app.js"></script>',
+      `<script>\n      window.__AGENTABLE_STATIC_EXPORT = true;\n      window.__AGENTABLE_PAYLOAD = ${serialized};\n    </script>\n    <script>${APP_JS}</script>`,
+    );
 }
