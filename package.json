@@ -11,7 +11,7 @@
   "scripts": {
     "build": "node scripts/bundle-frontend.mjs && tsc -p tsconfig.json",
     "check:max-lines": "node scripts/check-max-lines.mjs",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist test-dist",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint": "eslint src/",
@@ -19,7 +19,7 @@
     "new:criterion": "node scripts/new-criterion.mjs",
     "prepare": "husky",
     "quality:gates": "node scripts/check-functional-gates.mjs fixtures/quality-gates/functional-benchmark.json",
-    "test": "npm run build && npm run check:max-lines && node --test test/**/*.test.js"
+    "test": "npm run build && npm run check:max-lines && tsc -p tsconfig.test.json && node --test test-dist/**/*.test.js"
   },
   "keywords": [
     "agent",

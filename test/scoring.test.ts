@@ -59,3 +59,5 @@ test('score ignores skip and unverified in denominator', () => {
   assert.ok(summary.confidenceScore > 0);
   assert.ok(summary.highConfidenceCoverage > 0);
 });
+
+export {};

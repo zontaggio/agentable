@@ -41,7 +41,7 @@ function createAiResponse() {
 
 function installAiMock() {
   const previousFetch = global.fetch;
-  global.fetch = async (url, init) => {
+  global.fetch = (async (url, init) => {
     const target = typeof url === 'string' ? url : String(url);
     if (target.includes('openrouter.ai/api/v1/chat/completions')) {
       return {
@@ -55,7 +55,7 @@ function installAiMock() {
     }
 
     return REAL_FETCH(url, init);
-  };
+  }) as unknown as typeof fetch;
 
   return () => {
     global.fetch = previousFetch;
@@ -126,7 +126,7 @@ test('web server exposes report and refresh endpoints', async () => {
 
     const reportRes = await fetch(`${started.url}/api/report`);
     assert.equal(reportRes.status, 200);
-    const payload = await reportRes.json();
+    const payload = (await reportRes.json()) as any;
     assert.equal(typeof payload.header.repoPath, 'string');
     assert.ok(Array.isArray(payload.categories));
     assert.ok(payload.actionPlan);
@@ -178,3 +178,5 @@ test('web server exposes report and refresh endpoints', async () => {
     restoreFetch();
   }
 });
+
+export {};

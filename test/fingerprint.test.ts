@@ -27,3 +27,5 @@ test('fingerprint is stable and changes when file content changes', async () => 
   const fp3 = await computeRepoFingerprint(dir, files);
   assert.notEqual(fp2, fp3);
 });
+
+export {};

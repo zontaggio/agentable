@@ -82,3 +82,5 @@ test('appendHistory keeps only max snapshots', async () => {
   assert.equal(points.length, MAX_HISTORY_SNAPSHOTS);
   assert.equal(points[0].fingerprint, 'fp-5');
 });
+
+export {};

@@ -85,7 +85,7 @@ test('collectAiAssessments throws on provider request failure', async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-ai-provider-fail-'));
   const realFetch = global.fetch;
 
-  global.fetch = async (url, init) => {
+  global.fetch = (async (url, init) => {
     const target = typeof url === 'string' ? url : String(url);
     if (target.includes('openrouter.ai/api/v1/chat/completions')) {
       return {
@@ -98,7 +98,7 @@ test('collectAiAssessments throws on provider request failure', async () => {
       };
     }
     return realFetch(url, init);
-  };
+  }) as unknown as typeof fetch;
 
   try {
     await assert.rejects(
@@ -132,7 +132,7 @@ test('enrichActionPlanRecommendations batches and caches guidance', async () => 
   const realFetch = global.fetch;
   let recommendationCalls = 0;
 
-  global.fetch = async (url, init) => {
+  global.fetch = (async (url, init) => {
     const target = typeof url === 'string' ? url : String(url);
     if (!target.includes('openrouter.ai/api/v1/chat/completions')) {
       return realFetch(url, init);
@@ -190,7 +190,7 @@ test('enrichActionPlanRecommendations batches and caches guidance', async () => 
         };
       },
     };
-  };
+  }) as unknown as typeof fetch;
 
   try {
     const first = await enrichActionPlanRecommendations({
@@ -230,7 +230,7 @@ test('collectAiAssessments supports openai-compatible provider and custom base U
   const realFetch = global.fetch;
   let requestedUrl = '';
 
-  global.fetch = async (url, init) => {
+  global.fetch = (async (url, init) => {
     const target = typeof url === 'string' ? url : String(url);
     requestedUrl = target;
 
@@ -266,7 +266,7 @@ test('collectAiAssessments supports openai-compatible provider and custom base U
         };
       },
     };
-  };
+  }) as unknown as typeof fetch;
 
   try {
     const result = await collectAiAssessments({
@@ -288,3 +288,5 @@ test('collectAiAssessments supports openai-compatible provider and custom base U
     global.fetch = realFetch;
   }
 });
+
+export {};

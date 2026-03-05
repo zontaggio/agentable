@@ -208,3 +208,5 @@ process.exit(1);
     process.env.PATH = originalPath;
   }
 });
+
+export {};

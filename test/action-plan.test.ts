@@ -56,3 +56,5 @@ test('deterministic action plan keeps all three buckets for exactly three items'
   assert.equal(plan.highLeverage.length, 1);
   assert.equal(plan.quickWins.length, 1);
 });
+
+export {};

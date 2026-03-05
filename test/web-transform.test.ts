@@ -179,3 +179,5 @@ test('buildWebPayload creates category buckets and card metadata', () => {
   assert.equal(complexityCard.scoreLabel, '0/2');
   assert.equal(complexityCard.priorityRank, 1);
 });
+
+export {};

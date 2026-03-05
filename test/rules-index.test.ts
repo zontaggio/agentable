@@ -14,3 +14,5 @@ test('every catalog criterion is mapped to an evaluator', () => {
 test('unknown criterion returns no evaluator', () => {
   assert.equal(getCriterionEvaluator('missing_criterion_id'), undefined);
 });
+
+export {};

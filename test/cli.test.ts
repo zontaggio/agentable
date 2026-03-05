@@ -41,3 +41,5 @@ test('cli fails in non-interactive mode when AI config is missing', () => {
   assert.match(result.stderr, /AI config not found and strict AI mode is enabled/);
   assert.match(result.stderr, /agentable --setup/);
 });
+
+export {};

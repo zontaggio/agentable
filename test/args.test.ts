@@ -34,3 +34,5 @@ test('parseArgs rejects --setup with --dry-run', () => {
     /--setup and --dry-run cannot be used together/,
   );
 });
+
+export {};

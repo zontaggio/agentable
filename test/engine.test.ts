@@ -41,7 +41,7 @@ function createAiResponse() {
 
 function installAiMock() {
   const previousFetch = global.fetch;
-  global.fetch = async (url, init) => {
+  global.fetch = (async (url, init) => {
     const target = typeof url === 'string' ? url : String(url);
     if (target.includes('openrouter.ai/api/v1/chat/completions')) {
       return {
@@ -55,7 +55,7 @@ function installAiMock() {
     }
 
     return REAL_FETCH(url, init);
-  };
+  }) as unknown as typeof fetch;
 
   return () => {
     global.fetch = previousFetch;
@@ -221,3 +221,5 @@ test('engine applies .agentable.json skip and applicability overrides', async ()
   assert.equal(secretsManagement.status, 'skip');
   assert.equal(secretsManagement.reason, 'Managed by platform defaults for this fixture.');
 });
+
+export {};
