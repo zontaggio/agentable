@@ -3,6 +3,8 @@ import path from 'node:path';
 import { CATALOG_VERSION, CRITERIA } from '../catalog/v1';
 import {
   collectAiAssessments,
+  DEFAULT_AI_PROVIDER,
+  DEFAULT_OPENAI_MODEL,
   DEFAULT_OPENROUTER_MODEL,
   enrichActionPlanRecommendations,
 } from '../collectors/ai';
@@ -91,7 +93,9 @@ export async function runAgentReadiness(
 
   onProgress?.('Running AI assessments');
   const aiFailureMode = options.aiFailureMode ?? 'fallback';
-  const model = options.aiModel || DEFAULT_OPENROUTER_MODEL;
+  const provider = options.aiProvider ?? DEFAULT_AI_PROVIDER;
+  const defaultModel = provider === 'openai' ? DEFAULT_OPENAI_MODEL : DEFAULT_OPENROUTER_MODEL;
+  const model = options.aiModel || defaultModel;
   const aiCriteriaIds = findAiCriteriaIds();
   const warnings: string[] = [];
   let aiFallbackError: string | null = null;
@@ -105,8 +109,10 @@ export async function runAgentReadiness(
       criteriaIds: aiCriteriaIds,
       local,
       profile,
+      provider,
       apiKey: options.aiApiKey,
       model,
+      baseUrl: options.aiBaseUrl,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -120,7 +126,7 @@ export async function runAgentReadiness(
       assessments: buildFallbackAiAssessments(aiCriteriaIds, message),
       cacheKey: `fallback-${fingerprint}`,
       model,
-      provider: 'openrouter',
+      provider,
       fromCache: false,
     };
   }
@@ -151,8 +157,10 @@ export async function runAgentReadiness(
       local,
       profile,
       recommendations: deterministicPlan.seeds,
+      provider,
       apiKey: options.aiApiKey,
       model,
+      baseUrl: options.aiBaseUrl,
     });
 
     if (recommendationEnrichment.error) {

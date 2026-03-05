@@ -224,3 +224,67 @@ test('enrichActionPlanRecommendations batches and caches guidance', async () => 
     global.fetch = realFetch;
   }
 });
+
+test('collectAiAssessments supports openai-compatible provider and custom base URL', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'agentable-ai-openai-provider-'));
+  const realFetch = global.fetch;
+  let requestedUrl = '';
+
+  global.fetch = async (url, init) => {
+    const target = typeof url === 'string' ? url : String(url);
+    requestedUrl = target;
+
+    if (!target.includes('/chat/completions')) {
+      return realFetch(url, init);
+    }
+
+    const payload = JSON.parse(String(init && init.body ? init.body : '{}'));
+    assert.equal(payload.model, 'gpt-4o-mini');
+
+    return {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      async json() {
+        return {
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  assessments: [
+                    {
+                      id: 'code_modularization',
+                      status: 'pass',
+                      reason: 'Structured modules detected.',
+                      evidence: ['src directory'],
+                    },
+                  ],
+                }),
+              },
+            },
+          ],
+        };
+      },
+    };
+  };
+
+  try {
+    const result = await collectAiAssessments({
+      repoPath: root,
+      repoIdentifier: 'owner/repo',
+      fingerprint: `fp-${Date.now()}-openai-provider`,
+      criteriaIds: ['code_modularization'],
+      local: makeLocalContext(root),
+      profile: makeProfile(),
+      provider: 'openai',
+      model: 'gpt-4o-mini',
+      baseUrl: 'http://127.0.0.1:11434/v1',
+    });
+
+    assert.equal(result.provider, 'openai');
+    assert.ok(requestedUrl.startsWith('http://127.0.0.1:11434/v1/chat/completions'));
+    assert.equal(result.assessments.code_modularization.status, 'pass');
+  } finally {
+    global.fetch = realFetch;
+  }
+});

@@ -1,8 +1,9 @@
 import { AiAssessment } from '../types';
 
 export interface AiProviderConfig {
-  apiKey: string;
+  apiKey?: string;
   model: string;
+  baseUrl?: string;
 }
 
 export interface AiProviderContext {
@@ -12,7 +13,7 @@ export interface AiProviderContext {
 
 export interface AiProvider {
   name: string;
-  validateConfig(input: { apiKey?: string; model?: string }): AiProviderConfig;
+  validateConfig(input: { apiKey?: string; model?: string; baseUrl?: string }): AiProviderConfig;
   assessCriteria(
     context: AiProviderContext,
     config: AiProviderConfig,

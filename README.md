@@ -38,7 +38,7 @@ Options:
 - `--ai-failure-mode`: AI behavior on provider/config failure (`fallback` default, `strict` optional)
 - `--host`: dashboard bind host (default: `127.0.0.1`)
 - `--port`: dashboard port (default: `4173`)
-- `--setup`: reconfigure OpenRouter API key/model
+- `--setup`: configure AI provider credentials (`openrouter` or `openai` compatible)
 - `--dry-run`: print full criteria catalog + applicability preview, then exit without analysis/server/AI calls
 
 Removed options:
@@ -48,11 +48,11 @@ Removed options:
 
 ## First run and config
 
-On first interactive setup, Agentable stores OpenRouter config at:
+On first interactive setup, Agentable stores AI provider config at:
 
 - `~/.agentable/config.json`
 
-Strict mode requires configured OpenRouter credentials. If no TTY is available and config is missing, strict mode fails with instructions to run:
+Strict mode requires configured credentials for the selected provider. If no TTY is available and config is missing, strict mode fails with instructions to run:
 
 ```bash
 agentable --setup

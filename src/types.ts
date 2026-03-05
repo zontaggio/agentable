@@ -10,6 +10,7 @@ export type CategoryId =
   | 'product_analytics';
 
 export type CriterionStatus = 'pass' | 'fail' | 'skip' | 'unverified';
+export type AiProviderName = 'openrouter' | 'openai';
 
 export type CriterionSource = 'local' | 'gh' | 'ai' | 'hybrid';
 export type CriterionConfidence = 'high' | 'medium' | 'low';
@@ -76,8 +77,10 @@ export interface RunOptions {
   verbose: boolean;
   noGh: boolean;
   aiFailureMode?: 'fallback' | 'strict';
+  aiProvider?: AiProviderName;
   aiApiKey?: string;
   aiModel?: string;
+  aiBaseUrl?: string;
 }
 
 export interface LocalProjectContext {

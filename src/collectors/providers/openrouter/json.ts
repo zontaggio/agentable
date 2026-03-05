@@ -24,7 +24,7 @@ export function parseAssessmentResponse(
 ): Record<string, AiAssessment> {
   const jsonPart = extractJsonObject(content);
   if (!jsonPart) {
-    throw new Error('OpenRouter response did not contain valid JSON object.');
+    throw new Error('AI response did not contain a valid JSON object.');
   }
 
   const parsed = JSON.parse(jsonPart) as {
@@ -59,7 +59,7 @@ export function parseRecommendationResponse(
 ): Record<string, OpenRouterRecommendation> {
   const jsonPart = extractJsonObject(responseContent);
   if (!jsonPart) {
-    throw new Error('OpenRouter recommendation response did not contain valid JSON object.');
+    throw new Error('AI recommendation response did not contain a valid JSON object.');
   }
 
   const parsed = JSON.parse(jsonPart) as {

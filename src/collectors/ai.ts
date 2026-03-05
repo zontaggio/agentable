@@ -1,6 +1,4 @@
-import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { CATALOG_VERSION } from '../catalog/v1';
 import {
   loadAiBaseline,
   loadAiRecommendationBaseline,
@@ -10,20 +8,22 @@ import {
 import {
   AiAssessment,
   AiBaseline,
+  AiProviderName,
   AiRecommendationBaseline,
   AiRecommendationGuidance,
   LocalProjectContext,
   ProjectProfile,
 } from '../types';
 import {
-  enrichRecommendationsWithOpenRouter,
-  OpenRouterRecommendationPromptItem,
-  openRouterProvider,
-} from './providers/openrouter';
+  computeAssessmentCacheKey,
+  computeRecommendationCacheKey,
+  defaultModelForProvider,
+  enrichRecommendationsByProvider,
+  resolveAiProvider,
+} from './ai-helpers';
+import { OpenRouterRecommendationPromptItem } from './providers/openrouter';
 import { safeReadText } from '../utils/files';
 
-export const DEFAULT_OPENROUTER_MODEL = 'gpt-oss-120b';
-export const ACTIVE_AI_PROVIDER = openRouterProvider;
 const ASSESSMENT_CONTEXT_LIMITS = {
   files: 150,
   readme: 4_000,
@@ -40,8 +40,10 @@ interface AiCollectionInput {
   criteriaIds: string[];
   local: LocalProjectContext;
   profile: ProjectProfile;
+  provider?: AiProviderName;
   apiKey?: string;
   model?: string;
+  baseUrl?: string;
 }
 
 interface AiCollectionOutput {
@@ -58,43 +60,6 @@ export interface RecommendationEnrichmentOutput {
   model: string;
   usedAi: boolean;
   error?: string;
-}
-
-function computeCacheKey(repoIdentifier: string, fingerprint: string, model: string): string {
-  const input = `${repoIdentifier}::${fingerprint}::${CATALOG_VERSION}::${model}`;
-  return createHash('sha256').update(input).digest('hex');
-}
-
-function computeRecommendationCacheKey(
-  repoIdentifier: string,
-  fingerprint: string,
-  model: string,
-  recommendations: OpenRouterRecommendationPromptItem[],
-): string {
-  const recommendationSignature = recommendations
-    .map((item) => ({
-      criterionId: item.criterionId,
-      status: item.status,
-      priorityScore: item.priorityScore,
-      actionabilityScore: item.actionabilityScore,
-      rank: item.rank,
-      reason: item.reason,
-      evidence: item.evidence,
-      evidenceDetails: item.evidenceDetails,
-      deterministic: item.deterministic,
-    }))
-    .sort((a, b) => a.criterionId.localeCompare(b.criterionId));
-
-  const input = JSON.stringify({
-    repoIdentifier,
-    fingerprint,
-    model,
-    catalogVersion: CATALOG_VERSION,
-    provider: ACTIVE_AI_PROVIDER.name,
-    recommendationSignature,
-  });
-
-  return createHash('sha256').update(input).digest('hex');
 }
 
 async function buildPromptContext(
@@ -122,8 +87,16 @@ async function buildPromptContext(
 }
 
 export async function collectAiAssessments(input: AiCollectionInput): Promise<AiCollectionOutput> {
-  const model = input.model || DEFAULT_OPENROUTER_MODEL;
-  const cacheKey = computeCacheKey(input.repoIdentifier, input.fingerprint, model);
+  const provider = resolveAiProvider(input.provider);
+  const providerName = provider.name as AiProviderName;
+  const model = input.model || defaultModelForProvider(providerName);
+  const cacheKey = computeAssessmentCacheKey({
+    repoIdentifier: input.repoIdentifier,
+    fingerprint: input.fingerprint,
+    provider: providerName,
+    model,
+    baseUrl: input.baseUrl,
+  });
 
   const cached = await loadAiBaseline(cacheKey);
   if (cached) {
@@ -131,7 +104,7 @@ export async function collectAiAssessments(input: AiCollectionInput): Promise<Ai
       assessments: cached.assessments,
       cacheKey,
       model,
-      provider: ACTIVE_AI_PROVIDER.name,
+      provider: provider.name,
       fromCache: true,
     };
   }
@@ -141,21 +114,22 @@ export async function collectAiAssessments(input: AiCollectionInput): Promise<Ai
       assessments: {},
       cacheKey,
       model,
-      provider: ACTIVE_AI_PROVIDER.name,
+      provider: provider.name,
       fromCache: false,
     };
   }
 
-  const providerConfig = ACTIVE_AI_PROVIDER.validateConfig({
+  const providerConfig = provider.validateConfig({
     apiKey: input.apiKey,
     model,
+    baseUrl: input.baseUrl,
   });
 
   const context = await buildPromptContext(input.local, input.profile, ASSESSMENT_CONTEXT_LIMITS);
   let assessments: Record<string, AiAssessment>;
 
   try {
-    assessments = await ACTIVE_AI_PROVIDER.assessCriteria(
+    assessments = await provider.assessCriteria(
       {
         criteriaIds: input.criteriaIds,
         contextJson: context,
@@ -185,7 +159,7 @@ export async function collectAiAssessments(input: AiCollectionInput): Promise<Ai
     assessments,
     cacheKey,
     model,
-    provider: ACTIVE_AI_PROVIDER.name,
+    provider: provider.name,
     fromCache: false,
   };
 }
@@ -196,25 +170,33 @@ export async function enrichActionPlanRecommendations(input: {
   local: LocalProjectContext;
   profile: ProjectProfile;
   recommendations: OpenRouterRecommendationPromptItem[];
+  provider?: AiProviderName;
   apiKey?: string;
   model?: string;
+  baseUrl?: string;
 }): Promise<RecommendationEnrichmentOutput> {
-  const model = input.model || DEFAULT_OPENROUTER_MODEL;
+  const provider = resolveAiProvider(input.provider);
+  const providerName = provider.name as AiProviderName;
+  const model = input.model || defaultModelForProvider(providerName);
+
   if (input.recommendations.length === 0) {
     return {
       guidanceByCriterion: {},
-      provider: ACTIVE_AI_PROVIDER.name,
+      provider: provider.name,
       model,
       usedAi: false,
     };
   }
 
-  const cacheKey = computeRecommendationCacheKey(
-    input.repoIdentifier,
-    input.fingerprint,
+  const cacheKey = computeRecommendationCacheKey({
+    repoIdentifier: input.repoIdentifier,
+    fingerprint: input.fingerprint,
+    provider: providerName,
     model,
-    input.recommendations,
-  );
+    recommendations: input.recommendations,
+    baseUrl: input.baseUrl,
+  });
+
   const cached = await loadAiRecommendationBaseline(cacheKey);
   if (cached) {
     return {
@@ -226,16 +208,19 @@ export async function enrichActionPlanRecommendations(input: {
   }
 
   try {
-    const config = ACTIVE_AI_PROVIDER.validateConfig({
+    const config = provider.validateConfig({
       apiKey: input.apiKey,
       model,
+      baseUrl: input.baseUrl,
     });
     const repositoryContextJson = await buildPromptContext(
       input.local,
       input.profile,
       RECOMMENDATION_CONTEXT_LIMITS,
     );
-    const guidanceByCriterion = await enrichRecommendationsWithOpenRouter(config, {
+    const guidanceByCriterion = await enrichRecommendationsByProvider({
+      provider: providerName,
+      config,
       repositoryContextJson,
       recommendations: input.recommendations,
     });
@@ -243,7 +228,7 @@ export async function enrichActionPlanRecommendations(input: {
       key: cacheKey,
       fingerprint: input.fingerprint,
       model,
-      provider: ACTIVE_AI_PROVIDER.name,
+      provider: provider.name,
       createdAt: new Date().toISOString(),
       guidanceByCriterion,
     };
@@ -251,17 +236,19 @@ export async function enrichActionPlanRecommendations(input: {
 
     return {
       guidanceByCriterion,
-      provider: ACTIVE_AI_PROVIDER.name,
+      provider: provider.name,
       model,
       usedAi: Object.keys(guidanceByCriterion).length > 0,
     };
   } catch (error) {
     return {
       guidanceByCriterion: {},
-      provider: ACTIVE_AI_PROVIDER.name,
+      provider: provider.name,
       model,
       usedAi: false,
       error: error instanceof Error ? error.message : String(error),
     };
   }
 }
+
+export { DEFAULT_AI_PROVIDER, DEFAULT_OPENAI_MODEL, DEFAULT_OPENROUTER_MODEL } from './ai-helpers';
