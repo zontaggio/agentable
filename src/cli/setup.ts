@@ -9,7 +9,7 @@ import {
   saveUserConfig,
 } from '../core/user-config';
 import { RunOptions } from '../types';
-import { paint } from './ansi';
+import { padRightAnsi, paint, visibleLength } from './ansi';
 import { BRAND_NAME } from './constants';
 import { CliOptions } from './types';
 
@@ -33,50 +33,48 @@ const TOP_MODEL = 'claude-sonnet-4.6';
 const PREMIUM_MODEL = 'claude-opus-4.6';
 
 const OPENROUTER_MODEL_PRESETS: OpenRouterModelPreset[] = [
-  {
-    id: 'default',
-    label: 'Default',
-    model: DEFAULT_MODEL,
-    description: 'mais barato',
-  },
-  {
-    id: 'top',
-    label: 'Top',
-    model: TOP_MODEL,
-    description: 'melhor custo-beneficio',
-  },
-  {
-    id: 'premium',
-    label: 'Premium',
-    model: PREMIUM_MODEL,
-    description: 'mais caro',
-  },
+  { id: 'default', label: 'Default', model: DEFAULT_MODEL, description: 'most affordable' },
+  { id: 'top', label: 'Top', model: TOP_MODEL, description: 'best value' },
+  { id: 'premium', label: 'Premium', model: PREMIUM_MODEL, description: 'most expensive' },
 ];
 
 function printSetupHeader(isReconfigure: boolean): void {
   const title = isReconfigure
     ? `${BRAND_NAME} Setup (Reconfigure OpenRouter)`
     : `${BRAND_NAME} First-Time Setup`;
-  const lines = [
-    '┌─────────────────────────────────────────────────────────────────────┐',
-    `│ ${title.padEnd(67)}│`,
-    '├─────────────────────────────────────────────────────────────────────┤',
-    '│ OpenRouter is the default provider for this release.               │',
-    `│ Config: ${getUserConfigPath().padEnd(57)}│`,
-    '└─────────────────────────────────────────────────────────────────────┘',
+  const rows = [
+    title,
+    'OpenRouter is the default provider for this release.',
+    `Config: ${getUserConfigPath()}`,
   ];
+  const [headerRow, ...bodyRows] = rows;
+  if (!headerRow) return;
+  const contentWidth = rows.reduce((max, row) => Math.max(max, visibleLength(row)), 0);
 
   console.log('');
-  console.log(paint(lines.join('\n'), 'magenta', true));
+  console.log(
+    `${paint('┌', 'magenta', true)}${paint('─'.repeat(contentWidth + 2), 'magenta', true)}${paint('┐', 'magenta', true)}`,
+  );
+  console.log(
+    `${paint('│', 'magenta', true)} ${padRightAnsi(headerRow, contentWidth)} ${paint('│', 'magenta', true)}`,
+  );
+  console.log(
+    `${paint('├', 'magenta', true)}${paint('─'.repeat(contentWidth + 2), 'magenta', true)}${paint('┤', 'magenta', true)}`,
+  );
+  for (const row of bodyRows) {
+    console.log(
+      `${paint('│', 'magenta', true)} ${padRightAnsi(row, contentWidth)} ${paint('│', 'magenta', true)}`,
+    );
+  }
+  console.log(
+    `${paint('└', 'magenta', true)}${paint('─'.repeat(contentWidth + 2), 'magenta', true)}${paint('┘', 'magenta', true)}`,
+  );
   console.log('');
 }
 
 function chooseInput(currentValue: string, userInput: string): string {
   const normalized = userInput.trim();
-  if (normalized) {
-    return normalized;
-  }
-  return currentValue;
+  return normalized || currentValue;
 }
 
 function modelPresetForValue(value: string): OpenRouterModelPreset | null {
@@ -199,10 +197,10 @@ async function promptAndSaveUserConfig(
     const apiKey = chooseInput(previousApiKey, await rl.question(apiKeyPrompt));
 
     const modelOptions: ArrowMenuOption<string>[] = [
-      { value: DEFAULT_MODEL, label: DEFAULT_MODEL, description: 'Default - mais barato' },
-      { value: TOP_MODEL, label: TOP_MODEL, description: 'Top - melhor custo-beneficio' },
-      { value: PREMIUM_MODEL, label: PREMIUM_MODEL, description: 'Premium - mais caro' },
-      { value: '__custom__', label: 'Custom model', description: 'digitar manualmente' },
+      { value: DEFAULT_MODEL, label: DEFAULT_MODEL, description: 'Default - most affordable' },
+      { value: TOP_MODEL, label: TOP_MODEL, description: 'Top - best value' },
+      { value: PREMIUM_MODEL, label: PREMIUM_MODEL, description: 'Premium - most expensive' },
+      { value: '__custom__', label: 'Custom model', description: 'enter manually' },
     ];
 
     const selectedModel = await selectWithArrows(

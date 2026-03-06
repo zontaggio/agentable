@@ -34,13 +34,13 @@ async function createBaseRepoFixture() {
   return root;
 }
 
-function initGitRepo(root) {
+function initGitRepo(root: string) {
   execSync('git init', { cwd: root, stdio: 'ignore' });
   execSync('git config user.email "test@example.com"', { cwd: root });
   execSync('git config user.name "Test User"', { cwd: root });
 }
 
-function commitAll(root, message) {
+function commitAll(root: string, message: string) {
   execSync('git add .', { cwd: root });
   execSync(`git commit -m ${JSON.stringify(message)}`, { cwd: root, stdio: 'ignore' });
 }
@@ -57,7 +57,9 @@ test('agentic_development does not pass on generic "maintain" commit text', asyn
     aiFailureMode: 'fallback',
   });
 
-  const criterion = result.results.find((item) => item.id === 'agentic_development');
+  const criterion = result.results.find(
+    (item: { id: string }) => item.id === 'agentic_development',
+  );
   assert.ok(criterion);
   assert.equal(criterion.status, 'fail');
 });
@@ -74,7 +76,9 @@ test('agentic_development passes on explicit agent signal in commit text', async
     aiFailureMode: 'fallback',
   });
 
-  const criterion = result.results.find((item) => item.id === 'agentic_development');
+  const criterion = result.results.find(
+    (item: { id: string }) => item.id === 'agentic_development',
+  );
   assert.ok(criterion);
   assert.equal(criterion.status, 'pass');
 });
@@ -95,7 +99,9 @@ test('devcontainer_runnable fails when build is null', async () => {
     aiFailureMode: 'fallback',
   });
 
-  const criterion = result.results.find((item) => item.id === 'devcontainer_runnable');
+  const criterion = result.results.find(
+    (item: { id: string }) => item.id === 'devcontainer_runnable',
+  );
   assert.ok(criterion);
   assert.equal(criterion.status, 'fail');
 });
@@ -119,7 +125,9 @@ test('devcontainer_runnable passes with image and with valid build object', asyn
     noGh: true,
     aiFailureMode: 'fallback',
   });
-  const imageCriterion = imageResult.results.find((item) => item.id === 'devcontainer_runnable');
+  const imageCriterion = imageResult.results.find(
+    (item: { id: string }) => item.id === 'devcontainer_runnable',
+  );
   assert.ok(imageCriterion);
   assert.equal(imageCriterion.status, 'pass');
 
@@ -137,7 +145,9 @@ test('devcontainer_runnable passes with image and with valid build object', asyn
     noGh: true,
     aiFailureMode: 'fallback',
   });
-  const buildCriterion = buildResult.results.find((item) => item.id === 'devcontainer_runnable');
+  const buildCriterion = buildResult.results.find(
+    (item: { id: string }) => item.id === 'devcontainer_runnable',
+  );
   assert.ok(buildCriterion);
   assert.equal(buildCriterion.status, 'pass');
 });
@@ -203,7 +213,9 @@ process.exit(1);
     assert.equal(data.authenticated, true);
     assert.equal(data.defaultBranch, 'release/main');
     assert.equal(data.branchProtectionEnabled, true);
-    assert.ok(!data.errors.some((entry) => entry.includes('Branch protection API unavailable')));
+    assert.ok(
+      !data.errors.some((entry: string) => entry.includes('Branch protection API unavailable')),
+    );
   } finally {
     process.env.PATH = originalPath;
   }

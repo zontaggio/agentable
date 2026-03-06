@@ -2,7 +2,9 @@
 
 ## Project Purpose
 
-Agentable is a deterministic CLI that audits a repository for agent-readiness signals and launches a local web dashboard with results and prioritized improvements.
+Agentable is a deterministic CLI that audits a repository for agent-readiness signals across 9 categories (72 criteria total) and launches a local web dashboard with scores, evidence, and a prioritized action plan.
+
+It detects the project profile (service vs library, monorepo, database usage, etc.) and skips criteria that don't apply.
 
 Primary goals:
 
@@ -16,9 +18,10 @@ Primary goals:
 The runtime is split into four layers:
 
 1. `collectors` gather evidence from local files, Git, GitHub CLI, and AI provider integrations.
-2. `core/evaluate` maps criterion IDs to evaluators and produces criterion-level decisions + evidence.
-3. `core/scoring` and `core/reporter` compute aggregate metrics and structured output payloads.
-4. `web` transforms results and serves the dashboard UI.
+2. `core/profile` detects project shape (service, library, monorepo, database, etc.) to drive applicability.
+3. `core/evaluate` maps criterion IDs to evaluators and produces criterion-level decisions + evidence.
+4. `core/scoring` and `core/reporter` compute aggregate metrics and structured output payloads.
+5. `web` transforms results into the dashboard payload and serves the UI.
 
 Execution flow:
 
@@ -37,6 +40,7 @@ Execution flow:
 - `src/core`: profile building, evaluation engine, scoring, reporting, user config
 - `src/web`: server, transforms, template bridge, card metadata, improvement tips
 - `src/web/frontend`: editable dashboard frontend sources (`index.html`, `app.css`, `app.js`)
+- `src/utils`: filesystem helpers, command execution, content hashing
 - `test`: Node test runner suites
 - `scripts`: utility scripts (line budget checks, frontend bundle, quality-gates, benchmark generation)
 - `fixtures`: benchmark and quality-gate fixtures

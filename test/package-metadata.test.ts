@@ -24,6 +24,9 @@ test('package entrypoints and publish files are configured for release', () => {
   assert.equal(fs.existsSync(path.join(root, packageJson.types)), true);
 
   for (const binPath of Object.values(packageJson.bin)) {
-    assert.equal(fs.existsSync(path.join(root, binPath)), true);
+    const absBinPath = path.join(root, binPath);
+    assert.equal(fs.existsSync(absBinPath), true);
+    const mode = fs.statSync(absBinPath).mode & 0o777;
+    assert.equal(mode & 0o111, 0o111);
   }
 });

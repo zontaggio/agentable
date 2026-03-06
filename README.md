@@ -1,15 +1,22 @@
-# Agentable
+?# Agentable
 
-`agentable` evaluates repository agent readiness with deterministic criteria plus AI-assisted checks, and launches a guided web dashboard.
+[![CI](https://github.com/zontaggio/agentable/actions/workflows/ci.yml/badge.svg)](https://github.com/zontaggio/agentable/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
+[![Node](https://img.shields.io/badge/Node-%3E%3D20-green)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0-orange)](CHANGELOG.md)
+
+`agentable` scans a repository for agent-readiness signals across 9 categories (testing, security, build system, documentation, and more) and serves a local dashboard with scores, evidence, and a prioritized action plan. Most checks are deterministic; a few use AI when available, and fall back to `unverified` when not.
 
 ## Highlights
 
+- 72 criteria grouped into 9 categories, from linting config to backlog health
+- Profile-aware: skips checks that don't apply (e.g. database criteria for repos with no ORM)
 - Web-only UX (CLI acts as launcher/configurator for dashboard)
 - Configurable AI failure mode (`fallback` default, `strict` optional)
-- Conservative evaluation policy to reduce false positives
-- Score + coverage + confidence metrics
+- Evidence-based scoring with three confidence tiers (`high`, `medium`, `low`)
 - Prioritized action plan (`critical`, `high leverage`, `quick wins`)
-- Hybrid recommendations (deterministic ranking + AI wording refinement)
+- Hybrid recommendations (deterministic ranking + optional AI wording refinement)
 - Local history snapshots and export (`.json` / standalone `.html`)
 
 ## Install
@@ -167,9 +174,12 @@ Dataset template is available at `fixtures/quality-gates/functional-benchmark.te
 
 ## Architecture
 
-- `src/collectors`: local/git/gh/ai data collection
+- `src/catalog/v1/`: criterion definitions grouped by category
+- `src/collectors/`: local/git/gh/ai data collection
+- `src/core/profile.ts`: project profile detection (service vs library, database, monorepo, etc.)
 - `src/core/evaluate.ts`: conservative criterion decisions + evidence
+- `src/core/evaluate/applicability.ts`: profile-based criterion skipping
 - `src/core/scoring.ts`: score + confidence aggregation
-- `src/web/improvement-tips.ts`: deterministic ranking and fallback guidance
-- `src/web/frontend/*`: dashboard frontend source files (`index.html`, `app.css`, `app.js`)
-- `src/web/*`: dashboard server, transforms, template bundling bridge
+- `src/web/improvement-tips/`: deterministic ranking, priority scoring, and fallback guidance
+- `src/web/frontend/`: dashboard frontend source files (`index.html`, `app.css`, `app.js`)
+- `src/web/server.ts`: dashboard server, report endpoint, feedback endpoint
