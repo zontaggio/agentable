@@ -7,16 +7,24 @@
   "bin": {
     "agentable": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
   "type": "commonjs",
   "scripts": {
-    "build": "node scripts/bundle-frontend.mjs && tsc -p tsconfig.json",
+    "build": "npm run clean && node scripts/bundle-frontend.mjs && tsc -p tsconfig.json",
     "check:max-lines": "node scripts/check-max-lines.mjs",
-    "clean": "rm -rf dist test-dist",
+    "clean": "node -e \"const fs = require('node:fs'); fs.rmSync('dist', { recursive: true, force: true }); fs.rmSync('test-dist', { recursive: true, force: true });\"",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "new:criterion": "node scripts/new-criterion.mjs",
+    "prepack": "npm run build",
     "prepare": "husky",
     "quality:gates": "node scripts/check-functional-gates.mjs fixtures/quality-gates/functional-benchmark.json",
     "test": "npm run build && npm run check:max-lines && tsc -p tsconfig.test.json && node --test test-dist/*.test.js"
