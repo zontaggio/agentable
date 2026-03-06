@@ -1,4 +1,4 @@
-?# Agentable
+# Agentable
 
 [![CI](https://github.com/zontaggio/agentable/actions/workflows/ci.yml/badge.svg)](https://github.com/zontaggio/agentable/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
