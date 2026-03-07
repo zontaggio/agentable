@@ -1,7 +1,7 @@
 # Agentable
 
 <p align="center">
-  <img src="public/agentable.jpg" alt="Agentable" width="960">
+  <img src="https://raw.githubusercontent.com/zontaggio/agentable/main/public/agentable.jpg" alt="Agentable" width="960">
 </p>
 
 [![CI](https://github.com/zontaggio/agentable/actions/workflows/ci.yml/badge.svg)](https://github.com/zontaggio/agentable/actions/workflows/ci.yml)

@@ -6,13 +6,20 @@ import {
   STEPS_BY_CRITERION,
   TOOLING_BY_CRITERION,
 } from './constants';
+import { WHY_IT_MATTERS_BY_CRITERION } from './why-it-matters';
 
 export function defaultWhyItMatters(result: CriterionResult, criterionName: string): string {
+  const manual = WHY_IT_MATTERS_BY_CRITERION[result.id];
+  if (manual) {
+    return manual;
+  }
+
   const sourceDescription = DESCRIPTION_BY_CRITERION.get(result.id);
   if (sourceDescription) {
-    return `${criterionName} is currently weak. ${sourceDescription}`;
+    return `${criterionName} matters because it creates explicit repository signals around this area instead of leaving agents to infer intent from incomplete context.`;
   }
-  return `${criterionName} is currently weak and increases delivery risk for this repository.`;
+
+  return `${criterionName} matters because agents are more reliable when repository expectations are explicit, verifiable, and easy to validate.`;
 }
 
 export function defaultWhatGoodLooksLike(result: CriterionResult, criterionName: string): string {

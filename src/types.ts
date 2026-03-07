@@ -242,6 +242,7 @@ export interface WebCriterionCard {
   id: string;
   name: string;
   description: string;
+  whyItMatters: string;
   category: CategoryId;
   badge: CardBadge;
   maxPoints: number;

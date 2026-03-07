@@ -168,6 +168,7 @@ test('buildWebPayload creates category buckets and card metadata', () => {
   assert.ok(formatterCard);
   assert.equal(formatterCard.badge, 'BASIC');
   assert.equal(formatterCard.scoreLabel, '1/1');
+  assert.match(formatterCard.whyItMatters, /agents/i);
   assert.ok(Array.isArray(formatterCard.improvementTips));
   assert.ok(formatterCard.improvementTips.length > 0);
   assert.equal(formatterCard.remediationPrompt, undefined);
@@ -179,6 +180,7 @@ test('buildWebPayload creates category buckets and card metadata', () => {
   assert.equal(complexityCard.badge, 'ADVANCED');
   assert.equal(complexityCard.scoreLabel, '0/2');
   assert.equal(complexityCard.priorityRank, 1);
+  assert.equal(complexityCard.whyItMatters, 'Complexity increases change risk.');
   assert.equal(typeof complexityCard.remediationPrompt, 'string');
   assert.match(complexityCard.remediationPrompt, /\[Readiness Fix\] repo Cyclomatic Complexity/);
 

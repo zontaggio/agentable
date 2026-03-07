@@ -1,6 +1,6 @@
 {
   "name": "agentable",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deterministic CLI to assess repository agent readiness with Agentable",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -44,7 +44,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zontaggio/agentable.git"
+    "url": "git+https://github.com/zontaggio/agentable.git"
   },
   "bugs": {
     "url": "https://github.com/zontaggio/agentable/issues"

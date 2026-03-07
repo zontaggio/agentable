@@ -13,6 +13,7 @@ import {
 } from '../types';
 import { getCardMeta } from './card-meta';
 import { getImprovementTips } from './improvement-tips';
+import { defaultWhyItMatters } from './improvement-tips/defaults';
 import { buildRemediationPrompt } from './remediation-template';
 
 export interface WebTransformInput {
@@ -143,6 +144,7 @@ export function buildWebPayload(
     const cardMeta = getCardMeta(result.id);
     const guidance = guidanceByCriterion.get(result.id);
     const description = getDescription(result.id);
+    const whyItMatters = guidance?.whyItMatters ?? defaultWhyItMatters(result, cardMeta.name);
     const scoreLabel = toScoreLabel(result.status, cardMeta.maxPoints);
     const remediationPrompt =
       result.status === 'fail' || result.status === 'unverified'
@@ -161,6 +163,7 @@ export function buildWebPayload(
       id: result.id,
       name: cardMeta.name,
       description,
+      whyItMatters,
       category: result.category,
       badge: cardMeta.badge,
       maxPoints: cardMeta.maxPoints,

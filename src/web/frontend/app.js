@@ -618,7 +618,12 @@
     status.textContent = String(card.status || '').toUpperCase();
 
     var guidance = card.guidance || null;
-    why.textContent = guidance && guidance.whyItMatters ? guidance.whyItMatters : card.reason;
+    why.textContent =
+      typeof card.whyItMatters === 'string' && card.whyItMatters.trim().length > 0
+        ? card.whyItMatters
+        : guidance && guidance.whyItMatters
+          ? guidance.whyItMatters
+          : card.reason;
 
     var evid = card.evidence || [];
     if (
