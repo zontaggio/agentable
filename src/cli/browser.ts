@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 
-export function openBrowser(url: string): void {
+export async function openBrowser(url: string): Promise<boolean> {
   const platform = process.platform;
 
   let command: string;
@@ -17,13 +17,28 @@ export function openBrowser(url: string): void {
     args = [url];
   }
 
-  const child = spawn(command, args, {
-    stdio: 'ignore',
-    detached: true,
-  });
+  try {
+    const child = spawn(command, args, {
+      stdio: 'ignore',
+      detached: true,
+    });
 
-  child.on('error', () => {
-    // Ignore browser-launch errors; URL is still printed.
-  });
-  child.unref();
+    return await new Promise<boolean>((resolve) => {
+      const finish = (result: boolean) => {
+        child.removeAllListeners('spawn');
+        child.removeAllListeners('error');
+        child.unref();
+        resolve(result);
+      };
+
+      child.once('spawn', () => {
+        finish(true);
+      });
+      child.once('error', () => {
+        finish(false);
+      });
+    });
+  } catch {
+    return false;
+  }
 }

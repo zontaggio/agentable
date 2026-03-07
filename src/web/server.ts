@@ -6,6 +6,7 @@ import { APP_CSS, APP_JS, renderIndexHtml, renderStandaloneHtml } from './templa
 import { buildWebPayload, scoreToLevel } from './transform';
 import { appendRecommendationFeedback } from './feedback';
 import { appendHistory, computeRepoKey, loadHistory } from './history';
+import { buildAccessibleUrl } from './url';
 
 export interface StartWebServerOptions {
   runOptions: RunOptions;
@@ -275,7 +276,7 @@ export async function startWebServer(
     throw new Error('Unable to resolve server address.');
   }
 
-  const url = `http://${options.host}:${address.port}`;
+  const url = buildAccessibleUrl(options.host, address.port);
 
   return {
     url,

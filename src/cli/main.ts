@@ -39,10 +39,8 @@ export async function runCli(): Promise<void> {
       throw error;
     }
 
-    if (output.isTTY) {
-      openBrowser(started.url);
-    }
-    printDashboardReady(started.url);
+    const browserOpened = output.isTTY ? await openBrowser(started.url) : undefined;
+    printDashboardReady(started.url, browserOpened);
 
     const shutdown = async (): Promise<void> => {
       await started.close();

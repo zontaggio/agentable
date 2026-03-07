@@ -20,7 +20,7 @@ export async function sendOpenRouterChatRequest(
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${config.apiKey}`,
-        'HTTP-Referer': 'https://github.com/agentable/cli',
+        'HTTP-Referer': 'https://github.com/zontaggio/agentable',
         'X-Title': 'agentable',
       },
       signal: AbortSignal.timeout(timeoutMs),

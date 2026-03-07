@@ -11,6 +11,7 @@ import {
 import { RunOptions } from '../types';
 import { padRightAnsi, paint, visibleLength } from './ansi';
 import { BRAND_NAME } from './constants';
+import { promptSecret } from './secret-input';
 import { CliOptions } from './types';
 
 type OpenRouterModelPresetId = 'default' | 'top' | 'premium';
@@ -186,16 +187,16 @@ async function promptAndSaveUserConfig(
   const previousApiKey = existingConfig?.apiKey ?? '';
   const previousModel = existingConfig?.model ?? DEFAULT_MODEL;
 
+  console.log(`${paint('Provider', 'cyan', true)}: OpenRouter`);
+  console.log('');
+
+  const apiKeyPrompt = previousApiKey
+    ? `${paint('OpenRouter API key', 'cyan', true)} (Enter keeps current): `
+    : `${paint('OpenRouter API key', 'cyan', true)} (required): `;
+  const apiKey = chooseInput(previousApiKey, await promptSecret(apiKeyPrompt));
+
   const rl = createInterface({ input, output });
   try {
-    console.log(`${paint('Provider', 'cyan', true)}: OpenRouter`);
-    console.log('');
-
-    const apiKeyPrompt = previousApiKey
-      ? `${paint('OpenRouter API key', 'cyan', true)} (Enter keeps current): `
-      : `${paint('OpenRouter API key', 'cyan', true)} (required): `;
-    const apiKey = chooseInput(previousApiKey, await rl.question(apiKeyPrompt));
-
     const modelOptions: ArrowMenuOption<string>[] = [
       { value: DEFAULT_MODEL, label: DEFAULT_MODEL, description: 'Default - most affordable' },
       { value: TOP_MODEL, label: TOP_MODEL, description: 'Top - best value' },

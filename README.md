@@ -22,13 +22,21 @@
 ## Install
 
 ```bash
-npm install
-npm run build
+npx agentable .
+```
+
+Or install globally:
+
+```bash
+npm install -g agentable
+agentable .
 ```
 
 Run from source:
 
 ```bash
+npm install
+npm run build
 node dist/cli.js .
 ```
 
@@ -79,6 +87,7 @@ Fallback mode runs even without config and marks AI-assisted criteria as `unveri
    - `claude-opus-4.6` (premium, more expensive)
 
 Custom model ids are also supported.
+API key entry is masked during setup.
 
 ## Project overrides (`.agentable.json`)
 
