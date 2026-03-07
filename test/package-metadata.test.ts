@@ -15,13 +15,7 @@ test('package entrypoints and publish files are configured for release', () => {
     homepage: string;
   };
 
-  assert.deepEqual(packageJson.files, [
-    'dist',
-    'README.md',
-    'LICENSE',
-    'CHANGELOG.md',
-    'SECURITY.md',
-  ]);
+  assert.deepEqual(packageJson.files, ['dist', 'README.md', 'LICENSE', 'SECURITY.md']);
 
   assert.equal(fs.existsSync(path.join(root, packageJson.main)), true);
   assert.equal(fs.existsSync(path.join(root, packageJson.types)), true);
