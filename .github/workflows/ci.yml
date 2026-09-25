@@ -45,5 +45,8 @@ jobs:
       - name: Max lines check
         run: npm run check:max-lines
 
+      - name: Unused code and dependencies
+        run: npm run knip
+
       - name: Test
         run: npm test

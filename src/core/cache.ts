@@ -54,7 +54,3 @@ export async function saveAiRecommendationBaseline(
   const filePath = recommendationPath(baseline.key);
   await fs.writeFile(filePath, JSON.stringify(baseline, null, 2), 'utf8');
 }
-
-export function getCacheDirectory(): string {
-  return CACHE_DIR;
-}

@@ -52,19 +52,6 @@ export async function walkFiles(root: string): Promise<string[]> {
   return out;
 }
 
-export function hasAnyFile(fileSet: Set<string>, candidates: string[]): boolean {
-  for (const candidate of candidates) {
-    if (fileSet.has(candidate)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-export function findFilesByRegex(files: string[], regex: RegExp): string[] {
-  return files.filter((file) => regex.test(file));
-}
-
 export async function safeReadText(filePath: string): Promise<string> {
   try {
     return await fs.readFile(filePath, 'utf8');

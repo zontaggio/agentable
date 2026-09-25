@@ -2,15 +2,6 @@ import { createHash } from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-/**
- * Compute SHA-256 hash of the given input
- * @param input - String or Buffer to hash
- * @returns Hexadecimal hash string
- */
-export async function sha256(input: string | Buffer): Promise<string> {
-  return createHash('sha256').update(input).digest('hex');
-}
-
 const MAX_HASH_FILE_SIZE = 2 * 1024 * 1024;
 
 /**
