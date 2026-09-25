@@ -27,12 +27,23 @@ export function evaluateApplicabilitySkip(
       return !profile.isMonorepo
         ? { skip: true, reason: 'Skipped - single-project repository.' }
         : { skip: false };
+    // Runtime operations of a deployed service: libraries and CLIs have no production
+    // traffic to roll out, trace, alert on, measure or scrub.
     case 'progressive_rollout':
     case 'rollback_automation':
     case 'health_checks':
     case 'dast_scanning':
     case 'profiling_instrumentation':
     case 'api_schema_docs':
+    case 'distributed_tracing':
+    case 'alerting_configured':
+    case 'metrics_collection':
+    case 'deployment_observability':
+    case 'structured_logging':
+    case 'log_scrubbing':
+    case 'error_tracking_contextualized':
+    case 'error_to_insight_pipeline':
+    case 'feature_flag_infrastructure':
       return !profile.isService
         ? {
             skip: true,
