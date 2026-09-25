@@ -7,7 +7,7 @@
 
 [![CI](https://github.com/zontaggio/agentable/actions/workflows/ci.yml/badge.svg)](https://github.com/zontaggio/agentable/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
-[![Node](https://img.shields.io/badge/Node-%3E%3D20-green)](https://nodejs.org/)
+[![Node](https://img.shields.io/badge/Node-%3E%3D22-green)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Agentable checks how ready your JS/TS repository is for AI agents. It scans 81 criteria across 9 categories and shows you a dashboard with scores, evidence, and a clear action plan.

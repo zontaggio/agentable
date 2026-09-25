@@ -48,7 +48,7 @@ Execution flow:
 
 ## Conventions
 
-- Language/runtime: TypeScript on Node 20+.
+- Language/runtime: TypeScript on Node 22+.
 - Module system: CommonJS today (`"type": "commonjs"`).
 - Tests: Node built-in test runner (`node --test`).
 - Naming:
