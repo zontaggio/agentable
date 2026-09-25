@@ -28,7 +28,8 @@
     "prepare": "husky",
     "quality:gates": "node scripts/check-functional-gates.mjs fixtures/quality-gates/functional-benchmark.json",
     "test": "npm run build && npm run check:max-lines && tsc -p tsconfig.test.json && node --test test-dist/*.test.js",
-    "knip": "knip"
+    "knip": "knip",
+    "duplication": "jscpd"
   },
   "keywords": [
     "agent",
@@ -60,6 +61,7 @@
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
+    "jscpd": "^5.3.2",
     "knip": "^6.38.0",
     "lint-staged": "^16.3.2",
     "prettier": "^3.8.1",

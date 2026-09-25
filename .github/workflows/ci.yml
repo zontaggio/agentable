@@ -48,5 +48,8 @@ jobs:
       - name: Unused code and dependencies
         run: npm run knip
 
+      - name: Duplicate code
+        run: npm run duplication
+
       - name: Test
         run: npm test
