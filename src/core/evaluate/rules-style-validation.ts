@@ -53,8 +53,7 @@ export async function evaluateStyleValidation(input: CriterionEvaluatorInput) {
     }
 
     case 'cyclomatic_complexity':
-      return hasAnyFilePattern(local, [/\.eslintrc/i, /^eslint\.config\./]) &&
-        includesAny(signals.allTextIndex, ['complexity', 'sonarjs/cognitive-complexity'])
+      return includesAny(signals.lintConfigText, ['complexity'])
         ? makeResult(criterion, 'pass', 'Complexity rule detected in lint configuration.')
         : makeResult(criterion, 'fail', 'No complexity analysis rule detected.');
 
@@ -128,7 +127,12 @@ export async function evaluateStyleValidation(input: CriterionEvaluatorInput) {
         : makeResult(criterion, 'fail', 'No N+1 detection tooling found.');
 
     case 'naming_consistency':
-      return includesAny(signals.allTextIndex, ['naming-convention', 'naming convention'])
+      return includesAny(signals.lintConfigText, [
+        'naming-convention',
+        'camelcase',
+        'id-match',
+        'filename-case',
+      ]) || includesAny(signals.allTextIndex, ['naming-convention', 'naming convention'])
         ? makeResult(criterion, 'pass', 'Naming convention rules documented/configured.')
         : makeResult(criterion, 'fail', 'No naming convention rule detected.');
 

@@ -28,6 +28,17 @@ export async function buildSignals(local: LocalProjectContext): Promise<EvalSign
     }
   }
 
+  // Lint configs are where complexity and naming rules live, and the index above skips them.
+  const lintConfigFiles = local.files.filter((file) =>
+    /^(eslint\.config\.[cm]?[jt]s|\.eslintrc(\.[\w]+)?|biome\.jsonc?|\.oxlintrc\.json)$/i.test(
+      file,
+    ),
+  );
+  const lintConfigParts: string[] = [];
+  for (const rel of lintConfigFiles) {
+    lintConfigParts.push(await safeReadText(path.join(local.rootPath, rel)));
+  }
+
   const testFiles = local.files.filter((file) => /(test|spec)/i.test(file));
   const integrationTestFiles = local.files.filter((file) =>
     /(integration|acceptance|e2e|it\.|test\/integration|test\/acceptance)/i.test(file),
@@ -40,6 +51,7 @@ export async function buildSignals(local: LocalProjectContext): Promise<EvalSign
     readmeText: readmeText.toLowerCase(),
     workflowText: workflowTextParts.join('\n').toLowerCase(),
     allTextIndex: indexParts.join('\n').toLowerCase(),
+    lintConfigText: lintConfigParts.join('\n').toLowerCase(),
     testFiles,
     integrationTestFiles,
     unitTestFiles,

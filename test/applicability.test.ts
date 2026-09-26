@@ -58,3 +58,5 @@ test('criteria that matter for every project are not skipped for libraries', () 
     );
   }
 });
+
+export {};
