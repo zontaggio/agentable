@@ -6,6 +6,8 @@ All notable changes to Agentable are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-25
+
 ### Changed
 
 - **Breaking:** requires Node.js 22 or later (Node 20 reached end of life).
@@ -17,6 +19,14 @@ All notable changes to Agentable are documented here. The format follows
 - `env_template` only applies when there is configuration to document (a service, external services or `.env` files).
 - Complexity and naming rules are read from ESLint, Biome and Oxlint configs; before, they were only found when mentioned in docs.
 - AI requests always send a full `vendor/model` ID, including for bare model names saved by earlier versions.
+- README-based checks read the root README; a nested one such as `docs/README.md` could be picked instead.
+- Categories with nothing evaluated show "N/A" instead of "0%", and the criterion badge stays inside the detail view.
+
+### Security
+
+- On Windows the dashboard opens through the URL protocol handler instead of `cmd /c start`, and only http(s) URLs are opened.
+- Unexpected dashboard errors are logged in the terminal instead of being returned to the browser.
+- Repository fingerprinting reads each file's size and contents from one handle, closing a race with the size limit.
 
 ### Internal
 
@@ -41,6 +51,7 @@ First public release.
 - Copy-ready remediation prompts for failing criteria.
 - `--dry-run`, per-project overrides in `.agentable.json`, and guided setup with model presets.
 
-[Unreleased]: https://github.com/zontaggio/agentable/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/zontaggio/agentable/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/zontaggio/agentable/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/zontaggio/agentable/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/zontaggio/agentable/releases/tag/v0.1.0

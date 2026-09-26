@@ -1,6 +1,6 @@
 {
   "name": "agentable",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Deterministic CLI to assess repository agent readiness with Agentable",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
