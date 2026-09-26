@@ -92,6 +92,18 @@ export function evaluateApplicabilitySkip(
           }
         : { skip: false };
     }
+    // An env template documents the configuration a deployment needs. Libraries and CLIs
+    // without external services or .env files have nothing to put in one.
+    case 'env_template': {
+      const hasEnvSurface = hasAnyFilePattern(local, [/^\.env($|\.)/i]);
+      return !profile.isService && !profile.hasExternalServices && !hasEnvSurface
+        ? {
+            skip: true,
+            reason:
+              'Skipped - no environment configuration surface (service, external services or .env files).',
+          }
+        : { skip: false };
+    }
     default:
       return { skip: false };
   }

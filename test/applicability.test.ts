@@ -59,4 +59,12 @@ test('criteria that matter for every project are not skipped for libraries', () 
   }
 });
 
+test('env_template applies only when there is configuration to document', () => {
+  assert.equal(evaluateApplicabilitySkip('env_template', baseProfile, local).skip, true);
+  const withEnvFile = { fileSet: new Set(['.env']), files: ['.env'] };
+  assert.equal(evaluateApplicabilitySkip('env_template', baseProfile, withEnvFile).skip, false);
+  const service = { ...baseProfile, isService: true, isLibrary: false };
+  assert.equal(evaluateApplicabilitySkip('env_template', service, local).skip, false);
+});
+
 export {};
