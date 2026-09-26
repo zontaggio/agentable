@@ -1,4 +1,5 @@
 import { AiProviderConfig } from '../../ai-provider';
+import { toOpenRouterModelId } from './models';
 import { OpenRouterChatRequestBody } from './types';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -24,7 +25,7 @@ export async function sendOpenRouterChatRequest(
         'X-Title': 'agentable',
       },
       signal: AbortSignal.timeout(timeoutMs),
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...body, model: toOpenRouterModelId(body.model) }),
     });
   } catch (error) {
     if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {

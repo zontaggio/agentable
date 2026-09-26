@@ -2,6 +2,7 @@ import { stdin as input, stdout as output } from 'node:process';
 import { emitKeypressEvents } from 'node:readline';
 import { createInterface } from 'node:readline/promises';
 import { DEFAULT_AI_PROVIDER } from '../collectors/ai';
+import { toOpenRouterModelId } from '../collectors/providers/openrouter/models';
 import {
   AgentReadinessUserConfig,
   getUserConfigPath,
@@ -29,9 +30,9 @@ interface ArrowMenuOption<T> {
   description?: string;
 }
 
-const DEFAULT_MODEL = 'gpt-oss-120b';
-const TOP_MODEL = 'claude-sonnet-4.6';
-const PREMIUM_MODEL = 'claude-opus-4.6';
+const DEFAULT_MODEL = 'openai/gpt-oss-120b';
+const TOP_MODEL = 'anthropic/claude-sonnet-5';
+const PREMIUM_MODEL = 'anthropic/claude-opus-5.5';
 
 const OPENROUTER_MODEL_PRESETS: OpenRouterModelPreset[] = [
   { id: 'default', label: 'Default', model: DEFAULT_MODEL, description: 'most affordable' },
@@ -79,11 +80,13 @@ function chooseInput(currentValue: string, userInput: string): string {
 }
 
 function modelPresetForValue(value: string): OpenRouterModelPreset | null {
-  return OPENROUTER_MODEL_PRESETS.find((item) => item.model === value) ?? null;
+  const id = toOpenRouterModelId(value);
+  return OPENROUTER_MODEL_PRESETS.find((item) => item.model === id) ?? null;
 }
 
 function initialModelMenuIndex(currentModel: string): number {
-  const presetIndex = OPENROUTER_MODEL_PRESETS.findIndex((item) => item.model === currentModel);
+  const id = toOpenRouterModelId(currentModel);
+  const presetIndex = OPENROUTER_MODEL_PRESETS.findIndex((item) => item.model === id);
   return presetIndex === -1 ? OPENROUTER_MODEL_PRESETS.length : presetIndex;
 }
 

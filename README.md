@@ -52,13 +52,13 @@ Agentable uses [OpenRouter](https://openrouter.ai/) as the AI provider. It's opt
 
 When you run `agentable --setup`, you pick from three model presets:
 
-| Preset  | Model               | Why                                                                            |
-| ------- | ------------------- | ------------------------------------------------------------------------------ |
-| Default | `gpt-oss-120b`      | Cheapest option. Good enough for the few AI-assisted checks.                   |
-| Top     | `claude-sonnet-4.6` | Best cost-to-quality ratio. Recommended if you want better AI guidance.        |
-| Premium | `claude-opus-4.6`   | Best quality, higher cost. For when you want the best possible AI refinements. |
+| Preset  | Model                       | Why                                                                            |
+| ------- | --------------------------- | ------------------------------------------------------------------------------ |
+| Default | `openai/gpt-oss-120b`       | Cheapest option. Good enough for the few AI-assisted checks.                   |
+| Top     | `anthropic/claude-sonnet-5` | Best cost-to-quality ratio. Recommended if you want better AI guidance.        |
+| Premium | `anthropic/claude-opus-5.5` | Best quality, higher cost. For when you want the best possible AI refinements. |
 
-You can also use any custom model ID that OpenRouter supports.
+You can also use any custom model ID that OpenRouter supports, in its `vendor/model` form.
 
 The default is the cheapest model on purpose — Agentable only uses AI for 3 out of 81 criteria, so spending more only makes sense if you want the AI-refined action plan wording to be sharper.
 

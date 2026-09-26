@@ -239,7 +239,8 @@ test('collectAiAssessments uses OpenRouter provider', async () => {
     }
 
     const payload = JSON.parse(String(init && init.body ? init.body : '{}'));
-    assert.equal(payload.model, 'gpt-oss-120b');
+    // A bare name from an old config is sent as a full OpenRouter model ID.
+    assert.equal(payload.model, 'openai/gpt-oss-120b');
 
     return {
       ok: true,

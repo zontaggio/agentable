@@ -8,7 +8,7 @@ import {
   openRouterProvider,
 } from './providers/openrouter';
 
-export const DEFAULT_OPENROUTER_MODEL = 'gpt-oss-120b';
+export const DEFAULT_OPENROUTER_MODEL = 'openai/gpt-oss-120b';
 export const DEFAULT_AI_PROVIDER = 'openrouter' as const;
 
 export function resolveAiProvider() {
