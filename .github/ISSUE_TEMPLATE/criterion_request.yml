@@ -1,0 +1,15 @@
+name: New criterion or improvement
+description: Propose a check, or a change to how an existing one is evaluated
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What should Agentable check, and why does it matter for AI agents?
+    validations:
+      required: true
+  - type: textarea
+    id: detection
+    attributes:
+      label: How could it be detected deterministically?
+      description: Files, configs, dependencies or workflow steps that prove it.

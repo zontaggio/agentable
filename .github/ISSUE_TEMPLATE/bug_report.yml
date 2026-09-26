@@ -1,0 +1,29 @@
+name: Bug report
+description: A check gave a wrong result, or the CLI misbehaved
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Which criterion or command, what you expected and what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: The criterion ID and the evidence shown in the dashboard, or the terminal output. Remove anything private.
+      render: shell
+  - type: input
+    id: repo
+    attributes:
+      label: Repository analysed
+      description: A public URL if possible, or the kind of project (library, service, monorepo…).
+  - type: input
+    id: version
+    attributes:
+      label: Agentable and Node.js versions
+      placeholder: agentable 0.2.0, Node 22.20
+    validations:
+      required: true
