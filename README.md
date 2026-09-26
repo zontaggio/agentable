@@ -22,6 +22,10 @@
 npx agentable .
 ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zontaggio/agentable/main/docs/assets/dashboard.png" alt="Agentable dashboard: level 5, score by category and a prioritized action plan" width="880">
+</p>
+
 ## Why
 
 When an agent works on a codebase with no tests, no linter, vague docs or missing types, it guesses more, breaks more and wastes your time. The fix isn't a better prompt; it's a repository with guardrails the agent can lean on.
@@ -53,11 +57,15 @@ Agentable first detects the project's shape (library or service, monorepo, datab
 3. **Evaluate.** Runs every applicable check and records its evidence and confidence. High-risk criteria only pass on strong evidence.
 4. **Report.** Scores the repository from level 1 to 5 and opens a local dashboard with the results, their history and a prioritized action plan. Each failing check comes with a copy-ready prompt that asks your agent to fix it.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zontaggio/agentable/main/docs/assets/criterion-modal.png" alt="Criterion details: why it matters, evidence, next steps and a remediation prompt" width="880">
+</p>
+
 Three criteria can use AI through [OpenRouter](https://openrouter.ai/). It's optional: without a key they're marked `unverified` and everything else works the same.
 
 ## Agentable on Agentable
 
-A tool that grades repositories should pass its own checks. This repository runs the practices it looks for in CI on every push:
+A tool that grades repositories should pass its own checks. Agentable scores **level 5 (85/100)** on itself, and runs the practices it looks for in CI on every push:
 
 - TypeScript strict, ESLint with naming and complexity rules, Prettier and a 300-line limit per file
 - Tests with coverage thresholds, and a functional benchmark against 37 popular open-source repositories (`npm run quality:gates`)
