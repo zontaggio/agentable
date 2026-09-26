@@ -132,7 +132,11 @@ export async function collectLocalProjectContext(rootPath: string): Promise<Loca
   const devDependencies = asRecord(packageJson?.devDependencies);
   const scripts = asRecord(packageJson?.scripts);
 
-  const readmeCandidates = files.filter((f) => /^readme(\.|$)/i.test(path.basename(f)));
+  // The project README is the shallowest one: files are sorted alphabetically, so the
+  // first match could otherwise be e.g. docs/README.md or fixtures/README.md.
+  const readmeCandidates = files
+    .filter((f) => /^readme(\.|$)/i.test(path.basename(f)))
+    .sort((a, b) => a.split('/').length - b.split('/').length);
   const readmePath = readmeCandidates.at(0) ?? null;
 
   const gitignoreContent = await safeReadText(path.join(rootPath, '.gitignore'));
