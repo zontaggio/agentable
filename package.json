@@ -29,7 +29,8 @@
     "quality:gates": "node scripts/check-functional-gates.mjs fixtures/quality-gates/functional-benchmark.json",
     "test": "npm run build && npm run check:max-lines && tsc -p tsconfig.test.json && node --test test-dist/*.test.js",
     "knip": "knip",
-    "duplication": "jscpd"
+    "duplication": "jscpd",
+    "test:coverage": "npm run build && tsc -p tsconfig.test.json && node --test --experimental-test-coverage --test-coverage-include='dist/**' --test-coverage-lines=75 --test-coverage-branches=65 --test-coverage-functions=80 test-dist/*.test.js"
   },
   "keywords": [
     "agent",

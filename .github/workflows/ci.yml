@@ -53,3 +53,7 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Coverage thresholds
+        if: matrix.node-version == 22
+        run: npm run test:coverage
