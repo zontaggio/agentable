@@ -133,11 +133,12 @@
       var hp = polarToCartesian(cx, cy, radius * 1.03, angle);
       var categoryLabel = category && category.label ? category.label : 'Category';
       var categoryScore = typeof rawScore === 'number' ? Math.round(rawScore) : 0;
+      var categoryScoreText = evaluatedCount > 0 ? categoryScore + '%' : 'N/A';
       hoverTargets +=
         '<circle class="radar-hover-target" data-radar-category="' +
         escapeHtml(categoryLabel) +
         '" data-radar-score="' +
-        categoryScore +
+        categoryScoreText +
         '" cx="' +
         hp.x.toFixed(2) +
         '" cy="' +
@@ -146,8 +147,8 @@
         '<title>' +
         escapeHtml(categoryLabel) +
         ' (' +
-        categoryScore +
-        '%)</title>' +
+        categoryScoreText +
+        ')</title>' +
         '</circle>';
 
       var lp = polarToCartesian(cx, cy, radius * 1.2, angle);
@@ -161,7 +162,7 @@
         '<text class="radar-axis-label" data-radar-category="' +
         escapeHtml(categoryLabel) +
         '" data-radar-score="' +
-        categoryScore +
+        categoryScoreText +
         '" x="' +
         lp.x.toFixed(2) +
         '" y="' +
@@ -407,6 +408,15 @@
   }
 
   function renderCategorySections(payload) {
+    // A category where nothing applicable could be evaluated has no pass rate, not 0%.
+    function renderCategoryScore(category) {
+      var evaluated = Number(category.pass || 0) + Number(category.fail || 0);
+      if (evaluated === 0) {
+        return '<div class="category-score category-score-na" title="No applicable criteria could be evaluated">N/A</div>';
+      }
+      return '<div class="category-score">' + Math.round(category.score) + '%</div>';
+    }
+
     return payload.categories
       .map(function (category) {
         var cards = payload.criteriaByCategory[category.id] || [];
@@ -417,9 +427,7 @@
           escapeHtml(category.label) +
           '</div>' +
           '<div class="category-line"></div>' +
-          '<div class="category-score">' +
-          Math.round(category.score) +
-          '%</div>' +
+          renderCategoryScore(category) +
           '<span class="accordion-indicator" aria-hidden="true"></span>' +
           '</summary>' +
           '<div class="category-content"><div class="cards-grid">' +
@@ -455,8 +463,8 @@
     }
 
     var category = hit.getAttribute('data-radar-category') || 'Category';
-    var score = hit.getAttribute('data-radar-score') || '0';
-    tooltip.textContent = category + ' - ' + score + '%';
+    var score = hit.getAttribute('data-radar-score') || 'N/A';
+    tooltip.textContent = category + ' - ' + score;
 
     var rect = wrap.getBoundingClientRect();
     var x = event.clientX - rect.left;

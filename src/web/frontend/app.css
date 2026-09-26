@@ -453,6 +453,10 @@ details[open] > .category-content .criterion-card:nth-child(4n) {
   font-weight: 600;
 }
 
+.category-score-na {
+  opacity: 0.45;
+}
+
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
