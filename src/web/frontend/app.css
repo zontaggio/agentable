@@ -644,6 +644,11 @@ details[open] > .category-content .criterion-card:nth-child(4n) {
   margin: 0 auto;
 }
 
+/* The card badge is positioned in the card's corner; in the modal it sits in the header row. */
+.modal-header .card-badge {
+  position: static;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
