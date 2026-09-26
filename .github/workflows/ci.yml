@@ -45,6 +45,9 @@ jobs:
       - name: Max lines check
         run: npm run check:max-lines
 
+      - name: Validate AGENTS.md and README against the code
+        run: npm run check:docs
+
       - name: Unused code and dependencies
         run: npm run knip
 

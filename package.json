@@ -30,7 +30,8 @@
     "test": "npm run build && npm run check:max-lines && tsc -p tsconfig.test.json && node --test test-dist/*.test.js",
     "knip": "knip",
     "duplication": "jscpd",
-    "test:coverage": "npm run build && tsc -p tsconfig.test.json && node --test --experimental-test-coverage --test-coverage-include='dist/**' --test-coverage-lines=75 --test-coverage-branches=65 --test-coverage-functions=80 test-dist/*.test.js"
+    "test:coverage": "npm run build && tsc -p tsconfig.test.json && node --test --experimental-test-coverage --test-coverage-include='dist/**' --test-coverage-lines=75 --test-coverage-branches=65 --test-coverage-functions=80 test-dist/*.test.js",
+    "check:docs": "node scripts/check-docs.mjs"
   },
   "keywords": [
     "agent",

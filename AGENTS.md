@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-Agentable is a deterministic CLI that audits a repository for agent-readiness signals across 9 categories (72 criteria total) and launches a local web dashboard with scores, evidence, and a prioritized action plan.
+Agentable is a deterministic CLI that audits a repository for agent-readiness signals across 9 categories (81 criteria total) and launches a local web dashboard with scores, evidence, and a prioritized action plan.
 
 It detects the project profile (service vs library, monorepo, database usage, etc.) and skips criteria that don't apply.
 
@@ -15,7 +15,7 @@ Primary goals:
 
 ## Architecture Overview
 
-The runtime is split into four layers:
+The runtime is split into five layers:
 
 1. `collectors` gather evidence from local files, Git, GitHub CLI, and AI provider integrations.
 2. `core/profile` detects project shape (service, library, monorepo, database, etc.) to drive applicability.
@@ -107,6 +107,7 @@ Use this checklist to avoid incomplete registrations.
    - `npm run build`
    - `npm test`
    - `npm run check:max-lines`
+   - `npm run check:docs` (keeps the criteria count and paths in this file accurate)
 
 ## Pull Request Checklist
 
