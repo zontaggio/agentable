@@ -257,9 +257,10 @@ export async function startWebServer(
         json(res, error.statusCode, { error: error.message });
         return;
       }
-      json(res, 500, {
-        error: error instanceof Error ? error.message : String(error),
-      });
+      // Details stay in the terminal running agentable; the dashboard may be reachable
+      // from other machines when started with --host.
+      console.error(`agentable: ${method} ${pathname} failed:`, error);
+      json(res, 500, { error: 'Internal error. See the terminal running agentable for details.' });
     }
   });
 
