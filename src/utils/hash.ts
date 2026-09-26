@@ -18,17 +18,21 @@ export async function computeRepoFingerprint(root: string, files: string[]): Pro
     const abs = path.join(root, rel);
     hash.update(rel);
 
+    // Size and contents come from one open handle, so a file that changes between the
+    // two can't slip past the size limit.
+    let handle: fs.FileHandle | undefined;
     try {
-      const stat = await fs.stat(abs);
+      handle = await fs.open(abs, 'r');
+      const stat = await handle.stat();
       if (stat.size > MAX_HASH_FILE_SIZE) {
         hash.update(`large:${stat.size}:${Math.floor(stat.mtimeMs)}`);
         continue;
       }
-
-      const content = await fs.readFile(abs);
-      hash.update(content);
+      hash.update(await handle.readFile());
     } catch {
       hash.update('missing');
+    } finally {
+      await handle?.close();
     }
   }
 
