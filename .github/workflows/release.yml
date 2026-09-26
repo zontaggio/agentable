@@ -14,8 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      # Publishing to npm only happens when this repository secret is set.
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Publishing to npm only happens when this repository secret is set. It's checked
+      # under its own name because setup-node fills NODE_AUTH_TOKEN with a placeholder.
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -48,5 +49,7 @@ jobs:
         run: gh release create "$GITHUB_REF_NAME" --title "Agentable $GITHUB_REF_NAME" --notes-file release-notes.md
 
       - name: Publish to npm
-        if: env.NODE_AUTH_TOKEN != ''
+        if: env.NPM_TOKEN != ''
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
